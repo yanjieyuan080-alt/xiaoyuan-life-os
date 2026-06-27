@@ -1392,14 +1392,14 @@ async function qqmSearch() {
   const resEl = document.getElementById('qqm-results');
   resEl.innerHTML = `<div class="qqm-empty">搜索中…</div>`;
   try {
-    const res = await fetch(`/music/search?keywords=${encodeURIComponent(q)}&limit=20`);
+    const res = await fetch(`https://broad-rain-0c22.yanjieyuan080.workers.dev/search?keywords=${encodeURIComponent(q)}&limit=20`);
     const data = await res.json();
     const songs = data?.result?.songs || [];
     if (!songs.length) { resEl.innerHTML = `<div class="qqm-empty">未找到"${q}"相关歌曲</div>`; return; }
 
     // fetch covers via song/detail (batch)
     const ids = songs.map(s=>s.id).join(',');
-   const det = await fetch(`/music/song/detail?ids=${ids}`).then(r=>r.json()).catch(()=>({songs:[]}));
+    const det = await fetch(`https://broad-rain-0c22.yanjieyuan080.workers.dev/song/detail?ids=${ids}`).then(r=>r.json()).catch(()=>({songs:[]}));
     const coverMap = {};
     (det.songs||[]).forEach(s => { coverMap[s.id] = s.al?.picUrl || ''; });
 
@@ -1445,7 +1445,7 @@ async function qqmPlayIdx(idx) {
 
   // get play URL
   try {
-    const urlRes = await fetch(`/music/song/url?id=${s.id}`);
+    const urlRes = await fetch(`https://broad-rain-0c22.yanjieyuan080.workers.dev/song/url?id=${s.id}`);
     const urlData = await urlRes.json();
     const url = urlData?.data?.[0]?.url;
     if (!url) {
