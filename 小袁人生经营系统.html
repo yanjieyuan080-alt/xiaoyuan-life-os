@@ -1,0 +1,3162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小袁人生经营系统</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Segoe UI',sans-serif;background:#f0f2f7;color:#1e2040;display:flex;min-height:100vh;font-size:14px}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:2px}
+.sb{width:200px;background:#fff;border-right:1px solid #e8eaf0;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0;box-shadow:1px 0 0 #eef0f6}
+.sb-logo{padding:1.1rem 1rem .9rem;border-bottom:1px solid #eef0f6;margin-bottom:.25rem}
+.sb-logo h2{font-size:13px;font-weight:700;color:#1e2040;line-height:1.4}
+.sb-logo p{font-size:10px;color:#9ca3af;margin-top:2px}
+.nav-sec{font-size:9px;font-weight:700;color:#c4c8d8;padding:.75rem 1rem .25rem;letter-spacing:.12em;text-transform:uppercase}
+.nav{display:flex;align-items:center;gap:7px;padding:7px 1rem;font-size:12.5px;color:#7c82a0;cursor:pointer;border-left:2px solid transparent;border-radius:0 6px 6px 0;margin-right:6px}
+.nav:hover{color:#4f52a0;background:#f3f4fb}.nav.on{color:#5b5cf6;background:#eeeffd;border-left-color:#5b5cf6;font-weight:500}
+.nav-ic{width:14px;text-align:center;font-size:13px;flex-shrink:0}
+.sb-foot{margin-top:auto;padding:.75rem 1rem;border-top:1px solid #eef0f6;font-size:9px;color:#c4c8d8;line-height:2}
+.main{flex:1;overflow-y:auto;padding:2rem 2.25rem;max-width:1080px}
+.page{display:none}.page.on{display:block}
+.ph{margin-bottom:1.25rem}.ph h1{font-size:19px;font-weight:700;color:#1e2040;display:flex;align-items:center;gap:8px}
+.ph .sub{font-size:12px;color:#9ca3af;margin-top:3px}
+.remind{font-size:12px;color:#e05a6a;margin-top:6px;background:#fff5f6;border-left:2px solid #e05a6a;padding:5px 10px;border-radius:0 4px 4px 0;display:inline-block}
+.toolbar{display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:4px;font-size:12px;padding:5px 13px;border-radius:6px;border:1px solid #e2e4ef;background:#fff;color:#4a4f70;cursor:pointer;white-space:nowrap;transition:all .15s;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.btn:hover{background:#f5f6fb;border-color:#c8cbdf}.btn.pri{background:#5b5cf6;border-color:#5b5cf6;color:#fff;box-shadow:0 2px 6px rgba(91,92,246,.25)}.btn.pri:hover{background:#4a4be0}
+.btn.danger{background:#fff;border-color:#fbd0d5;color:#e05a6a}.btn.danger:hover{background:#fff5f6}
+.sinput{flex:1;max-width:200px;padding:5px 10px;font-size:12px;background:#fff;border:1px solid #e2e4ef;border-radius:6px;color:#1e2040;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.sinput:focus{outline:none;border-color:#a5a6f6}
+.fpanel{background:#fff;border:1px solid #e2e4ef;border-radius:10px;padding:1.25rem;margin-bottom:1rem;display:none;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.fpanel.open{display:block}
+.fgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:.625rem}
+.fg{display:flex;flex-direction:column;gap:3px}.fg.full{grid-column:span 2}
+.fl{font-size:10px;color:#9ca3af}
+input.fi,select.fs,textarea.fta{padding:6px 10px;font-size:12px;background:#f8f9fc;border:1px solid #e2e4ef;border-radius:6px;color:#1e2040;font-family:inherit;width:100%}
+input.fi:focus,select.fs:focus,textarea.fta:focus{outline:none;border-color:#a5a6f6;background:#fff}
+select.fs option{background:#fff}
+textarea.fta{resize:vertical;min-height:62px}
+.emoji-picker{display:flex;flex-wrap:wrap;gap:.625rem;padding:.375rem 0}
+.ep-item{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:transform .15s}
+.ep-item:hover .ep-face{transform:scale(1.12);box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.ep-item.on .ep-face{box-shadow:0 0 0 3px #5b5cf6,0 4px 14px rgba(91,92,246,.35);transform:scale(1.12)}
+.ep-face{width:52px;height:52px;border-radius:50%;overflow:hidden;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.ep-lb{font-size:9px;color:#9ca3af;white-space:nowrap}
+.ep-item.on .ep-lb{color:#5b5cf6;font-weight:700}
+.factions{display:flex;gap:.5rem;margin-top:.75rem;padding-top:.75rem;border-top:1px solid #eef0f6}
+/* 表格视图（Notion/飞书风格） */
+.db-wrap{background:#fff;border:1px solid #eaecf4;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.db-table{width:100%;border-collapse:collapse}
+.db-thead tr{background:#f8f9fc;border-bottom:1px solid #eaecf4}
+.db-thead th{padding:8px 12px;font-size:11px;font-weight:600;color:#9ca3af;text-align:left;white-space:nowrap;letter-spacing:.04em}
+.db-thead th:first-child{padding-left:16px;min-width:200px}
+.db-tbody tr{border-bottom:1px solid #f3f4fb;transition:background .1s;cursor:default}
+.db-tbody tr:last-child{border-bottom:none}
+.db-tbody tr:hover{background:#fafbff}
+.db-tbody td{padding:9px 12px;font-size:13px;color:#4a4f70;vertical-align:middle}
+.db-tbody td:first-child{padding-left:16px;color:#1e2040;font-weight:500;max-width:260px}
+.db-title-cell{display:flex;align-items:center;gap:6px}
+.db-title-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.db-actions{display:none;gap:4px}
+.db-tbody tr:hover .db-actions{display:flex}
+.db-prop{display:inline-flex;align-items:center;font-size:11px;padding:2px 8px;border-radius:4px;font-weight:500;white-space:nowrap}
+.dp-default{background:#f3f4fb;color:#7c82a0}
+.dp-accent{background:#fef2f3;color:#e05a6a}
+.dp-green{background:#ecfdf5;color:#059669}
+.dp-purple{background:#f5f3ff;color:#7c3aed}
+.dp-amber{background:#fffbeb;color:#d97706}
+.dp-blue{background:#eff6ff;color:#2563eb}
+.rlist{display:flex;flex-direction:column;gap:.625rem}
+.rc{background:#fff;border:1px solid #eaecf4;border-radius:10px;padding:1rem;transition:all .15s;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.rc:hover{border-color:#c5c7e8;box-shadow:0 3px 10px rgba(0,0,0,.07)}
+.rc-hd{display:flex;align-items:flex-start;gap:.5rem;margin-bottom:.625rem}
+.rc-title{font-size:13px;font-weight:600;color:#1e2040;flex:1;line-height:1.4}
+.rc-date{font-size:10px;color:#b8bdd0;white-space:nowrap;flex-shrink:0}
+.rc-body{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:.5rem}
+.rf .rfl{font-size:10px;color:#b0b5cc;margin-bottom:1px}.rf .rfv{font-size:12px;color:#4a4f70;word-break:break-word;line-height:1.5}
+.rfv.accent{color:#e05a6a}.rfv.green{color:#059669}.rfv.purple{color:#7c3aed}.rfv.amber{color:#d97706}.rfv.blue{color:#2563eb}
+.rc-foot{display:flex;gap:.5rem;margin-top:.75rem;padding-top:.5rem;border-top:1px solid #f3f4fb}
+.empty{text-align:center;padding:2.5rem 1rem;color:#c4c8d8;font-size:13px}
+.badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:4px}
+.bS{background:#fef2f3;color:#e05a6a;border:1px solid #fbd0d5}.bA{background:#f0f0fe;color:#5b5cf6;border:1px solid #c7c8f8}.bB{background:#ecfdf5;color:#059669;border:1px solid #a7f3d0}.bC,.bD{background:#f8f9fc;color:#9ca3af;border:1px solid #e2e4ef}
+.stats-strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:.6rem;margin-bottom:1.25rem}
+.sbox{background:#fff;border:1px solid #eaecf4;border-radius:8px;padding:.875rem;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.sbox .n{font-size:24px;font-weight:700}.sbox .l{font-size:10px;color:#9ca3af;margin-top:2px}
+.c0{color:#e05a6a}.c1{color:#7c3aed}.c2{color:#059669}.c3{color:#d97706}.c4{color:#0891b2}.c5{color:#2563eb}
+.qnav{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin-bottom:1.5rem}
+.qb{background:#fff;border:1px solid #eaecf4;border-radius:10px;padding:.875rem;cursor:pointer;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.04);transition:all .15s}
+.qb:hover{border-color:#a5a6f6;background:#f5f6fe;box-shadow:0 3px 10px rgba(91,92,246,.1)}.qb .qi{font-size:18px;margin-bottom:4px}.qb .qn{font-size:11px;color:#7c82a0}
+.tabs{display:flex;gap:.25rem;margin-bottom:1rem}
+.tab{padding:5px 12px;font-size:12px;border-radius:6px;cursor:pointer;color:#9ca3af;border:1px solid transparent}
+.tab.on{background:#f0f0fe;color:#5b5cf6;border-color:#c7c8f8;font-weight:500}
+.sec-title{font-size:10px;font-weight:700;color:#c4c8d8;text-transform:uppercase;letter-spacing:.1em;margin:.875rem 0 .5rem}
+.hero-card{background:#fff;border:1px solid #eaecf4;border-radius:12px;padding:1.25rem;margin-bottom:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.hero-card h2{font-size:16px;font-weight:700;color:#1e2040;margin-bottom:3px}
+.hero-card .ml{font-size:12px;color:#7c3aed;margin-bottom:.875rem}
+.hero-card ul{list-style:none;display:flex;flex-direction:column;gap:4px}
+.hero-card li{font-size:12px;color:#7c82a0;display:flex;gap:6px;align-items:flex-start}
+.hero-card li::before{content:'◆';color:#a5a6f6;font-size:9px;margin-top:3px;flex-shrink:0}
+.strat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem}
+.strat-blk{background:#fff;border:1px solid #eaecf4;border-radius:10px;padding:1rem;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.strat-blk h3{font-size:11px;color:#7c3aed;font-weight:600;margin-bottom:.625rem;letter-spacing:.05em;text-transform:uppercase}
+.strat-row{display:flex;gap:.5rem;padding:5px 0;border-bottom:1px solid #f3f4fb;font-size:12px}
+.strat-row:last-child{border-bottom:none}.strat-k{color:#9ca3af;min-width:85px;flex-shrink:0}.strat-v{color:#4a4f70}
+.mo{position:fixed;inset:0;background:rgba(30,32,64,.4);display:none;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(2px)}
+.mo.open{display:flex}
+.mo-box{background:#fff;border:1px solid #e2e4ef;border-radius:14px;width:620px;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+.mo-hd{display:flex;justify-content:space-between;align-items:center;padding:.875rem 1rem;border-bottom:1px solid #eef0f6}
+.mo-hd h3{font-size:14px;font-weight:600;color:#1e2040}
+.mo-body{flex:1;overflow-y:auto;padding:1rem}
+.mo-ta{width:100%;height:300px;padding:.75rem;font-size:11px;background:#f8f9fc;border:1px solid #e2e4ef;border-radius:6px;color:#4a4f70;font-family:monospace;resize:none;line-height:1.6}
+.mo-ft{padding:.75rem 1rem;border-top:1px solid #eef0f6;display:flex;justify-content:flex-end;gap:.5rem}
+/* 项目关联推荐 */
+.ins-sug-item{background:#f8f9ff;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;cursor:pointer;transition:border-color .15s,background .15s}
+.ins-sug-item:hover{background:#ede9fe;border-color:#a78bfa}
+.sug-section-label{font-size:11px;font-weight:700;color:#6b7280;letter-spacing:.06em;padding:6px 2px 4px;border-bottom:1px solid #f3f4f6;margin-bottom:4px;margin-top:8px}
+.sug-section-label:first-child{margin-top:0}
+
+/* 重点洞察 */
+.istar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
+.istar-card{background:#fffbeb;border:1.5px solid #fde68a;border-radius:12px;padding:16px 18px;cursor:pointer;transition:box-shadow .15s,border-color .15s}
+.istar-card:hover{box-shadow:0 4px 20px rgba(245,158,11,.15);border-color:#f59e0b}
+.istar-card-head{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.istar-badge{font-size:11px;font-weight:600;color:#92400e;background:#fef3c7;padding:2px 8px;border-radius:20px}
+.istar-unpin{margin-left:auto;color:#9ca3af;font-size:13px;cursor:pointer;padding:2px 4px;border-radius:4px}
+.istar-unpin:hover{color:#ef4444;background:#fee2e2}
+.istar-title{font-size:15px;font-weight:700;color:#1e2040;line-height:1.4;margin-bottom:8px}
+.istar-section{margin-top:10px}
+.istar-sec-label{font-size:10px;font-weight:600;color:#9ca3af;letter-spacing:.06em;margin-bottom:3px;text-transform:uppercase}
+.istar-text{font-size:12.5px;color:#4a4f70;line-height:1.7;white-space:pre-wrap}
+.istar-take{background:#f0fdf4;border-left:3px solid #22c55e;padding:6px 10px;border-radius:4px;color:#166534}
+.istar-empty{text-align:center;padding:80px 20px;color:#6b7280;font-size:15px}
+
+/* 洞察库 */
+.ilib-filters{display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+.ilib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.ilib-card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:14px 16px;cursor:pointer;transition:box-shadow .15s,border-color .15s}
+.ilib-card:hover{box-shadow:0 4px 16px rgba(91,92,246,.1);border-color:#c4b5fd}
+.ilib-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px}
+.ilib-title{font-size:14px;font-weight:600;color:#1e2040;line-height:1.4}
+.ilib-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+.ilib-tag{background:#ede9fe;color:#5b5cf6;font-size:11px;padding:2px 7px;border-radius:20px}
+.ilib-summary{font-size:12px;color:#6b7280;line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:10px}
+.ilib-foot{display:flex;justify-content:space-between;font-size:11px;color:#9ca3af}
+
+/* 行业洞察导入 */
+.ins-import{background:#fff;border:1px solid #eaecf4;border-radius:10px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.ins-url-row{display:flex;gap:.5rem;margin-bottom:.75rem}
+.ins-url-input{flex:1;padding:7px 12px;font-size:13px;background:#f8f9fc;border:1px solid #e2e4ef;border-radius:7px;color:#1e2040;font-family:inherit}
+.ins-url-input:focus{outline:none;border-color:#a5a6f6;background:#fff}
+.ins-split{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:.75rem}
+.ins-raw{background:#f8f9fc;border:1px solid #e2e4ef;border-radius:7px;padding:.75rem;height:380px;overflow-y:auto;font-size:12px;color:#4a4f70;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.ins-raw-placeholder{color:#b0b5cc;font-size:13px;text-align:center;padding-top:4rem}
+.ins-form{display:flex;flex-direction:column;gap:.5rem;height:380px;overflow-y:auto;padding-right:4px}
+.ins-field{display:flex;flex-direction:column;gap:3px}
+.ins-label{font-size:10px;font-weight:600;color:#9ca3af;letter-spacing:.04em}
+.ins-input,.ins-sel,.ins-ta{padding:6px 10px;font-size:12px;background:#f8f9fc;border:1px solid #e2e4ef;border-radius:6px;color:#1e2040;font-family:inherit;width:100%}
+.ins-input:focus,.ins-sel:focus,.ins-ta:focus{outline:none;border-color:#a5a6f6;background:#fff}
+.ins-ta{resize:vertical;min-height:72px;line-height:1.6}
+.ins-foot{display:flex;gap:.5rem;margin-top:.875rem;padding-top:.75rem;border-top:1px solid #eef0f6;align-items:center}
+.ins-status{flex:1;font-size:12px;color:#9ca3af}
+.ins-detail-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem}
+/* AI 分析面板 */
+.ins-ltabs{display:flex;border-bottom:1px solid #e2e4ef;margin-bottom:0}
+.ins-ltab{padding:6px 14px;font-size:11px;font-weight:600;color:#9ca3af;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.ins-ltab.on{color:#5b5cf6;border-bottom-color:#5b5cf6}
+.ins-analysis{height:340px;overflow-y:auto;padding:.875rem .25rem .875rem 0;font-size:12.5px;line-height:1.8}
+.ana-h{font-size:13.5px;font-weight:700;color:#1e2040;padding:1rem 0 .375rem;border-bottom:2px solid #f0f0fe;margin-bottom:.625rem;display:flex;align-items:center;gap:6px}
+.ana-h::before{content:'';display:inline-block;width:3px;height:14px;background:#5b5cf6;border-radius:2px;flex-shrink:0}
+.ana-sub{font-size:12px;font-weight:600;color:#5b5cf6;margin:.875rem 0 .25rem}
+.ana-p{font-size:12.5px;color:#4a4f70;line-height:1.9;margin-bottom:.25rem}
+.ana-bullet{font-size:12.5px;color:#4a4f70;padding-left:1rem;line-height:1.9;position:relative}
+.ana-bullet::before{content:'•';position:absolute;left:0;color:#a5a6f6;font-weight:700}
+.ana-num{font-size:12.5px;color:#4a4f70;padding-left:1.5rem;line-height:1.9;position:relative}
+.ana-num .n{position:absolute;left:0;color:#5b5cf6;font-weight:700;font-size:11px}
+.ana-kv{display:grid;grid-template-columns:5.5em 1fr;gap:.125rem .5rem;font-size:12px;margin:.375rem 0;padding:.5rem .75rem;background:#f8f9fc;border-radius:6px;border-left:2px solid #c7c8f8}
+.ana-kv .k{color:#9ca3af;font-weight:600}.ana-kv .v{color:#4a4f70;line-height:1.7}
+.ana-loading{display:flex;align-items:center;padding:3rem 1rem;color:#9ca3af;font-size:13px}
+.ana-loading .spin{display:inline-block;animation:spin 1s linear infinite;margin-right:6px}
+.ana-loading-dot{width:7px;height:7px;border-radius:50%;background:#5b5cf6;margin:0 3px;animation:dotPulse 1.2s ease-in-out infinite}
+.ana-loading-dot:nth-child(2){animation-delay:.2s}
+.ana-loading-dot:nth-child(3){animation-delay:.4s}
+@keyframes dotPulse{0%,80%,100%{opacity:.2;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* API 设置 */
+.api-banner{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:.875rem 1rem;margin-bottom:.75rem;display:flex;align-items:center;gap:.75rem}
+.api-banner p{font-size:12px;color:#92400e;flex:1}
+.api-mo{position:fixed;inset:0;background:rgba(30,32,64,.4);display:none;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(2px)}
+.api-mo.open{display:flex}
+.api-mo-box{background:#fff;border-radius:12px;width:480px;padding:1.5rem;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+.api-mo-box h3{font-size:15px;font-weight:700;color:#1e2040;margin-bottom:.375rem}
+.api-mo-box p{font-size:12px;color:#9ca3af;margin-bottom:1rem;line-height:1.6}
+.api-key-inp{width:100%;padding:8px 12px;font-size:13px;background:#f8f9fc;border:1px solid #e2e4ef;border-radius:7px;color:#1e2040;font-family:monospace;margin-bottom:.75rem}
+.api-key-inp:focus{outline:none;border-color:#a5a6f6;background:#fff}
+/* 详情展开 */
+.ins-detail-card{background:#fff;border:1px solid #eaecf4;border-radius:10px;margin-bottom:1rem;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.ins-detail-hd{display:flex;align-items:center;gap:.75rem;padding:1rem 1.25rem;cursor:pointer;border-bottom:1px solid #f3f4fb}
+.ins-detail-hd:hover{background:#fafbff}
+.ins-detail-body{padding:1.25rem;display:none}
+.ins-detail-body.open{display:block}
+.ins-kp{font-size:12px;color:#4a4f70;line-height:1.8;white-space:pre-wrap}
+/* 网易云音乐播放器 */
+.qqm-card{background:#fff;border:1px solid #eaecf4;border-radius:12px;overflow:hidden;margin-bottom:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.qqm-search-row{display:flex;gap:.5rem;padding:1rem 1.25rem .75rem}
+.qqm-inp{flex:1;padding:8px 12px;font-size:13px;background:#f8f9fc;border:1px solid #e2e4ef;border-radius:8px;color:#1e2040;min-width:0}
+.qqm-inp:focus{outline:none;border-color:#e05a6a;background:#fff}
+.qqm-results{max-height:230px;overflow-y:auto}
+.qqm-item{display:flex;align-items:center;gap:.625rem;padding:.5rem 1.25rem;cursor:pointer;transition:background .1s;border-top:1px solid #f3f4fb}
+.qqm-item:hover{background:#fff5f5}
+.qqm-item.playing{background:#fff0f0}
+.qqm-cover{width:38px;height:38px;border-radius:6px;object-fit:cover;background:#e8eaf0;flex-shrink:0}
+.qqm-info{flex:1;min-width:0}
+.qqm-sname{font-size:13px;color:#1e2040;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qqm-singer{font-size:11px;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qqm-vip{font-size:9px;color:#e05a6a;background:#fee2e2;border-radius:3px;padding:1px 5px;flex-shrink:0}
+.qqm-empty{font-size:12px;color:#b0b5cc;text-align:center;padding:1.25rem}
+/* 播放器底栏 */
+.qqm-player{border-top:1px solid #f3f4fb;padding:.75rem 1.25rem;display:none}
+.qqm-player.on{display:flex;align-items:center;gap:.75rem}
+.qqm-pl-cover{width:44px;height:44px;border-radius:8px;object-fit:cover;background:#f0f2f7;flex-shrink:0}
+.qqm-pl-info{flex:1;min-width:0}
+.qqm-pl-name{font-size:13px;font-weight:600;color:#1e2040;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qqm-pl-artist{font-size:11px;color:#9ca3af}
+.qqm-pl-progress{height:3px;background:#f0f2f7;border-radius:2px;margin-top:.4rem;cursor:pointer;position:relative}
+.qqm-pl-bar{height:100%;background:#e05a6a;border-radius:2px;width:0%;transition:width .5s linear}
+.qqm-pl-btns{display:flex;align-items:center;gap:.5rem;flex-shrink:0}
+.qqm-pl-btn{width:36px;height:36px;border-radius:50%;background:#f8f9fc;border:1px solid #e2e4ef;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all .15s}
+.qqm-pl-btn:hover{background:#fee2e2;border-color:#f9a8a8}
+.qqm-pl-btn.main{width:42px;height:42px;background:#e05a6a;border-color:#e05a6a;color:#fff;font-size:18px}
+.qqm-pl-btn.main:hover{background:#c94a5a}
+.qqm-pl-time{font-size:10px;color:#b0b5cc;white-space:nowrap}
+/* 番茄钟 */
+.pomodoro{background:#fff;border:1px solid #eaecf4;border-radius:12px;padding:1.5rem 1.75rem;margin-bottom:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.pomo-top{display:flex;align-items:center;gap:2rem}
+.pomo-clock{text-align:center;flex-shrink:0;min-width:180px}
+.pomo-time{font-size:52px;font-weight:700;color:#1e2040;letter-spacing:2px;line-height:1;font-variant-numeric:tabular-nums}
+.pomo-mode{font-size:11px;color:#9ca3af;margin-top:4px;margin-bottom:.75rem}
+.pomo-btns{display:flex;gap:.5rem;justify-content:center}
+.pomo-info{flex:1;border-left:1px solid #eef0f6;padding-left:1.75rem}
+.pomo-sessions{font-size:13px;color:#4a4f70;margin-bottom:.5rem}
+.pomo-sessions strong{color:#5b5cf6}
+.pomo-task{font-size:12px;color:#9ca3af;line-height:1.6}
+.pomo-progress{width:100%;height:4px;background:#f0f2f7;border-radius:2px;margin-top:1rem;overflow:hidden}
+.pomo-bar{height:100%;background:linear-gradient(90deg,#5b5cf6,#a5a6f6);border-radius:2px;transition:width .5s linear}
+.pomo-work .pomo-time{color:#e05a6a}.pomo-work .pomo-bar{background:linear-gradient(90deg,#e05a6a,#f9a8b2)}
+.pomo-break .pomo-time{color:#059669}.pomo-break .pomo-bar{background:linear-gradient(90deg,#059669,#6ee7b7)}
+/* ── 喵喵记账 ── */
+.ldg-wrap{display:flex;flex-direction:column;height:calc(100vh - 120px);max-height:780px}
+.ldg-tabs{display:flex;gap:0;border-bottom:2px solid #f0f2f7;margin-bottom:1rem}
+.ldg-tab{flex:1;text-align:center;padding:.625rem;font-size:13px;font-weight:600;color:#9ca3af;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s}
+.ldg-tab.on{color:#FFAA00;border-color:#FFAA00}
+.ldg-type{display:flex;justify-content:center;gap:2.5rem;margin-bottom:1rem}
+.ldg-type-btn{font-size:15px;font-weight:700;color:#c4c8d8;cursor:pointer;padding:.25rem .75rem;border-radius:20px;transition:all .15s;position:relative}
+.ldg-type-btn.on{color:#ff6b6b}
+.ldg-type-btn.on::after{content:'';position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);width:24px;height:3px;background:#ff6b6b;border-radius:2px}
+.ldg-type-btn.income.on{color:#4CAF50}
+.ldg-type-btn.income.on::after{background:#4CAF50}
+.cat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:.625rem;margin-bottom:1rem}
+.cat-item{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
+.cat-icon{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;border:2.5px solid transparent;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.cat-item:hover .cat-icon{transform:scale(1.08)}
+.cat-item.on .cat-icon{border-color:#FFAA00;box-shadow:0 0 0 3px rgba(255,170,0,.2),0 2px 8px rgba(0,0,0,.08)}
+.cat-name{font-size:10px;color:#6b7280}
+.cat-item.on .cat-name{color:#FFAA00;font-weight:700}
+.ldg-display{display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;background:#fffbf0;border-radius:10px;margin-bottom:.75rem;border:1px solid #ffe299}
+.ldg-display-icon{width:36px;height:36px;border-radius:50%;background:#FFAA00;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.ldg-note{flex:1;font-size:13px;color:#9ca3af;background:transparent;border:none;outline:none;font-family:inherit}
+.ldg-note::placeholder{color:#c4c8d8}
+.ldg-amount{font-size:20px;font-weight:700;color:#1e2040;font-variant-numeric:tabular-nums;letter-spacing:1px}
+.kp-wrap{background:#f8f9fc;border-radius:12px;padding:.625rem;border:1px solid #eaecf4}
+.kp-row{display:grid;grid-template-columns:repeat(4,1fr);gap:.375rem;margin-bottom:.375rem}
+.kp-row:last-child{margin-bottom:0}
+.kp-btn{padding:.75rem;text-align:center;background:#fff;border-radius:8px;font-size:16px;font-weight:600;color:#1e2040;cursor:pointer;border:1px solid #e2e4ef;transition:all .12s;user-select:none}
+.kp-btn:active{background:#f0f2f7;transform:scale(.96)}
+.kp-btn.kp-del{font-size:18px;color:#6b7280}
+.kp-btn.kp-op{font-size:20px;color:#FFAA00;font-weight:700;background:#fffbf0;border-color:#ffe299}
+.kp-btn.kp-done{background:#ff6b6b;color:#fff;border-color:#ff6b6b;font-size:15px;font-weight:700}
+.kp-btn.kp-date{font-size:11px;color:#5b5cf6;background:#f0f0ff;border-color:#c4b5fd}
+/* 明细 */
+.ldg-month-bar{display:flex;align-items:center;gap:.75rem;margin-bottom:1rem}
+.ldg-month-sel{padding:5px 12px;border:1px solid #e2e4ef;border-radius:7px;font-size:13px;background:#fff;color:#1e2040;font-family:inherit;cursor:pointer;outline:none}
+.ldg-month-sum{display:flex;gap:1.25rem;margin-left:auto}
+.ldg-sum-item{font-size:12px;color:#9ca3af}
+.ldg-sum-item strong{color:#1e2040;font-weight:700}
+.ldg-day-group{margin-bottom:1rem}
+.ldg-day-hd{display:flex;justify-content:space-between;font-size:11px;color:#9ca3af;padding:.25rem 0;border-bottom:1px solid #f0f2f7;margin-bottom:.5rem}
+.ldg-row{display:flex;align-items:center;gap:.75rem;padding:.5rem 0;border-bottom:1px solid #f8f9fc}
+.ldg-row:last-child{border-bottom:none}
+.ldg-row-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.ldg-row-info{flex:1;min-width:0}
+.ldg-row-cat{font-size:13px;font-weight:600;color:#1e2040}
+.ldg-row-note{font-size:11px;color:#9ca3af;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ldg-row-amt{font-size:15px;font-weight:700;color:#e05a6a;flex-shrink:0}
+.ldg-row-amt.income{color:#059669}
+.ldg-row-del{font-size:11px;color:#c4c8d8;cursor:pointer;padding:2px 6px;margin-left:4px}
+.ldg-row-del:hover{color:#e05a6a}
+/* 统计 */
+.ldg-stat-cards{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem}
+.ldg-stat-card{background:#fff;border:1px solid #eaecf4;border-radius:10px;padding:1rem}
+.ldg-stat-label{font-size:11px;color:#9ca3af;margin-bottom:.25rem}
+.ldg-stat-val{font-size:22px;font-weight:700;color:#1e2040}
+.ldg-stat-val.neg{color:#e05a6a}
+.ldg-stat-val.pos{color:#059669}
+.ldg-cat-bar-wrap{margin-bottom:1rem}
+.ldg-cat-bar-row{display:flex;align-items:center;gap:.75rem;margin-bottom:.625rem}
+.ldg-cat-bar-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.ldg-cat-bar-info{flex:1}
+.ldg-cat-bar-top{display:flex;justify-content:space-between;font-size:12px;font-weight:600;color:#1e2040;margin-bottom:3px}
+.ldg-cat-bar-track{height:6px;background:#f0f2f7;border-radius:3px;overflow:hidden}
+.ldg-cat-bar-fill{height:100%;border-radius:3px;transition:width .4s ease}
+/* ── 任务待办 ── */
+.todo-quick{display:flex;gap:.5rem;margin-bottom:1rem}
+.todo-quick-inp{flex:1;padding:9px 14px;font-size:13px;background:#fff;border:1.5px solid #e2e4ef;border-radius:10px;color:#1e2040;font-family:inherit;outline:none;transition:border-color .15s}
+.todo-quick-inp:focus{border-color:#a5a6f6}
+.todo-filters{display:flex;gap:.375rem;margin-bottom:1rem}
+.todo-filter{padding:.3rem .875rem;border-radius:20px;font-size:12px;font-weight:600;color:#9ca3af;background:#f3f4fb;cursor:pointer;border:1.5px solid transparent;transition:all .15s}
+.todo-filter.on{color:#5b5cf6;background:#ede9fe;border-color:#c4b5fd}
+.todo-list{display:flex;flex-direction:column;gap:.5rem}
+.todo-item{display:flex;align-items:flex-start;gap:.75rem;padding:.875rem 1rem;background:#fff;border:1.5px solid #eaecf4;border-radius:12px;transition:all .15s}
+.todo-item:hover{border-color:#c4b5fd;box-shadow:0 2px 8px rgba(91,92,246,.07)}
+.todo-item.done{opacity:.55;background:#fafbff}
+.todo-item.done .todo-title{text-decoration:line-through;color:#9ca3af}
+.todo-cb{width:20px;height:20px;border-radius:50%;border:2px solid #c4c8d8;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;margin-top:1px}
+.todo-cb:hover{border-color:#5b5cf6}
+.todo-cb.checked{background:#5b5cf6;border-color:#5b5cf6;color:#fff;font-size:11px}
+.todo-body{flex:1;min-width:0}
+.todo-title{font-size:14px;font-weight:600;color:#1e2040;line-height:1.4;margin-bottom:4px}
+.todo-meta{display:flex;flex-wrap:wrap;gap:.375rem;align-items:center}
+.todo-tag{font-size:10px;padding:1px 7px;border-radius:10px;font-weight:600}
+.todo-tag.p0{background:#fee2e2;color:#dc2626}
+.todo-tag.p1{background:#fef3c7;color:#d97706}
+.todo-tag.p2{background:#dbeafe;color:#2563eb}
+.todo-tag.p3{background:#f3f4f6;color:#6b7280}
+.todo-tag.cat{background:#f0f0ff;color:#5b5cf6}
+.todo-tag.due-over{background:#fee2e2;color:#dc2626}
+.todo-tag.due-today{background:#fef3c7;color:#d97706}
+.todo-tag.due-ok{background:#dcfce7;color:#16a34a}
+.todo-actions{display:flex;gap:.25rem;flex-shrink:0}
+.todo-del{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#d1d5db;cursor:pointer;transition:all .15s}
+.todo-del:hover{background:#fee2e2;color:#e05a6a}
+.todo-add-form{background:#fff;border:1.5px solid #c4b5fd;border-radius:12px;padding:1rem;margin-bottom:1rem}
+.todo-add-row{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.5rem}
+.todo-empty{text-align:center;padding:3rem 1rem;color:#c4c8d8;font-size:13px}
+.stat-mode-btn{padding:.3rem .75rem;border-radius:20px;font-size:12px;font-weight:600;color:#9ca3af;background:#f3f4fb;cursor:pointer;border:1.5px solid transparent;transition:all .15s}
+.stat-mode-btn:hover{color:#FFAA00;background:#fffbf0}
+.stat-mode-btn.on{color:#FFAA00;background:#fffbf0;border-color:#FFAA00}
+/* 语音输入 */
+.voice-wrap{position:relative}
+.voice-btn{position:absolute;top:50%;right:6px;transform:translateY(-50%);width:26px;height:26px;border-radius:50%;background:#f3f4fb;border:1px solid #e2e4ef;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;transition:all .15s;z-index:2;line-height:1}
+.voice-btn.ta-btn{top:7px;transform:none}
+.voice-btn:hover{background:#ede9fe;border-color:#a5a6f6}
+.voice-btn.recording{background:#fee2e2;border-color:#f9a8a8;animation:voicePulse .8s ease-in-out infinite}
+@keyframes voicePulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.4)}50%{box-shadow:0 0 0 6px rgba(239,68,68,0)}}
+.voice-btn.recording::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid #ef4444;animation:voiceRing 1s ease infinite}
+@keyframes voiceRing{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.6)}}
+.voice-tip{position:absolute;bottom:calc(100% + 4px);right:0;background:#1e2040;color:#fff;font-size:10px;padding:3px 8px;border-radius:5px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s}
+.voice-wrap:hover .voice-tip{opacity:1}
+.fi.has-voice,.fta.has-voice{padding-right:36px}
+/* 跨页面联动按钮 */
+.field-action{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#5b5cf6;background:#f0f0ff;border:1px solid #d4d4ff;border-radius:5px;padding:2px 8px;cursor:pointer;margin-bottom:4px;transition:all .12s}
+.field-action:hover{background:#e8e8ff;color:#4040cc}
+</style>
+</head>
+<body>
+
+<nav class="sb">
+  <div class="sb-logo"><h2>小袁人生经营系统</h2><p>餐饮 · 运营 · 私域 · 成长</p></div>
+  <div class="nav on" onclick="go('home')"><span class="nav-ic">⌂</span>首页总览</div>
+  <div class="nav-sec">日常核心</div>
+  <div class="nav" onclick="go('daily')"><span class="nav-ic">⊙</span>今日经营台</div>
+  <div class="nav" onclick="go('todos')"><span class="nav-ic">☑</span>任务待办</div>
+  <div class="nav" onclick="go('ideas')"><span class="nav-ic">✦</span>想法池</div>
+  <div class="nav" onclick="go('projects')"><span class="nav-ic">◫</span>项目池</div>
+  <div class="nav" onclick="go('emotions')"><span class="nav-ic">◑</span>情绪判断</div>
+  <div class="nav" onclick="go('assets')"><span class="nav-ic">◈</span>我的案例</div>
+  <div class="nav" onclick="go('assetlib')"><span class="nav-ic">◉</span>资产库</div>
+  <div class="nav" onclick="go('assetwin')"><span class="nav-ic">🏆</span>成功案例</div>
+  <div class="nav-sec">成长复盘</div>
+  <div class="nav" onclick="go('reviews')"><span class="nav-ic">↺</span>复盘中心</div>
+  <div class="nav" onclick="go('skills')"><span class="nav-ic">▲</span>能力训练</div>
+  <div class="nav" onclick="go('content')"><span class="nav-ic">✐</span>内容/IP</div>
+  <div class="nav-sec">知识沉淀</div>
+  <div class="nav" onclick="go('insights')"><span class="nav-ic">◉</span>行业洞察</div>
+  <div class="nav" onclick="go('inslib')"><span class="nav-ic">◈</span>洞察库</div>
+  <div class="nav" onclick="go('insstar')"><span class="nav-ic">★</span>重点洞察</div>
+  <div class="nav" onclick="go('obsidian')"><span class="nav-ic">🗂</span>知识库</div>
+  <div class="nav-sec">长期战略</div>
+  <div class="nav" onclick="go('strategy')"><span class="nav-ic">◎</span>我的战略</div>
+  <div class="nav" onclick="go('network')"><span class="nav-ic">⊕</span>人脉资源</div>
+  <div class="nav" onclick="go('finance')"><span class="nav-ic">¥</span>财务生活</div>
+  <div class="nav" onclick="go('ledger')"><span class="nav-ic">🐱</span>记账本</div>
+  <div class="nav" onclick="go('body')"><span class="nav-ic">♡</span>身体精力</div>
+  <div class="sb-foot">
+    想法先进池 · 先完成再完美<br>
+    每天留下一个可见成果<br>
+    系统服务我，不是我伺候系统
+  </div>
+</nav>
+
+<main class="main">
+  <div id="home" class="page on"></div>
+  <div id="daily" class="page"></div>
+  <div id="todos" class="page"></div>
+  <div id="ideas" class="page"></div>
+  <div id="projects" class="page"></div>
+  <div id="emotions" class="page"></div>
+  <div id="assets" class="page"></div>
+  <div id="assetlib" class="page"></div>
+  <div id="assetwin" class="page"></div>
+  <div id="reviews" class="page"></div>
+  <div id="skills" class="page"></div>
+  <div id="content" class="page"></div>
+  <div id="insights" class="page"></div>
+  <div id="inslib" class="page"></div>
+  <div id="insstar" class="page"></div>
+  <div id="obsidian" class="page"></div>
+  <div id="strategy" class="page"></div>
+  <div id="network" class="page"></div>
+  <div id="finance" class="page"></div>
+  <div id="ledger" class="page"></div>
+  <div id="body" class="page"></div>
+</main>
+
+<!-- API Key 设置弹窗 -->
+<div class="api-mo" id="api-key-modal">
+  <div class="api-mo-box">
+    <h3>配置豆包 API Key</h3>
+    <p>Key 保存在本地，仅用于行业洞察 AI 分析，不会上传。<br>
+    获取方式：登录 <a href="https://console.volcengine.com/ark" target="_blank" style="color:#5b5cf6">火山方舟控制台</a> → 左侧「API Key管理」→ 创建 API Key 复制即可。</p>
+    <input class="api-key-inp" id="api-key-inp" type="password" placeholder="请粘贴 API Key（格式：xxxxx）">
+    <div style="margin-bottom:.75rem">
+      <label style="font-size:12px;color:#6b7280;display:block;margin-bottom:4px">模型（默认 doubao-pro-32k-241215，也可填接入点 ID）</label>
+      <input class="api-key-inp" id="doubao-model-inp" type="text" placeholder="doubao-pro-32k-241215" style="margin-bottom:0">
+    </div>
+    <div style="display:flex;gap:.5rem;justify-content:flex-end">
+      <span class="btn" onclick="insCloseApiMo()">取消</span>
+      <span class="btn pri" onclick="insSaveApiKey()">保存并启用</span>
+    </div>
+  </div>
+</div>
+
+<!-- Server酱 Key 设置弹窗 -->
+<div class="api-mo" id="sc-key-modal">
+  <div class="api-mo-box">
+    <h3>配置 Server酱 SendKey</h3>
+    <p>用于将待办提醒推送到你的微信。<br>
+    1. 访问 <a href="https://sct.ftqq.com" target="_blank" style="color:#5b5cf6">sct.ftqq.com</a> 登录（微信扫码）<br>
+    2. 进入「SendKey」页面复制你的 Key<br>
+    3. 粘贴到下方保存</p>
+    <input class="api-key-inp" id="sc-key-inp" type="password" placeholder="SCT...">
+    <div style="display:flex;gap:.5rem;justify-content:flex-end">
+      <span class="btn" onclick="document.getElementById('sc-key-modal').style.display='none'">取消</span>
+      <span class="btn pri" onclick="scSaveKey()">保存</span>
+    </div>
+  </div>
+</div>
+
+<!-- 通用记录详情弹窗 -->
+<div class="api-mo" id="rec-detail-modal" style="display:none;align-items:flex-start;padding-top:50px">
+  <div class="api-mo-box" style="max-width:600px;width:95%;max-height:82vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+      <h3 id="rec-det-heading" style="margin:0;flex:1"></h3>
+      <span class="btn" onclick="document.getElementById('rec-detail-modal').style.display='none'">关闭</span>
+    </div>
+    <div id="rec-det-body"></div>
+  </div>
+</div>
+
+<!-- 项目相关洞察推荐弹窗 -->
+<div class="api-mo" id="ins-suggest-modal" style="display:none;align-items:flex-start;padding-top:60px">
+  <div class="api-mo-box" style="max-width:600px;width:95%;max-height:80vh;overflow-y:auto">
+    <h3 id="ins-sug-title">💡 发现相关洞察</h3>
+    <p id="ins-sug-desc" style="font-size:12.5px;color:#6b7280;margin-bottom:12px"></p>
+    <div id="ins-sug-list" style="display:flex;flex-direction:column;gap:8px"></div>
+    <div style="text-align:right;margin-top:16px">
+      <span class="btn pri" onclick="document.getElementById('ins-suggest-modal').style.display='none'">知道了</span>
+    </div>
+  </div>
+</div>
+
+<!-- 洞察查看/编辑弹窗 -->
+<div class="api-mo" id="ins-detail-modal" style="display:none;align-items:flex-start;padding-top:40px">
+  <div class="api-mo-box" style="max-width:680px;width:95%;max-height:85vh;overflow-y:auto">
+    <h3 id="ins-det-heading">查看洞察</h3>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div><label class="ins-label">标题 *</label><input class="ins-input" id="ins-det-title" style="width:100%"></div>
+      <div style="display:flex;gap:8px">
+        <div style="flex:1"><label class="ins-label">类型</label>
+          <select class="ins-sel" id="ins-det-type" style="width:100%">
+            <option value="">— 选择 —</option>
+            ${['行业趋势','数据报告','竞品分析','用户研究','政策解读','方法论','案例分析','其他'].map(o=>`<option>${o}</option>`).join('')}
+          </select>
+        </div>
+        <div style="flex:2"><label class="ins-label">标签（逗号分隔）</label><input class="ins-input" id="ins-det-tags" style="width:100%"></div>
+      </div>
+      <div><label class="ins-label">核心摘要</label><textarea class="ins-ta" id="ins-det-summary" rows="4" style="width:100%"></textarea></div>
+      <div><label class="ins-label">关键数据 / 观点</label><textarea class="ins-ta" id="ins-det-kp" rows="4" style="width:100%"></textarea></div>
+      <div><label class="ins-label">我的判断</label><textarea class="ins-ta" id="ins-det-take" rows="3" style="width:100%"></textarea></div>
+      <div><label class="ins-label">可应用到</label><input class="ins-input" id="ins-det-apply" style="width:100%"></div>
+      <div><label class="ins-label">来源链接</label><input class="ins-input" id="ins-det-source" style="width:100%" readonly></div>
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 0">
+        <input type="checkbox" id="ins-det-starred" style="width:16px;height:16px;accent-color:#f59e0b">
+        <label for="ins-det-starred" style="font-size:13px;color:#92400e;font-weight:500;cursor:pointer">⭐ 标记为重点洞察</label>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
+      <span class="btn" onclick="insCloseDetail()">取消</span>
+      <span class="btn pri" onclick="insDetailSave()">保存修改</span>
+    </div>
+  </div>
+</div>
+
+<div class="mo" id="export-modal">
+  <div class="mo-box">
+    <div class="mo-hd"><h3>导出 Markdown</h3><span class="btn" onclick="closeModal()">✕ 关闭</span></div>
+    <div class="mo-body"><textarea class="mo-ta" id="export-ta" readonly></textarea></div>
+    <div class="mo-ft"><span class="btn pri" onclick="copyExport()">复制全部</span><span class="btn" onclick="closeModal()">关闭</span></div>
+  </div>
+</div>
+
+<script>
+// ─── Module Configs ───────────────────────────────────────────────
+const MOD = {
+  daily: {
+    name:'今日经营台', icon:'⊙',
+    remind:'今天不是做更多事，而是推进最重要的事，并留下一个可见成果。',
+    titleField:'top1',
+    fields:[
+      {k:'date',l:'日期',t:'date',req:true},
+      {k:'mood',l:'今日状态',t:'emoji',cls:'full'},
+      {k:'top1',l:'今日最重要的一件事',t:'text',req:true,cls:'full'},
+      {k:'tasks',l:'今日必做三件事（每行一条）',t:'ta',cls:'full'},
+      {k:'not_todo',l:'今日不做清单',t:'ta',cls:'full'},
+      {k:'result',l:'今日可见成果',t:'text',cls:'full'},
+      {k:'asset',l:'今日可沉淀资产',t:'text'},
+      {k:'comm',l:'今日需要沟通的人 / 沟通目的',t:'text'},
+      {k:'review',l:'晚间复盘',t:'ta',cls:'full'},
+      {k:'tomorrow',l:'明日最重要的一件事',t:'text',cls:'full'},
+    ],
+    listFields:['date','mood','top1','result','asset'],
+    colorMap:{mood:{开心:'green',幸福:'green',兴奋:'green',充实:'green',平静:'',纠结:'amber',烦躁:'amber',焦虑:'accent',疲惫:'amber',委屈:'accent',愤怒:'accent',麻木:'amber'}}
+  },
+  ideas: {
+    name:'想法池', icon:'✦',
+    remind:'不是每个好想法都值得现在做，先进系统，再决定是否行动。',
+    titleField:'title',
+    fields:[
+      {k:'date',l:'日期',t:'date',req:true},
+      {k:'title',l:'想法标题',t:'text',req:true,cls:'full'},
+      {k:'content',l:'想法内容',t:'ta',cls:'full'},
+      {k:'source',l:'来源'},
+      {k:'mood_now',l:'当前情绪',t:'emoji',cls:'full'},
+      {k:'type',l:'类型',t:'sel',opts:['工作项目','职业成长','内容/IP','情绪型想法','认知兴奋','长期资产','方法论','暂存','无效消耗']},
+      {k:'mainline',l:'是否符合长期主线',t:'sel',opts:['是','部分符合','否']},
+      {k:'biz_val',l:'业务价值 1-5',t:'sel',opts:['1','2','3','4','5']},
+      {k:'asset_val',l:'资产价值 1-5',t:'sel',opts:['1','2','3','4','5']},
+      {k:'voice_val',l:'话语权价值 1-5',t:'sel',opts:['1','2','3','4','5']},
+      {k:'emotion_driven',l:'是否情绪驱动',t:'sel',opts:['否','是']},
+      {k:'cogn_excited',l:'是否认知兴奋',t:'sel',opts:['否','是']},
+      {k:'action',l:'处理结果',t:'sel',opts:['立即执行','排期执行','转为项目','转为资产','转为内容选题','暂存7天','暂时放弃','删除']},
+      {k:'next',l:'下一步动作',t:'text',cls:'full'},
+      {k:'future_asset',l:'未来可沉淀资产',t:'text',cls:'full'},
+    ],
+    listFields:['date','type','mainline','biz_val','action','next'],
+    colorMap:{action:{'立即执行':'green','排期执行':'green','转为项目':'purple','转为资产':'purple','转为内容选题':'blue','暂存7天':'amber','暂时放弃':'','删除':'accent'},mainline:{是:'green',否:'accent','部分符合':'amber'}}
+  },
+  projects: {
+    name:'项目池', icon:'◫',
+    remind:'项目不是"我来做"，而是"我来推动，并留下资产"。写不出下一步动作的，只是焦虑，不是项目。',
+    titleField:'name',
+    fields:[
+      {k:'name',l:'项目名称',t:'text',req:true,cls:'full'},
+      {k:'priority',l:'优先级',t:'sel',opts:['S','A','B','C','D']},
+      {k:'status',l:'状态',t:'sel',opts:['想法中','规划中','推进中','卡住了','已完成','已复盘','已沉淀']},
+      {k:'type',l:'类型',t:'sel',opts:['职业','内容','能力','健康','财务','生活','人际']},
+      {k:'background',l:'项目背景',t:'ta',cls:'full'},
+      {k:'problem',l:'要解决的问题',t:'ta',cls:'full'},
+      {k:'goal',l:'项目目标',t:'text',cls:'full'},
+      {k:'biz_value',l:'业务价值'},
+      {k:'org_value',l:'组织价值'},
+      {k:'growth_value',l:'个人成长价值'},
+      {k:'kpi',l:'核心指标'},
+      {k:'key_actions',l:'关键动作',t:'ta',cls:'full'},
+      {k:'resources',l:'关键资源'},
+      {k:'key_people',l:'关键影响人'},
+      {k:'blockers',l:'潜在阻力'},
+      {k:'interest_bind',l:'利益绑定方式'},
+      {k:'week1',l:'第一周动作',t:'ta',cls:'full'},
+      {k:'today_step',l:'今天第一步',t:'text',cls:'full'},
+      {k:'blocker_now',l:'当前卡点'},
+      {k:'risk',l:'风险'},
+      {k:'report',l:'向上汇报口径',t:'ta',cls:'full'},
+      {k:'final_asset',l:'最终资产',t:'ta',cls:'full'},
+      {k:'review',l:'项目复盘',t:'ta',cls:'full'},
+    ],
+    listFields:['priority','status','type','today_step','blocker_now'],
+    colorMap:{priority:{S:'accent',A:'purple',B:'green',C:'',D:''},status:{推进中:'green','卡住了':'accent',已完成:'blue',想法中:'',规划中:'amber'}}
+  },
+  emotions: {
+    name:'情绪判断', icon:'◑',
+    remind:'情绪是真的，但情绪给出的结论不一定是真的。先填表，再做决定。',
+    titleField:'event',
+    fields:[
+      {k:'date',l:'日期',t:'date',req:true},
+      {k:'event',l:'触发事件',t:'text',req:true,cls:'full'},
+      {k:'emotion',l:'当前情绪',t:'emoji',cls:'full'},
+      {k:'fact',l:'事实是什么',t:'ta',cls:'full'},
+      {k:'my_read',l:'我的解释',t:'text',cls:'full'},
+      {k:'amplified',l:'这个解释有没有被情绪放大',t:'sel',opts:['是，明显放大了','可能有放大','没有，就是事实']},
+      {k:'real_hurt',l:'真正伤到我的点',t:'text',cls:'full'},
+      {k:'category',l:'问题类型',t:'sel',opts:['能力问题','沟通问题','资源问题','边界问题','价值不匹配','综合']},
+      {k:'impulse',l:'我现在最想做的冲动',t:'text',cls:'full'},
+      {k:'impulse_good',l:'这个冲动会让我变好吗',t:'sel',opts:['是','不一定','否']},
+      {k:'not_do',l:'现在不该做什么',t:'text',cls:'full'},
+      {k:'next_stable',l:'最稳妥下一步',t:'text',cls:'full'},
+      {k:'judge_24h',l:'24小时后再判断的问题',t:'ta',cls:'full'},
+    ],
+    listFields:['date','emotion','amplified','category','next_stable'],
+    colorMap:{amplified:{'是，明显放大了':'accent','可能有放大':'amber','没有，就是事实':'green'},impulse_good:{是:'green','不一定':'amber',否:'accent'}}
+  },
+  assets: {
+    name:'资产库', icon:'◈',
+    remind:'工作做完如果没有沉淀，只是消耗；沉淀下来，才是资产。',
+    titleField:'name',
+    fields:[
+      {k:'name',l:'资产名称',t:'text',req:true,cls:'full'},
+      {k:'type',l:'类型',t:'sel',opts:['项目案例','方案模板','SOP','数据分析','汇报话术','行业观察','简历素材','作品集素材','内容选题','管理经验']},
+      {k:'source_proj',l:'来源项目'},
+      {k:'source_event',l:'来源事件'},
+      {k:'content',l:'资产内容（摘要）',t:'ta',cls:'full'},
+      {k:'use_for',l:'可用于哪里',t:'text',cls:'full'},
+      {k:'status',l:'当前状态',t:'sel',opts:['草稿','可用','已优化','已发布']},
+      {k:'next_opt',l:'下一步优化'},
+      {k:'portfolio',l:'可放作品集',t:'sel',opts:['是','否','待评估']},
+      {k:'resume',l:'可写进简历',t:'sel',opts:['是','否','待评估']},
+      {k:'article',l:'可变成文章',t:'sel',opts:['是','否','待评估']},
+      {k:'method',l:'可变成方法论',t:'sel',opts:['是','否','待评估']},
+    ],
+    listFields:['type','source_proj','use_for','status','portfolio'],
+    colorMap:{status:{'草稿':'amber','可用':'green','已优化':'blue','已发布':'green'},portfolio:{是:'green',否:'',待评估:'amber'}}
+  },
+  reviews: {
+    name:'复盘中心', icon:'↺',
+    remind:'每周必须复盘一次。第7题最重要：下周不做什么。',
+    titleField:'period',
+    tabs:['每日复盘','每周复盘','月度复盘'],
+    tabFields:{
+      '每日复盘':[
+        {k:'date',l:'日期',t:'date',req:true},
+        {k:'period',l:'记录标题',t:'text',cls:'full'},
+        {k:'done',l:'今天真正推进了什么',t:'ta',cls:'full'},
+        {k:'result',l:'今天留下了什么可见成果',t:'text',cls:'full'},
+        {k:'emotion_up',l:'今天有没有情绪上头',t:'sel',opts:['没有','轻微','明显']},
+        {k:'asset',l:'今天有什么值得沉淀',t:'text',cls:'full'},
+        {k:'tomorrow',l:'明天最重要的一件事',t:'text',cls:'full'},
+      ],
+      '每周复盘':[
+        {k:'week',l:'周期（如2026-W26）',t:'text',req:true},
+        {k:'period',l:'记录标题',t:'text'},
+        {k:'progress',l:'本周推进了什么',t:'ta',cls:'full'},
+        {k:'results',l:'本周真正有结果的事情',t:'ta',cls:'full'},
+        {k:'waste',l:'本周无效忙碌',t:'ta',cls:'full'},
+        {k:'blocker',l:'本周最大卡点',t:'text',cls:'full'},
+        {k:'blocker_type',l:'卡点类型',t:'sel',opts:['能力','资源','组织','情绪','优先级','综合']},
+        {k:'skill_train',l:'本周训练了哪项能力',t:'text'},
+        {k:'asset',l:'本周沉淀了什么资产',t:'text'},
+        {k:'emotion_off',l:'本周是否被情绪带跑',t:'sel',opts:['没有','轻微','明显']},
+        {k:'next3',l:'下周最重要的三件事',t:'ta',cls:'full'},
+        {k:'not_next',l:'下周放弃/延后的事情',t:'ta',cls:'full'},
+      ],
+      '月度复盘':[
+        {k:'month',l:'月份（如2026-06）',t:'text',req:true},
+        {k:'period',l:'记录标题',t:'text'},
+        {k:'on_track',l:'是否围绕长期主线推进',t:'sel',opts:['是','部分','否']},
+        {k:'real_results',l:'哪个项目有实质结果',t:'ta',cls:'full'},
+        {k:'real_value',l:'哪些事情产生了真实价值',t:'ta',cls:'full'},
+        {k:'waste',l:'哪些事情只是忙但无长期价值',t:'ta',cls:'full'},
+        {k:'grow_manage',l:'是否更懂经营/组织/增长',t:'text',cls:'full'},
+        {k:'asset',l:'本月留下了哪些资产',t:'ta',cls:'full'},
+        {k:'skill_up',l:'本月最明显提升的能力'},
+        {k:'emotion_trap',l:'本月最容易被什么情绪影响'},
+        {k:'next3',l:'下月只抓哪三件事',t:'ta',cls:'full'},
+        {k:'not_next',l:'下月哪些事不做',t:'ta',cls:'full'},
+      ]
+    },
+    listFields:['period','results','asset','next3'],
+  },
+  skills: {
+    name:'能力训练', icon:'▲',
+    remind:'每个现实问题都是底层能力训练机会。',
+    titleField:'event',
+    fields:[
+      {k:'date',l:'日期',t:'date',req:true},
+      {k:'event',l:'事件',t:'text',req:true,cls:'full'},
+      {k:'surface',l:'表面问题',t:'text',cls:'full'},
+      {k:'skill',l:'底层能力',t:'sel',opts:['经营思维','组织协同','向上管理','结构化表达','方案能力','数据分析','复盘能力','SOP搭建','项目管理','团队管理','内容IP表达','情绪稳定与判断力']},
+      {k:'weakness',l:'我的短板',t:'text'},
+      {k:'good',l:'本次做得好的地方',t:'ta',cls:'full'},
+      {k:'improve',l:'下次怎么改',t:'ta',cls:'full'},
+      {k:'can_asset',l:'是否能沉淀成模板/案例/SOP',t:'sel',opts:['是','部分可以','否']},
+    ],
+    listFields:['date','skill','weakness','can_asset'],
+    colorMap:{can_asset:{是:'green','部分可以':'amber',否:''}}
+  },
+  content: {
+    name:'内容/IP', icon:'✐',
+    remind:'把行业经验转化为可见影响力，让机会不只来自简历。',
+    titleField:'topic',
+    fields:[
+      {k:'topic',l:'选题',t:'text',req:true,cls:'full'},
+      {k:'source',l:'来源事件'},
+      {k:'viewpoint',l:'核心观点',t:'ta',cls:'full'},
+      {k:'platform',l:'适合平台',t:'sel',opts:['朋友圈','小红书','公众号','作品集','汇报']},
+      {k:'published',l:'是否发布',t:'sel',opts:['未发布','已发布','草稿中']},
+      {k:'asset',l:'可沉淀资产'},
+      {k:'extend',l:'可延展文章'},
+      {k:'moments',l:'可转成朋友圈',t:'sel',opts:['是','否','待定']},
+      {k:'xiaohongshu',l:'可转成小红书',t:'sel',opts:['是','否','待定']},
+      {k:'article',l:'可转成公众号文章',t:'sel',opts:['是','否','待定']},
+      {k:'portfolio',l:'可转成作品集观点',t:'sel',opts:['是','否','待定']},
+    ],
+    listFields:['platform','viewpoint','published','asset'],
+    colorMap:{published:{'已发布':'green','草稿中':'amber','未发布':''}}
+  },
+  strategy: {
+    name:'我的战略', icon:'◎',
+    remind:'每月校准一次职业主线，防止被短期兴趣和外界评价带跑。',
+    titleField:'period',
+    fields:[
+      {k:'period',l:'记录标题（如2026-Q3）',t:'text',req:true},
+      {k:'positioning',l:'长期定位',t:'text',cls:'full'},
+      {k:'year_keyword',l:'年度关键词'},
+      {k:'mainline',l:'当前主线',t:'ta',cls:'full'},
+      {k:'quarter_focus',l:'本季度重点',t:'ta',cls:'full'},
+      {k:'month_focus',l:'本月重点',t:'ta',cls:'full'},
+      {k:'give_up',l:'当前必须放弃的事情',t:'ta',cls:'full'},
+      {k:'skill_now',l:'当前最该积累的能力',t:'text',cls:'full'},
+      {k:'proj_now',l:'当前最该推进的项目',t:'text',cls:'full'},
+      {k:'asset_now',l:'当前最该沉淀的资产',t:'text',cls:'full'},
+      {k:'warn',l:'是否又在为了被认可而乱用力',t:'sel',opts:['没有','有一点','明显有'],cls:'full'},
+    ],
+    listFields:['period','year_keyword','month_focus','warn'],
+    colorMap:{warn:{没有:'green','有一点':'amber','明显有':'accent'}}
+  },
+  insights: {
+    name:'行业洞察', icon:'◉',
+    remind:'把行业知识转化成你的认知资产，每一条洞察都是你的竞争壁垒。',
+    titleField:'title',
+    fields:[
+      {k:'date',l:'日期',t:'date',req:true},
+      {k:'title',l:'洞察标题',t:'text',req:true,cls:'full'},
+      {k:'source',l:'来源 / 链接',t:'text',cls:'full'},
+      {k:'type',l:'类型',t:'sel',opts:['行业趋势','数据报告','竞品分析','用户研究','政策解读','方法论','案例分析','其他']},
+      {k:'tags',l:'标签（逗号分隔）'},
+      {k:'summary',l:'核心摘要（3-5句话）',t:'ta',cls:'full'},
+      {k:'key_points',l:'关键数据 / 观点',t:'ta',cls:'full'},
+      {k:'my_take',l:'我的判断',t:'ta',cls:'full'},
+      {k:'apply_to',l:'可应用到',t:'text',cls:'full'},
+    ],
+    listFields:['date','type','tags','apply_to'],
+    colorMap:{type:{'行业趋势':'blue','数据报告':'purple','竞品分析':'amber','用户研究':'green','政策解读':'accent','方法论':'blue','案例分析':'green'}}
+  },
+  network: {
+    name:'人脉资源', icon:'⊕',
+    remind:'不只靠自己硬冲，学会识别关键人、资源、利益和合作关系。',
+    titleField:'name',
+    fields:[
+      {k:'name',l:'名称/公司',t:'text',req:true},
+      {k:'relation',l:'关系类型'},
+      {k:'role',l:'角色',t:'sel',opts:['老板','同事','督导','加盟商','门店','行业前辈','朋友','外部合作方']},
+      {k:'impact_proj',l:'对当前项目的影响'},
+      {k:'impact_career',l:'对长期职业的影响'},
+      {k:'their_care',l:'对方关心什么',t:'ta',cls:'full'},
+      {k:'my_value',l:'我能提供什么价值',t:'text',cls:'full'},
+      {k:'need_support',l:'我需要争取什么支持',t:'text',cls:'full'},
+      {k:'relation_status',l:'当前关系状态',t:'sel',opts:['密切','一般','需要维护','待开发']},
+      {k:'next',l:'下一步维护动作',t:'text',cls:'full'},
+      {k:'collab',l:'可合作事项'},
+    ],
+    listFields:['role','impact_proj','relation_status','next'],
+    colorMap:{relation_status:{密切:'green',需要维护:'amber',待开发:'blue'}}
+  },
+  finance: {
+    name:'财务生活', icon:'¥',
+    remind:'对生活有掌控感，减少生活混乱带来的职业焦虑。',
+    titleField:'month',
+    fields:[
+      {k:'month',l:'月份（如2026-06）',t:'text',req:true},
+      {k:'income',l:'月收入（元）'},
+      {k:'rent',l:'房租'},
+      {k:'food',l:'餐饮'},
+      {k:'transport',l:'通勤'},
+      {k:'personal',l:'个人花销'},
+      {k:'installment',l:'分期还款'},
+      {k:'other',l:'其他支出'},
+      {k:'left',l:'本月剩余'},
+      {k:'saving',l:'本月储蓄'},
+      {k:'over',l:'是否超预算',t:'sel',opts:['没有','轻微超支','明显超支']},
+      {k:'reason',l:'超支原因',t:'text'},
+      {k:'adjust',l:'下月调整',t:'ta',cls:'full'},
+    ],
+    listFields:['month','income','left','saving','over'],
+    colorMap:{over:{没有:'green','轻微超支':'amber','明显超支':'accent'}}
+  },
+  body: {
+    name:'身体精力', icon:'♡',
+    remind:'精力差的时候，不要用低状态否定整个人生。',
+    titleField:'date',
+    fields:[
+      {k:'date',l:'日期',t:'date',req:true},
+      {k:'sleep',l:'睡眠状态',t:'sel',opts:['好','一般','差']},
+      {k:'energy',l:'精力状态',t:'sel',opts:['充沛','一般','低迷']},
+      {k:'diet',l:'饮食状态',t:'sel',opts:['健康','一般','不规律']},
+      {k:'exercise',l:'运动/步数'},
+      {k:'discomfort',l:'身体不适'},
+      {k:'mood',l:'情绪状态',t:'emoji',cls:'full'},
+      {k:'affect_work',l:'是否影响工作判断',t:'sel',opts:['没有','有一点','明显影响']},
+      {k:'reduce',l:'今天需要降低任务强度吗',t:'sel',opts:['不需要','适当降低','大幅降低']},
+      {k:'not_decide',l:'今天不适合做什么决定'},
+    ],
+    listFields:['date','sleep','energy','mood','affect_work'],
+    colorMap:{sleep:{好:'green',差:'accent'},energy:{充沛:'green','低迷':'accent'},affect_work:{没有:'green','明显影响':'accent'}}
+  },
+};
+
+// ─── Storage ──────────────────────────────────────────────────────
+const S = {
+  get(k){ try{return JSON.parse(localStorage.getItem('sys_'+k)||'[]')}catch(e){return []} },
+  set(k,v){ localStorage.setItem('sys_'+k, JSON.stringify(v)) },
+  add(k,r){ const d=S.get(k); d.unshift({_id:Date.now(),...r,_createdAt:new Date().toISOString()}); S.set(k,d); },
+  del(k,id){ S.set(k, S.get(k).filter(r=>r._id!==id)); },
+};
+
+// ─── Navigation ──────────────────────────────────────────────────
+let currentPage = 'home';
+function go(id) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nav').forEach(n=>n.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  document.querySelectorAll('.nav').forEach(n=>{ if(n.getAttribute('onclick')?.includes("'"+id+"'")) n.classList.add('on'); });
+  currentPage = id;
+  renderPage(id);
+}
+
+// ─── Field Colors ─────────────────────────────────────────────────
+function fieldColor(mod, key, val) {
+  const cm = MOD[mod]?.colorMap?.[key];
+  if (!cm) return '';
+  return cm[val] || '';
+}
+
+// ─── Emmo-style mood faces ────────────────────────────────────────
+const EMMO_MOODS = [
+  ['开心','#FFD93D', `<path d="M13,19 Q16,14 19,19" stroke="rgba(0,0,0,.55)" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M25,19 Q28,14 31,19" stroke="rgba(0,0,0,.55)" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M12,27 Q22,37 32,27" stroke="rgba(0,0,0,.55)" stroke-width="2.2" fill="none" stroke-linecap="round"/>`],
+  ['幸福','#FF9EBB', `<path d="M13,19 Q16,14 19,19" stroke="rgba(0,0,0,.5)" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M25,19 Q28,14 31,19" stroke="rgba(0,0,0,.5)" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M14,27 Q22,34 30,27" stroke="rgba(0,0,0,.5)" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="12" cy="24" r="3.5" fill="rgba(255,100,150,.35)"/><circle cx="32" cy="24" r="3.5" fill="rgba(255,100,150,.35)"/>`],
+  ['兴奋','#FF8C42', `<circle cx="16" cy="18" r="3.5" fill="rgba(0,0,0,.6)"/><circle cx="28" cy="18" r="3.5" fill="rgba(0,0,0,.6)"/><circle cx="14.5" cy="16.5" r="1.2" fill="white"/><circle cx="26.5" cy="16.5" r="1.2" fill="white"/><path d="M12,27 Q22,38 32,27" stroke="rgba(0,0,0,.55)" stroke-width="2.2" fill="none" stroke-linecap="round"/>`],
+  ['充实','#4ECDC4', `<circle cx="16" cy="18" r="2.2" fill="rgba(0,0,0,.6)"/><circle cx="28" cy="18" r="2.2" fill="rgba(0,0,0,.6)"/><path d="M13,14 Q15.5,16 18,14" stroke="rgba(0,0,0,.45)" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M26,14 Q28.5,16 31,14" stroke="rgba(0,0,0,.45)" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M15,27 Q22,33 29,27" stroke="rgba(0,0,0,.55)" stroke-width="2" fill="none" stroke-linecap="round"/>`],
+  ['平静','#A8E6CF', `<path d="M13,18 Q16,22 19,18" stroke="rgba(0,0,0,.55)" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M25,18 Q28,22 31,18" stroke="rgba(0,0,0,.55)" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M17,28 Q22,32 27,28" stroke="rgba(0,0,0,.5)" stroke-width="1.8" fill="none" stroke-linecap="round"/>`],
+  ['纠结','#FFE082', `<circle cx="16" cy="18" r="2.2" fill="rgba(0,0,0,.6)"/><path d="M24,16 Q26.5,19.5 29,16 Q31,19.5 33,16" stroke="rgba(0,0,0,.55)" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M13,28 Q16.5,24 20,28 Q22,31 24,28 Q27.5,24 31,28" stroke="rgba(0,0,0,.55)" stroke-width="1.8" fill="none" stroke-linecap="round"/>`],
+  ['烦躁','#FF7675', `<path d="M13,15 Q15,18.5 18,16.5" stroke="rgba(0,0,0,.6)" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M26,16.5 Q29,18.5 31,15" stroke="rgba(0,0,0,.6)" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="16" cy="20" r="2.2" fill="rgba(0,0,0,.6)"/><circle cx="28" cy="20" r="2.2" fill="rgba(0,0,0,.6)"/><path d="M15,29 L29,29" stroke="rgba(0,0,0,.55)" stroke-width="2.2" stroke-linecap="round"/>`],
+  ['焦虑','#C5A3FF', `<circle cx="16" cy="18" r="3" fill="rgba(0,0,0,.6)"/><circle cx="28" cy="18" r="3" fill="rgba(0,0,0,.6)"/><circle cx="14.5" cy="16.5" r="1" fill="white"/><circle cx="26.5" cy="16.5" r="1" fill="white"/><path d="M34,8 Q37,13 34,16 Q31,13 34,8Z" fill="rgba(255,255,255,.65)"/><path d="M15,30 Q22,25 29,30" stroke="rgba(0,0,0,.55)" stroke-width="2" fill="none" stroke-linecap="round"/>`],
+  ['疲惫','#90A4AE', `<path d="M13,17 L19,19.5" stroke="rgba(0,0,0,.55)" stroke-width="2.5" stroke-linecap="round"/><path d="M25,19.5 L31,17" stroke="rgba(0,0,0,.55)" stroke-width="2.5" stroke-linecap="round"/><path d="M15,29 L29,29" stroke="rgba(0,0,0,.4)" stroke-width="2" stroke-linecap="round"/>`],
+  ['委屈','#81D4FA', `<path d="M13,16 Q15.5,19.5 18,15.5" stroke="rgba(0,0,0,.55)" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M26,15.5 Q28.5,19.5 31,16" stroke="rgba(0,0,0,.55)" stroke-width="1.8" fill="none" stroke-linecap="round"/><circle cx="16" cy="20" r="2.2" fill="rgba(0,0,0,.55)"/><circle cx="28" cy="20" r="2.2" fill="rgba(0,0,0,.55)"/><path d="M28,23 Q30.5,27.5 28,29.5 Q25.5,27.5 28,23Z" fill="rgba(255,255,255,.6)"/><path d="M15,30 Q22,25 29,30" stroke="rgba(0,0,0,.55)" stroke-width="2" fill="none" stroke-linecap="round"/>`],
+  ['愤怒','#EF5350', `<path d="M11,13 L19,17.5" stroke="rgba(0,0,0,.7)" stroke-width="2.5" stroke-linecap="round"/><path d="M25,17.5 L33,13" stroke="rgba(0,0,0,.7)" stroke-width="2.5" stroke-linecap="round"/><circle cx="16" cy="20" r="2.5" fill="rgba(0,0,0,.7)"/><circle cx="28" cy="20" r="2.5" fill="rgba(0,0,0,.7)"/><path d="M13,32 Q22,24 31,32" stroke="rgba(0,0,0,.7)" stroke-width="2.2" fill="none" stroke-linecap="round"/>`],
+  ['麻木','#CFD8DC', `<circle cx="16" cy="18" r="1.8" fill="rgba(0,0,0,.4)"/><circle cx="28" cy="18" r="1.8" fill="rgba(0,0,0,.4)"/><path d="M15,28 L29,28" stroke="rgba(0,0,0,.35)" stroke-width="2" stroke-linecap="round"/>`],
+];
+
+function emmoPickerHTML(fieldKey) {
+  return `<div class="emoji-picker" id="ep-${fieldKey}"><input type="hidden" name="${fieldKey}">${
+    EMMO_MOODS.map(([label,bg,face])=>`<div class="ep-item" onclick="epSelect(this,'${fieldKey}')" data-val="${label}"><div class="ep-face"><svg viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%"><circle cx="22" cy="22" r="22" fill="${bg}"/>${face}</svg></div><span class="ep-lb">${label}</span></div>`).join('')
+  }</div>`;
+}
+
+// ─── Cross-page action buttons per field ─────────────────────────
+function fieldActionBtn(modKey, fieldKey) {
+  const b = (label, fn) => `<span class="field-action" onclick="${fn}">${label}</span>`;
+  // ── 今日经营台 ──
+  if (modKey==='daily' && fieldKey==='tasks')    return b('📋 导入今日待办', `importTodayTodos('daily')`);
+  if (modKey==='daily' && fieldKey==='asset')    return b('📦 存入资产库',   `pushAssetFromDaily('daily')`);
+  if (modKey==='daily' && fieldKey==='mood')     return b('🔗 同步到情绪判断', `syncMoodToEmotion()`);
+  if (modKey==='daily' && fieldKey==='tomorrow') return b('📌 加入待办',     `pushTomorrowToTodo('daily')`);
+  // ── 项目池 ──
+  if (modKey==='projects' && fieldKey==='today_step')  return b('📌 加入任务待办', `pushStepToTodo('projects')`);
+  if (modKey==='projects' && fieldKey==='final_asset') return b('📦 存入资产库',   `pushProjectAsset('projects')`);
+  // ── 想法池 ──
+  if (modKey==='ideas' && fieldKey==='next')     return b('🚀 转为项目',     `convertIdeaToProject('ideas')`);
+  // ── 情绪判断 ──
+  if (modKey==='emotions' && fieldKey==='emotion') return b('🔗 同步到今日状态', `syncEmotionToDaily()`);
+  // ── 能力训练 ──
+  if (modKey==='skills' && fieldKey==='good')    return b('📦 存入资产库',   `pushSkillAsset('skills')`);
+  // ── 内容/IP ──
+  if (modKey==='content' && fieldKey==='viewpoint') return b('📦 存入资产库', `pushContentAsset('content')`);
+  if (modKey==='content' && fieldKey==='topic')     return b('🔍 来自行业洞察', `pickInsightForContent('content')`);
+  // ── 行业洞察 ──
+  if (modKey==='insights' && fieldKey==='apply_to') return b('✐ 转为内容选题', `convertInsightToContent('insights')`);
+  // ── 人脉资源 ──
+  if (modKey==='network' && fieldKey==='next')   return b('📌 加入任务待办', `pushNetworkNextToTodo('network')`);
+  // ── 财务生活 ──
+  if (modKey==='finance' && fieldKey==='month')  return b('📊 从记账本导入', `importLedgerToFinance('finance')`);
+  // ── 复盘中心 ──
+  if (modKey==='reviews' && fieldKey==='progress') return b('📊 汇总本周日志', `importWeeklyProgress('reviews')`);
+  if (modKey==='reviews' && fieldKey==='results')  return b('◫ 从项目池导入', `importProjectResults('reviews')`);
+  // ── 资产库 ──
+  if (modKey==='assets' && fieldKey==='source_proj') return b('◫ 从项目池选择', `pickProjectForAsset('assets')`);
+  return '';
+}
+
+// ─── Generic Form ─────────────────────────────────────────────────
+function formHTML(modKey, fields) {
+  return `<div class="fgrid">${fields.map(f=>`
+    <div class="fg ${f.cls||''}">
+      <label class="fl">${f.l}${f.req?'<span style="color:#e05a6a;margin-left:2px">*</span>':''}
+        ${fieldActionBtn(modKey, f.k)}
+      </label>
+      ${f.t==='emoji' ? emmoPickerHTML(f.k)
+        : f.t==='sel' ? `<select class="fs" name="${f.k}"><option value="">— 选择 —</option>${(f.opts||[]).map(o=>`<option value="${o}">${o}</option>`).join('')}</select>`
+        : f.t==='ta' ? `<div class="voice-wrap"><textarea class="fta has-voice" name="${f.k}" rows="3" id="vta-${f.k}"></textarea><span class="voice-btn ta-btn" id="vbtn-${f.k}" onclick="voiceToggle('${f.k}')" title="语音输入">🎤</span><span class="voice-tip">点击语音输入</span></div>`
+        : f.t==='date' ? `<input class="fi" type="date" name="${f.k}">`
+        : `<div class="voice-wrap"><input class="fi has-voice" type="text" name="${f.k}" id="vta-${f.k}"><span class="voice-btn" id="vbtn-${f.k}" onclick="voiceToggle('${f.k}')" title="语音输入">🎤</span><span class="voice-tip">点击语音输入</span></div>`
+      }
+    </div>`).join('')}
+  </div>
+  <div class="factions">
+    <span class="btn pri" onclick="submitForm('${modKey}')">保存记录</span>
+    <span class="btn" onclick="toggleForm('${modKey}')">取消</span>
+  </div>`;
+}
+
+function epSelect(el, key) {
+  el.closest('.emoji-picker').querySelectorAll('.ep-item').forEach(i=>i.classList.remove('on'));
+  el.classList.add('on');
+  el.closest('.emoji-picker').querySelector('input[name="'+key+'"]').value = el.dataset.val;
+}
+
+function toggleForm(modKey, tabName) {
+  const el = document.getElementById(`form-${modKey}`);
+  if (!el) return;
+  const wasOpen = el.classList.contains('open');
+  el.classList.toggle('open');
+  if (!wasOpen) formAutoFill(modKey, tabName, el);
+}
+
+function formAutoFill(modKey, tabName, el) {
+  const today = new Date().toISOString().slice(0,10);
+  // date → today
+  const dateInp = el.querySelector('[name="date"]');
+  if (dateInp && !dateInp.value) dateInp.value = today;
+
+  // week → current ISO week  e.g. 2026-W26
+  const weekInp = el.querySelector('[name="week"]');
+  if (weekInp && !weekInp.value) {
+    const d = new Date(); const jan4 = new Date(d.getFullYear(),0,4);
+    const wk = Math.ceil(((d - jan4) / 86400000 + jan4.getDay() + 1) / 7);
+    weekInp.value = `${d.getFullYear()}-W${String(wk).padStart(2,'0')}`;
+  }
+
+  // month → current month  e.g. 2026-06
+  const monthInp = el.querySelector('[name="month"]');
+  if (monthInp && !monthInp.value) monthInp.value = today.slice(0,7);
+
+  // 情绪判断 emotion → sync from today's daily record mood
+  if (modKey === 'emotions') {
+    const todayRec = S.get('daily').find(r => r.date === today);
+    if (todayRec?.mood) {
+      const ep = el.querySelector('.emoji-picker');
+      if (ep) {
+        const item = ep.querySelector(`[data-val="${todayRec.mood}"]`);
+        if (item) { epSelect(item, 'emotion'); }
+      }
+    }
+  }
+
+  // 今日经营台 → pre-fill tomorrow hint from yesterday's record
+  if (modKey === 'daily') {
+    const yesterday = new Date(Date.now()-86400000).toISOString().slice(0,10);
+    const yRec = S.get('daily').find(r => r.date === yesterday);
+    if (yRec?.tomorrow) {
+      const top1 = el.querySelector('[name="top1"]');
+      if (top1 && !top1.value) top1.value = yRec.tomorrow;
+    }
+  }
+}
+
+function submitForm(modKey, tabName) {
+  const el = document.getElementById(`form-${modKey}`);
+  if (!el) return;
+  const fields = tabName ? MOD[modKey].tabFields[tabName] : MOD[modKey].fields;
+  const r = {};
+  const req = [];
+  fields.forEach(f=>{
+    const inp = el.querySelector(`[name="${f.k}"]`);
+    if (!inp) return;
+    r[f.k] = inp.value.trim();
+    if (f.req && !r[f.k]) req.push(f.l);
+  });
+  if (tabName) r._tab = tabName;
+  if (req.length) { alert('请填写：' + req.join('、')); return; }
+  S.add(modKey, r);
+  el.classList.remove('open');
+  el.querySelectorAll('input,select,textarea').forEach(i=>i.value='');
+  // reset emoji pickers
+  el.querySelectorAll('.ep-item').forEach(i=>i.classList.remove('on'));
+  el.querySelectorAll('.emoji-picker input[type=hidden]').forEach(i=>i.value='');
+  renderPage(modKey);
+  postSaveHook(modKey, r);
+}
+
+// ─── Obsidian 同步 ────────────────────────────────────────────────
+function obsidianWrite(path, content) {
+  fetch('/obsidian/write', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({path, content})
+  }).catch(()=>{});
+}
+
+function toObsidianMd(modKey, r) {
+  const date = r.date || new Date().toISOString().slice(0,10);
+  const safeName = (r.name||r.title||r.topic||r.period||'记录').replace(/[\/\\:*?"<>|]/g,'_');
+
+  if (modKey === 'projects') {
+    const path = `03-项目/${date}-${safeName}.md`;
+    const content = `---\ntags: [project]\ncreated: ${date}\nstatus: ${r.status||''}\npriority: ${r.priority||''}\n---\n\n# ${r.name||''}\n\n## 目标\n${r.goal||''}\n\n## 今日第一步\n${r.today_step||''}\n\n## 当前推进\n${r.scope||''}\n\n## 最终资产\n${r.final_asset||''}\n`;
+    return {path, content};
+  }
+  if (modKey === 'assets') {
+    const path = `资产库/${date}-${safeName}.md`;
+    const content = `---\ntags: [asset, ${(r.type||'').replace(/\s/g,'_')}]\ncreated: ${date}\nstatus: ${r.status||''}\nportfolio: ${r.portfolio||''}\n---\n\n# ${r.name||''}\n\n**类型**: ${r.type||''}\n**来源**: ${r.source_proj||r.source_event||''}\n**可用于**: ${r.use_for||''}\n\n## 内容\n${r.content||''}\n\n## 下一步优化\n${r.next_opt||''}\n`;
+    return {path, content};
+  }
+  if (modKey === 'ideas') {
+    const path = `想法库/${date}-${safeName}.md`;
+    const content = `---\ntags: [idea, ${(r.type||'').replace(/\s/g,'_')}]\ncreated: ${date}\naction: ${r.action||''}\n---\n\n# ${r.title||''}\n\n${r.content||''}\n\n**来源**: ${r.source||''}\n**类型**: ${r.type||''}\n**下一步**: ${r.next||''}\n**未来资产**: ${r.future_asset||''}\n`;
+    return {path, content};
+  }
+  return null;
+}
+
+function postSaveHook(modKey, r) {
+  // 同步到 Obsidian
+  if (['projects','assets','ideas'].includes(modKey)) {
+    const ob = toObsidianMd(modKey, r);
+    if (ob) obsidianWrite(ob.path, ob.content);
+  }
+
+  // 项目池 → 新增时自动检索相关洞察、资产库、想法池
+  if (modKey==='projects') {
+    const keywords = [r.name, r.goal, r.scope, r.category]
+      .filter(Boolean).join(' ').toLowerCase().split(/[\s，,、]+/).filter(k=>k.length>1);
+    const match = (fields) => (item) => {
+      const hay = fields.map(f=>item[f]).filter(Boolean).join(' ').toLowerCase();
+      return keywords.some(k=>hay.includes(k));
+    };
+    const ins    = S.get('insights').filter(match(['title','tags','summary','key_points','my_take']));
+    const assets = S.get('assets').filter(match(['name','type','content','use_for','source_proj']));
+    const ideas  = S.get('ideas').filter(match(['title','content','type','next','future_asset']));
+    if (ins.length || assets.length || ideas.length) {
+      showProjectSuggestion(r.name, ins, assets, ideas);
+    }
+  }
+  // 项目池 → 状态"已完成/已复盘" 提示存入资产库
+  if (modKey==='projects' && ['已完成','已复盘','已沉淀'].includes(r.status) && r.final_asset) {
+    if (confirm(`项目「${r.name}」已完成，要把最终资产存入资产库吗？`)) {
+      S.add('assets', { name:r.name, type:'项目案例', source_proj:r.name, content:r.final_asset, use_for:'作品集/汇报', status:'草稿', portfolio:'待评估', resume:'待评估' });
+      showToast('已存入资产库 ✓');
+    }
+  }
+  // 能力训练 → can_asset=是 提示存入资产库
+  if (modKey==='skills' && r.can_asset==='是') {
+    if (confirm(`「${r.event}」可沉淀为资产，现在存入资产库？`)) {
+      S.add('assets', { name:r.event, type:'管理经验', source_event:r.date, content:`${r.good}\n改进：${r.improve}`, use_for:'面试/汇报', status:'草稿', portfolio:'待评估' });
+      showToast('已存入资产库 ✓');
+    }
+  }
+  // 内容/IP → 已发布 提示存入资产库
+  if (modKey==='content' && r.published==='已发布') {
+    if (confirm(`内容「${r.topic}」已发布，要存入资产库吗？`)) {
+      S.add('assets', { name:r.topic, type:'内容选题', source_event:r.source, content:r.viewpoint, use_for:`发布在${r.platform||''}`, status:'已发布', portfolio:'是', article:'是' });
+      showToast('已存入资产库 ✓');
+    }
+  }
+  // 情绪判断 → 保存后同步情绪到今日经营台
+  if (modKey==='emotions' && r.emotion) {
+    const today = new Date().toISOString().slice(0,10);
+    const recs = S.get('daily');
+    const idx = recs.findIndex(rec => rec.date === today);
+    if (idx >= 0 && !recs[idx].mood) {
+      recs[idx].mood = r.emotion; S.set('daily', recs);
+      showToast(`已同步「${r.emotion}」到今日经营台 ✓`);
+    }
+  }
+}
+
+// ─── Prop chip helper ─────────────────────────────────────────────
+function propChip(modKey, k, val) {
+  if (!val) return `<span class="db-prop dp-default">—</span>`;
+  const color = fieldColor(modKey, k, val);
+  const cls = color==='accent'?'dp-accent':color==='green'?'dp-green':color==='purple'?'dp-purple':color==='amber'?'dp-amber':color==='blue'?'dp-blue':'dp-default';
+  return `<span class="db-prop ${cls}">${val}</span>`;
+}
+
+// ─── Table row ────────────────────────────────────────────────────
+function recordRow(modKey, rec, colFields) {
+  const m = MOD[modKey];
+  const title = rec[m.titleField] || Object.values(rec).find(v=>v&&typeof v==='string'&&!v.startsWith('20')) || '—';
+  const allFields = m.fields || Object.values(m.tabFields||{}).flat();
+  const cells = colFields.filter(k=>k!==m.titleField).map(k=>{
+    const fDef = allFields.find(f=>f.k===k);
+    const val = rec[k] || '';
+    const isSel = fDef?.t === 'sel';
+    return `<td>${isSel||['priority','status','mood','type','action','mainline','energy','sleep','amplified','impulse_good','affect_work'].includes(k) ? propChip(modKey,k,val) : `<span style="font-size:12px;color:#6b7280;max-width:200px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${val||'—'}</span>`}</td>`;
+  }).join('');
+  return `<tr>
+    <td><div class="db-title-cell">
+      <span class="db-title-text" title="${title}">${title}</span>
+      <span class="db-actions">
+        <span class="btn danger" style="padding:2px 8px;font-size:11px" onclick="delRecord('${modKey}',${rec._id})">删除</span>
+      </span>
+    </div></td>
+    ${cells}
+  </tr>`;
+}
+
+function delRecord(modKey, id) {
+  if (!confirm('确认删除这条记录？')) return;
+  S.del(modKey, id);
+  renderPage(modKey);
+}
+
+// ─── Standard Page ────────────────────────────────────────────────
+function renderStdPage(modKey, filter) {
+  const m = MOD[modKey];
+  const all = S.get(modKey);
+  let records = filter ? all.filter(r=>JSON.stringify(r).toLowerCase().includes(filter.toLowerCase())) : all;
+  const el = document.getElementById(modKey);
+  const allFields = m.fields || [];
+  const colFields = m.listFields || [];
+  const allFieldDefs = m.fields || Object.values(m.tabFields||{}).flat();
+
+  const thead = `<tr><th>${m.titleField ? (allFieldDefs.find(f=>f.k===m.titleField)?.l || '标题') : '标题'}</th>${colFields.filter(k=>k!==m.titleField).map(k=>`<th>${allFieldDefs.find(f=>f.k===k)?.l||k}</th>`).join('')}</tr>`;
+
+  const tbody = records.length
+    ? records.map(r=>recordRow(modKey, r, colFields)).join('')
+    : `<tr><td colspan="${colFields.length+1}" class="empty">暂无记录 · 点击「＋ 新增记录」开始</td></tr>`;
+
+  el.innerHTML = `
+    <div class="ph">
+      <h1><span>${m.icon}</span>${m.name}</h1>
+      ${m.remind?`<div class="remind">${m.remind}</div>`:''}
+    </div>
+    <div class="toolbar">
+      <span class="btn pri" onclick="toggleForm('${modKey}')">＋ 新增记录</span>
+      <input class="sinput" placeholder="搜索..." oninput="renderStdPage('${modKey}', this.value)">
+      <span style="margin-left:auto;font-size:11px;color:#9ca3af">${records.length} 条记录</span>
+    </div>
+    <div class="fpanel" id="form-${modKey}">${formHTML(modKey, allFields)}</div>
+    <div class="db-wrap">
+      <table class="db-table">
+        <thead class="db-thead">${thead}</thead>
+        <tbody class="db-tbody">${tbody}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+// ─── Reviews Page (with tabs) ─────────────────────────────────────
+let reviewTab = '每日复盘';
+function renderReviews(filter) {
+  const m = MOD.reviews;
+  const all = S.get('reviews');
+  const tabRecords = all.filter(r=>r._tab===reviewTab);
+  const records = filter ? tabRecords.filter(r=>JSON.stringify(r).toLowerCase().includes(filter.toLowerCase())) : tabRecords;
+  const fields = m.tabFields[reviewTab];
+  const el = document.getElementById('reviews');
+
+  el.innerHTML = `
+    <div class="ph"><h1><span>${m.icon}</span>${m.name}</h1><div class="remind">${m.remind}</div></div>
+    <div class="tabs">${m.tabs.map(t=>`<span class="tab ${t===reviewTab?'on':''}" onclick="switchReviewTab('${t}')">${t}</span>`).join('')}</div>
+    <div class="toolbar">
+      <span class="btn pri" onclick="toggleForm('reviews')">＋ 新增${reviewTab}</span>
+      <input class="sinput" placeholder="搜索..." oninput="renderReviews(this.value)">
+      <span style="margin-left:auto;font-size:11px;color:#40405a">${records.length} 条记录</span>
+    </div>
+    <div class="fpanel" id="form-reviews">${formHTML('reviews', fields)}</div>
+    <div class="rlist">${records.length ? records.map(r=>recordCard('reviews', r, m.listFields)).join('') : '<div class="empty">暂无'+reviewTab+'记录</div>'}</div>
+  `;
+  document.querySelectorAll('#form-reviews button, #form-reviews .btn').forEach(b=>{
+    if (b.getAttribute('onclick')?.includes('submitForm')) b.setAttribute('onclick', `submitReview('${reviewTab}')`);
+  });
+}
+
+function switchReviewTab(tab) {
+  reviewTab = tab;
+  renderReviews();
+}
+
+function submitReview(tab) {
+  const el = document.getElementById('form-reviews');
+  const fields = MOD.reviews.tabFields[tab];
+  const r = {_tab: tab};
+  const req = [];
+  fields.forEach(f=>{
+    const inp = el.querySelector(`[name="${f.k}"]`);
+    if (!inp) return;
+    r[f.k] = inp.value.trim();
+    if (f.req && !r[f.k]) req.push(f.l);
+  });
+  if (req.length) { alert('请填写：' + req.join('、')); return; }
+  S.add('reviews', r);
+  el.classList.remove('open');
+  el.querySelectorAll('input,select,textarea').forEach(i=>i.value='');
+  renderReviews();
+}
+
+// ─── Strategy Page ────────────────────────────────────────────────
+function renderStrategy() {
+  const m = MOD.strategy;
+  const records = S.get('strategy');
+  const latest = records[0];
+  const el = document.getElementById('strategy');
+
+  const strategyDisplay = latest ? `
+    <div class="sec-title">当前战略（${latest.period||'最近一次'}）</div>
+    <div class="strat-grid">
+      <div class="strat-blk">
+        <h3>定位与主线</h3>
+        ${[['长期定位',latest.positioning],['年度关键词',latest.year_keyword],['当前主线',latest.mainline]].filter(([,v])=>v).map(([k,v])=>`<div class="strat-row"><span class="strat-k">${k}</span><span class="strat-v">${v}</span></div>`).join('')}
+      </div>
+      <div class="strat-blk">
+        <h3>当前聚焦</h3>
+        ${[['本季度重点',latest.quarter_focus],['本月重点',latest.month_focus],['最该积累能力',latest.skill_now],['最该推进项目',latest.proj_now]].filter(([,v])=>v).map(([k,v])=>`<div class="strat-row"><span class="strat-k">${k}</span><span class="strat-v">${v}</span></div>`).join('')}
+      </div>
+      <div class="strat-blk">
+        <h3>减法清单</h3>
+        ${latest.give_up?`<div class="strat-row"><span class="strat-k">放弃/延后</span><span class="strat-v" style="color:#e05a6a">${latest.give_up}</span></div>`:''}
+        ${latest.warn?`<div class="strat-row"><span class="strat-k">乱用力警告</span><span class="strat-v ${fieldColor('strategy','warn',latest.warn)}">${latest.warn}</span></div>`:''}
+      </div>
+      <div class="strat-blk">
+        <h3>三年路线</h3>
+        <div class="strat-row"><span class="strat-k">第一年</span><span class="strat-v">执行者 → 项目负责人</span></div>
+        <div class="strat-row"><span class="strat-k">第二年</span><span class="strat-v">项目负责人 → 增长负责人</span></div>
+        <div class="strat-row"><span class="strat-k">第三年</span><span class="strat-v">增长负责人 → 经营型人才</span></div>
+      </div>
+    </div>` : `
+    <div class="strat-grid">
+      <div class="strat-blk">
+        <h3>默认定位</h3>
+        <div class="strat-row"><span class="strat-k">长期定位</span><span class="strat-v">餐饮行业用户增长与组织协同型经营人才</span></div>
+        <div class="strat-row"><span class="strat-k">年度关键词</span><span class="strat-v" style="color:#7c3aed">沉淀</span></div>
+        <div class="strat-row"><span class="strat-k">当前主线</span><span class="strat-v">餐饮私域 / 会员体系 / 加盟体系 / 用户增长 / 组织协同</span></div>
+      </div>
+    </div>`;
+
+  el.innerHTML = `
+    <div class="ph"><h1><span>${m.icon}</span>${m.name}</h1><div class="remind">${m.remind}</div></div>
+    ${strategyDisplay}
+    <div class="sec-title">记录战略校准</div>
+    <div class="toolbar"><span class="btn pri" onclick="toggleForm('strategy')">＋ 新增战略校准</span></div>
+    <div class="fpanel" id="form-strategy">${formHTML('strategy', m.fields)}</div>
+    ${records.length>1?`<div class="sec-title">历史记录</div><div class="rlist">${records.slice(1).map(r=>recordCard('strategy',r,m.listFields)).join('')}</div>`:''}
+  `;
+}
+
+// ─── Home Page ────────────────────────────────────────────────────
+function renderHome() {
+  const today = new Date().toISOString().slice(0,10);
+  const dailyRecs = S.get('daily');
+  const todayRec = dailyRecs.find(r=>r.date===today);
+  const projects = S.get('projects');
+  const assets = S.get('assets');
+  const ideas = S.get('ideas');
+  const emotions = S.get('emotions');
+
+  const p0 = projects.filter(r=>r.priority==='S'||r.priority==='A').length;
+  const activeP = projects.filter(r=>r.status==='推进中').length;
+  const assetCount = assets.length;
+  const ideaPool = ideas.filter(r=>!['删除','暂时放弃'].includes(r.action)).length;
+
+  const todayBlock = todayRec ? `
+    <div class="hero-card" style="border-color:#e8eaf0">
+      <h2 style="font-size:14px;color:#5b5cf6">今日经营台 · ${todayRec.date}</h2>
+      <div style="margin-top:.5rem">
+        ${todayRec.mood?`<span class="badge bA" style="margin-bottom:.5rem;display:inline-block">${todayRec.mood}</span>`:''}
+        <div style="font-size:13px;color:#1e2040;margin-top:.375rem;font-weight:500">◆ ${todayRec.top1||'未填写'}</div>
+        ${todayRec.tasks?todayRec.tasks.split('\n').filter(t=>t).map((t,i)=>`<div style="font-size:12px;color:#7c82a0;padding:2px 0;padding-left:14px">${i+1}. ${t}</div>`).join(''):''}
+        ${todayRec.result?`<div style="font-size:12px;color:#059669;margin-top:.375rem">✓ 成果 · ${todayRec.result}</div>`:''}
+      </div>
+    </div>` : `
+    <div class="hero-card" style="cursor:pointer;background:#fafbff" onclick="go('daily')">
+      <div style="color:#b0b5cc;font-size:13px;text-align:center;padding:.5rem">今天还没有填今日经营台 · 点击前往</div>
+    </div>`;
+
+  // 昨日 tomorrow 提醒
+  const yesterday = new Date(Date.now()-86400000).toISOString().slice(0,10);
+  const yRec = dailyRecs.find(r=>r.date===yesterday);
+  const tomorrowBanner = (yRec?.tomorrow && !todayRec) ? `
+    <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:.75rem 1rem;margin-bottom:.875rem;display:flex;align-items:center;gap:.75rem;cursor:pointer" onclick="go('daily')">
+      <span style="font-size:20px">☀️</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11px;color:#92400e;margin-bottom:2px">昨天设定的今日首要任务</div>
+        <div style="font-size:13px;font-weight:600;color:#1e2040;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${yRec.tomorrow}</div>
+      </div>
+      <span style="font-size:11px;color:#d97706;background:#fef3c7;padding:3px 8px;border-radius:6px;flex-shrink:0">去填写 →</span>
+    </div>` : '';
+
+  document.getElementById('home').innerHTML = `
+    ${tomorrowBanner}
+    <div class="hero-card" style="background:linear-gradient(135deg,#f5f6fe 0%,#fff 100%)">
+      <h2>小袁人生经营系统</h2>
+      <div class="ml" style="margin-bottom:.875rem">主线：餐饮 / 用户运营 / 私域 / 会员体系 / 加盟协同 · 年度关键词：<strong style="color:#1e2040">沉淀</strong></div>
+      <ul>
+        <li>找到能让我从执行者升级到项目型/增长型人才的工作</li>
+        <li>搭建个人作品集，沉淀5个可展示案例</li>
+        <li>稳定输出行业内容，完成3篇高质量文章</li>
+      </ul>
+    </div>
+    <div class="stats-strip">
+      <div class="sbox"><div class="n c0">${p0}</div><div class="l">S/A级项目</div></div>
+      <div class="sbox"><div class="n c1">${activeP}</div><div class="l">推进中项目</div></div>
+      <div class="sbox"><div class="n c2">${assetCount}</div><div class="l">资产总数</div></div>
+      <div class="sbox"><div class="n c3">${ideaPool}</div><div class="l">待处理想法</div></div>
+      <div class="sbox"><div class="n c4">${emotions.length}</div><div class="l">情绪记录</div></div>
+    </div>
+    ${todayBlock}
+    <div class="sec-title">🎵 网易云音乐</div>
+    <div class="qqm-card">
+      <div class="qqm-search-row">
+        <input class="qqm-inp" id="qqm-inp" placeholder="搜索歌曲、歌手、专辑…" onkeydown="if(event.key==='Enter')qqmSearch()">
+        <span class="btn" onclick="qqmSearch()" style="flex-shrink:0;background:#e05a6a;color:#fff;border-color:#e05a6a">搜索</span>
+      </div>
+      <div id="qqm-results"></div>
+      <div id="qqm-player" class="qqm-player">
+        <img id="qqm-pl-cover" class="qqm-pl-cover" src="" alt="">
+        <div class="qqm-pl-info">
+          <div class="qqm-pl-name" id="qqm-pl-name">—</div>
+          <div class="qqm-pl-artist" id="qqm-pl-artist">—</div>
+          <div class="qqm-pl-progress" id="qqm-progress" onclick="qqmSeek(event)">
+            <div class="qqm-pl-bar" id="qqm-bar"></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:.25rem">
+          <div class="qqm-pl-btns">
+            <div class="qqm-pl-btn" onclick="qqmPrev()" title="上一首">⏮</div>
+            <div class="qqm-pl-btn main" id="qqm-playbtn" onclick="qqmToggle()">▶</div>
+            <div class="qqm-pl-btn" onclick="qqmNext()" title="下一首">⏭</div>
+          </div>
+          <div class="qqm-pl-time" id="qqm-time">0:00 / 0:00</div>
+        </div>
+      </div>
+      <audio id="qqm-audio" onended="qqmNext()" ontimeupdate="qqmTick()" onplay="qqmOnPlay()" onpause="qqmOnPause()"></audio>
+    </div>
+    <div class="sec-title">番茄钟</div>
+    <div class="pomodoro" id="pomo-widget">
+      <div class="pomo-top">
+        <div class="pomo-clock">
+          <div class="pomo-time" id="pomo-time">25:00</div>
+          <div class="pomo-mode" id="pomo-mode">专注时间</div>
+          <div class="pomo-btns">
+            <span class="btn pri" id="pomo-btn" onclick="pomoToggle()">▶ 开始</span>
+            <span class="btn" onclick="pomoReset()">↺ 重置</span>
+            <span class="btn" onclick="pomoSwitch()">☕ 休息</span>
+          </div>
+        </div>
+        <div class="pomo-info">
+          <div class="pomo-sessions">今日已完成 <strong id="pomo-count">0</strong> 个番茄 · 专注 <strong id="pomo-mins">0</strong> 分钟</div>
+          <div class="pomo-task" id="pomo-task-tip">每次专注前，先确认手头只做一件事</div>
+        </div>
+      </div>
+      <div class="pomo-progress"><div class="pomo-bar" id="pomo-bar" style="width:0%"></div></div>
+    </div>
+    <div class="sec-title">快速入口</div>
+    <div class="qnav">
+      ${[['daily','⊙','今日经营台'],['ideas','✦','想法池'],['projects','◫','项目池'],['emotions','◑','情绪判断'],['assets','◈','资产库'],['reviews','↺','复盘中心'],['skills','▲','能力训练'],['strategy','◎','我的战略']].map(([id,ic,nm])=>`<div class="qb" onclick="go('${id}')"><div class="qi">${ic}</div><div class="qn">${nm}</div></div>`).join('')}
+    </div>
+    <div class="toolbar" style="margin-top:1.25rem"><span class="btn" onclick="exportMD()">↓ 导出 Markdown</span></div>
+  `;
+  pomoRender();
+  qqmInit();
+}
+
+// ─── 网易云音乐播放器 ─────────────────────────────────────────────
+let _qqmList = [];   // current search results [{id,name,artist,cover,fee}]
+let _qqmIdx  = -1;  // index in _qqmList currently playing
+
+function _qqmFmt(s) {
+  return Math.floor(s/60) + ':' + String(Math.floor(s%60)).padStart(2,'0');
+}
+
+async function qqmSearch() {
+  const q = (document.getElementById('qqm-inp')?.value || '').trim();
+  if (!q) return;
+  const resEl = document.getElementById('qqm-results');
+  resEl.innerHTML = `<div class="qqm-empty">搜索中…</div>`;
+  try {
+    const res = await fetch(`/music/search?keywords=${encodeURIComponent(q)}&limit=20`);
+    const data = await res.json();
+    const songs = data?.result?.songs || [];
+    if (!songs.length) { resEl.innerHTML = `<div class="qqm-empty">未找到"${q}"相关歌曲</div>`; return; }
+
+    // fetch covers via song/detail (batch)
+    const ids = songs.map(s=>s.id).join(',');
+    const det = await fetch(`/music/song/detail?ids=${ids}`).then(r=>r.json()).catch(()=>({songs:[]}));
+    const coverMap = {};
+    (det.songs||[]).forEach(s => { coverMap[s.id] = s.al?.picUrl || ''; });
+
+    _qqmList = songs.map(s => ({
+      id: s.id,
+      name: s.name,
+      artist: (s.artists||[]).map(a=>a.name).join(' / '),
+      album: s.album?.name || '',
+      cover: coverMap[s.id] || '',
+      fee: s.fee || 0,
+    }));
+
+    resEl.innerHTML = _qqmList.map((s,i) => `
+      <div class="qqm-item" id="qqm-item-${s.id}" onclick="qqmPlayIdx(${i})">
+        <img class="qqm-cover" src="${s.cover}?param=68y68" onerror="this.style.background='#f0f2f7'" alt="">
+        <div class="qqm-info">
+          <div class="qqm-sname">${s.name}</div>
+          <div class="qqm-singer">${s.artist}${s.album?' · '+s.album:''}</div>
+        </div>
+        ${s.fee===1?'<span class="qqm-vip">VIP</span>':''}
+      </div>`).join('');
+  } catch(e) {
+    resEl.innerHTML = `<div class="qqm-empty">搜索失败：${e.message}</div>`;
+  }
+}
+
+async function qqmPlayIdx(idx) {
+  if (idx < 0 || idx >= _qqmList.length) return;
+  _qqmIdx = idx;
+  const s = _qqmList[idx];
+
+  // highlight row
+  document.querySelectorAll('.qqm-item').forEach(el => el.classList.remove('playing'));
+  const row = document.getElementById('qqm-item-' + s.id);
+  if (row) { row.classList.add('playing'); row.scrollIntoView({block:'nearest'}); }
+
+  // update player bar
+  const player = document.getElementById('qqm-player');
+  document.getElementById('qqm-pl-cover').src = s.cover ? s.cover+'?param=88y88' : '';
+  document.getElementById('qqm-pl-name').textContent = s.name;
+  document.getElementById('qqm-pl-artist').textContent = s.artist;
+  if (player) player.classList.add('on');
+
+  // get play URL
+  try {
+    const urlRes = await fetch(`/music/song/url?id=${s.id}`);
+    const urlData = await urlRes.json();
+    const url = urlData?.data?.[0]?.url;
+    if (!url) {
+      alert(`「${s.name}」暂无版权或需要登录会员，已自动跳到下一首`);
+      qqmNext(); return;
+    }
+    const audio = document.getElementById('qqm-audio');
+    audio.src = url;
+    audio.play();
+    // save for restore
+    localStorage.setItem('sys_qqm_meta', JSON.stringify({id:s.id, name:s.name, artist:s.artist, cover:s.cover}));
+  } catch(e) {
+    resEl && (resEl.innerHTML = `<div class="qqm-empty">加载失败：${e.message}</div>`);
+  }
+}
+
+function qqmToggle() {
+  const a = document.getElementById('qqm-audio');
+  a.paused ? a.play() : a.pause();
+}
+function qqmOnPlay()  { document.getElementById('qqm-playbtn').textContent = '⏸'; }
+function qqmOnPause() { document.getElementById('qqm-playbtn').textContent = '▶'; }
+function qqmPrev() { if (_qqmIdx > 0) qqmPlayIdx(_qqmIdx - 1); }
+function qqmNext() { if (_qqmIdx < _qqmList.length - 1) qqmPlayIdx(_qqmIdx + 1); }
+
+function qqmTick() {
+  const a = document.getElementById('qqm-audio');
+  if (!a.duration) return;
+  const pct = (a.currentTime / a.duration * 100).toFixed(1);
+  document.getElementById('qqm-bar').style.width = pct + '%';
+  document.getElementById('qqm-time').textContent = _qqmFmt(a.currentTime) + ' / ' + _qqmFmt(a.duration);
+}
+
+function qqmSeek(e) {
+  const a = document.getElementById('qqm-audio');
+  if (!a.duration) return;
+  const rect = e.currentTarget.getBoundingClientRect();
+  a.currentTime = ((e.clientX - rect.left) / rect.width) * a.duration;
+}
+
+function qqmInit() {
+  const meta = JSON.parse(localStorage.getItem('sys_qqm_meta') || 'null');
+  if (meta) {
+    const inp = document.getElementById('qqm-inp');
+    if (inp) inp.placeholder = `上次播放：${meta.name} — ${meta.artist||''}`;
+  }
+}
+
+// ─── Insights Page ────────────────────────────────────────────────
+function renderInsights(filter) {
+  const m = MOD.insights;
+  const all = S.get('insights');
+  const records = filter ? all.filter(r=>JSON.stringify(r).toLowerCase().includes(filter.toLowerCase())) : all;
+  const el = document.getElementById('insights');
+
+  const typeColors = {'行业趋势':'dp-blue','数据报告':'dp-purple','竞品分析':'dp-amber','用户研究':'dp-green','政策解读':'dp-accent','方法论':'dp-blue','案例分析':'dp-green','其他':'dp-default'};
+
+  const rows = records.length ? records.map(r=>`
+    <tr style="cursor:pointer" onclick="insOpenDetail(${r._id})">
+      <td><div class="db-title-cell">
+        <span class="db-title-text" title="${r.title||''}">${r.title||'—'}</span>
+        <span class="db-actions">
+          <span class="btn" style="padding:2px 8px;font-size:11px" onclick="event.stopPropagation();insOpenDetail(${r._id})">查看/编辑</span>
+          <span class="btn danger" style="padding:2px 8px;font-size:11px" onclick="event.stopPropagation();delRecord('insights',${r._id})">删除</span>
+        </span>
+      </div></td>
+      <td>${r.date||'—'}</td>
+      <td>${r.type?`<span class="db-prop ${typeColors[r.type]||'dp-default'}">${r.type}</span>`:'—'}</td>
+      <td><span style="font-size:12px;color:#6b7280">${r.tags||'—'}</span></td>
+      <td style="max-width:280px"><span style="font-size:12px;color:#4a4f70;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${r.summary||'—'}</span></td>
+    </tr>`) .join('') : `<tr><td colspan="5" class="empty">暂无洞察记录 · 通过上方导入文章或手动新增</td></tr>`;
+
+  el.innerHTML = `
+    <div class="ph">
+      <h1><span>◉</span>行业洞察</h1>
+      <div class="remind">把行业知识转化成你的认知资产，每一条洞察都是你的竞争壁垒。</div>
+    </div>
+
+    <div class="ins-import">
+      <div style="font-size:13px;font-weight:600;color:#1e2040;margin-bottom:.75rem">导入文章</div>
+      <div class="ins-url-row">
+        <input class="ins-url-input" id="ins-url" placeholder="粘贴文章链接..." />
+        <span class="btn pri" onclick="insFetch()">抓取正文</span>
+        <span class="btn" onclick="insManual()">手动输入</span>
+      </div>
+      <div id="ins-workspace" style="display:none">
+        <div id="ins-api-banner" class="api-banner" style="display:none">
+          <p>⚠️ 需要配置豆包 API Key 才能使用 AI 分析功能</p>
+          <span class="btn" onclick="insOpenApiMo()">配置豆包 Key</span>
+        </div>
+        <div class="ins-split">
+          <div style="display:flex;flex-direction:column;gap:0">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0">
+              <div class="ins-ltabs">
+                <span class="ins-ltab on" id="ins-tab-raw" onclick="insTabSwitch('raw')">原文</span>
+                <span class="ins-ltab" id="ins-tab-analysis" onclick="insTabSwitch('analysis')">✦ AI 分析</span>
+              </div>
+              <span class="btn" id="ins-analyze-btn" onclick="insAnalyze()" style="font-size:11px;padding:3px 10px;display:none;margin-bottom:1px">✦ 开始分析</span>
+            </div>
+            <div id="ins-raw-wrap">
+              <div class="ins-raw" id="ins-raw"><div class="ins-raw-placeholder">正文将显示在这里</div></div>
+            </div>
+            <div id="ins-analysis-wrap" style="display:none">
+              <div class="ins-analysis" id="ins-analysis"><div class="ana-loading">点击右上角「✦ 开始分析」按钮</div></div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:10px;font-weight:600;color:#9ca3af;margin-bottom:6px;letter-spacing:.04em">洞察整理</div>
+            <div class="ins-form" id="ins-form">
+              <div class="ins-field"><label class="ins-label">标题 *</label><input class="ins-input" id="ins-f-title" placeholder="文章标题或核心主题"></div>
+              <div class="ins-field"><label class="ins-label">类型</label>
+                <select class="ins-sel" id="ins-f-type">
+                  <option value="">— 选择 —</option>
+                  ${['行业趋势','数据报告','竞品分析','用户研究','政策解读','方法论','案例分析','其他'].map(o=>`<option>${o}</option>`).join('')}
+                </select>
+              </div>
+              <div class="ins-field"><label class="ins-label">标签（逗号分隔）</label><input class="ins-input" id="ins-f-tags" placeholder="如：私域, 会员体系, 餐饮"></div>
+              <div class="ins-field"><label class="ins-label">核心摘要（3-5句）</label><textarea class="ins-ta" id="ins-f-summary" rows="4" placeholder="AI 分析后自动填入，也可手动填写..."></textarea></div>
+              <div class="ins-field"><label class="ins-label">关键数据 / 观点</label><textarea class="ins-ta" id="ins-f-kp" rows="4" placeholder="• 数据点1&#10;• 观点2&#10;• ..."></textarea></div>
+              <div class="ins-field"><label class="ins-label">我的判断</label><textarea class="ins-ta" id="ins-f-take" rows="3" placeholder="对我有什么启发？和我的工作有什么关联？"></textarea></div>
+              <div class="ins-field"><label class="ins-label">可应用到</label><input class="ins-input" id="ins-f-apply" placeholder="如：ICC项目 / 下一篇文章 / 面试素材"></div>
+            </div>
+          </div>
+        </div>
+        <div class="ins-foot">
+          <span class="ins-status" id="ins-status"></span>
+          <span class="btn" onclick="insClose()">取消</span>
+          <span class="btn pri" onclick="insSave()">保存洞察</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <input class="sinput" placeholder="搜索洞察..." oninput="renderInsights(this.value)">
+      <span style="margin-left:auto;font-size:11px;color:#9ca3af">${records.length} 条记录</span>
+    </div>
+    <div class="db-wrap">
+      <table class="db-table">
+        <thead class="db-thead"><tr><th>洞察标题</th><th>日期</th><th>类型</th><th>标签</th><th>核心摘要</th></tr></thead>
+        <tbody class="db-tbody">${rows}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+// ─── Insights Import Logic ─────────────────────────────────────────
+function insShowWorkspace() {
+  document.getElementById('ins-workspace').style.display = 'block';
+}
+function insClose() {
+  document.getElementById('ins-workspace').style.display = 'none';
+  document.getElementById('ins-url').value = '';
+  document.getElementById('ins-raw').innerHTML = '<div class="ins-raw-placeholder">正文将显示在这里</div>';
+  ['title','type','tags','summary','kp','take','apply'].forEach(k=>{
+    const el = document.getElementById('ins-f-'+k);
+    if (el) el.value = '';
+  });
+}
+
+function insManual() {
+  insShowWorkspace();
+  document.getElementById('ins-raw').innerHTML = '<textarea style="width:100%;height:340px;border:none;background:transparent;resize:none;font-size:12px;color:#4a4f70;line-height:1.7;font-family:inherit;outline:none" placeholder="在这里粘贴文章原文..." id="ins-raw-ta"></textarea>';
+  document.getElementById('ins-status').textContent = '请在左侧粘贴原文，右侧填写你的洞察整理';
+  insCheckApiKey();
+}
+
+async function insFetch() {
+  const url = document.getElementById('ins-url').value.trim();
+  if (!url) { alert('请先输入文章链接'); return; }
+  insShowWorkspace();
+  const rawEl = document.getElementById('ins-raw');
+  const status = document.getElementById('ins-status');
+  rawEl.innerHTML = '<div class="ins-raw-placeholder">正在抓取中...</div>';
+  status.textContent = '抓取中，请稍候...';
+
+  let html = null;
+  try {
+    // 优先走本地代理（serve.py 提供）
+    const proxyUrl = `/proxy?url=${encodeURIComponent(url)}`;
+    const res = await fetch(proxyUrl, {signal: AbortSignal.timeout(15000)});
+    if (res.ok) {
+      html = await res.text();
+    }
+  } catch(e) {
+    html = null;
+  }
+
+  if (!html || html.length < 100) {
+    rawEl.innerHTML = `<div class="ins-raw-placeholder" style="text-align:left;padding:1rem">
+      抓取失败（网络超时或链接需登录）<br><br>
+      请手动复制文章内容粘贴到下方 ↓
+    </div>
+    <textarea style="width:100%;height:260px;border:none;border-top:1px solid #e2e4ef;background:transparent;resize:none;font-size:12px;color:#4a4f70;line-height:1.7;font-family:inherit;outline:none;padding:.75rem" placeholder="粘贴原文内容..." id="ins-raw-ta"></textarea>`;
+    status.textContent = '抓取失败，已切换到手动模式';
+    return;
+  }
+
+  // 提取纯文本
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+  doc.querySelectorAll('script,style,nav,header,footer,aside,iframe,noscript,[class*="ad"],[class*="banner"],[id*="sidebar"],[class*="recommend"],[class*="related"]').forEach(e=>e.remove());
+  const article = doc.querySelector('article,[class*="article"],[class*="content"],[class*="post-body"],[class*="rich_media_content"],[class*="detail"],main') || doc.body;
+  const text = (article?.innerText || article?.textContent || '').replace(/[ \t]+/g,' ').replace(/\n{3,}/g,'\n\n').trim();
+  const pageTitle = doc.title || '';
+
+  rawEl.textContent = text.slice(0, 10000) + (text.length > 10000 ? '\n\n[内容过长，已截断前10000字]' : '');
+  if (pageTitle) document.getElementById('ins-f-title').value = pageTitle.replace(/[-_|—–].*$/, '').replace(/_微信公众号.*/, '').trim();
+  status.textContent = `✓ 抓取成功 · ${text.length} 字 · 请在右侧填写洞察整理`;
+  insCheckApiKey();
+}
+
+function insSave() {
+  const title = document.getElementById('ins-f-title').value.trim();
+  if (!title) { alert('请填写洞察标题'); return; }
+  const rec = {
+    date: new Date().toISOString().slice(0,10),
+    title,
+    source: document.getElementById('ins-url').value.trim(),
+    type: document.getElementById('ins-f-type').value,
+    tags: document.getElementById('ins-f-tags').value.trim(),
+    summary: document.getElementById('ins-f-summary').value.trim(),
+    key_points: document.getElementById('ins-f-kp').value.trim(),
+    my_take: document.getElementById('ins-f-take').value.trim(),
+    apply_to: document.getElementById('ins-f-apply').value.trim(),
+  };
+  S.add('insights', rec);
+  // 同步到 Obsidian
+  const safeName = rec.title.replace(/[\/\\:*?"<>|]/g,'_');
+  obsidianWrite(`洞察记录/${rec.date}-${safeName}.md`,
+    `---\ntags: [insight, ${(rec.type||'').replace(/\s/g,'_')}]\ncreated: ${rec.date}\nsource: ${rec.source||''}\n---\n\n# ${rec.title}\n\n## 核心摘要\n${rec.summary||''}\n\n## 关键观点\n${rec.key_points||''}\n\n## 我的判断\n${rec.my_take||''}\n\n## 可应用到\n${rec.apply_to||''}\n`
+  );
+  insClose();
+  renderInsights();
+  document.getElementById('ins-status') && (document.getElementById('ins-status').textContent = '');
+}
+
+// ─── Insights AI Analysis ──────────────────────────────────────────
+async function insCheckApiKey() {
+  try {
+    const res = await fetch('/config');
+    const data = await res.json();
+    const banner = document.getElementById('ins-api-banner');
+    const btn = document.getElementById('ins-analyze-btn');
+    if (data.has_doubao) {
+      if (banner) banner.style.display = 'none';
+      if (btn) btn.style.display = 'inline-block';
+    } else {
+      if (banner) banner.style.display = 'flex';
+      if (btn) btn.style.display = 'none';
+    }
+  } catch(e) {}
+}
+
+function insTabSwitch(tab) {
+  const rawWrap = document.getElementById('ins-raw-wrap');
+  const anaWrap = document.getElementById('ins-analysis-wrap');
+  const tabRaw = document.getElementById('ins-tab-raw');
+  const tabAna = document.getElementById('ins-tab-analysis');
+  if (tab === 'raw') {
+    rawWrap.style.display = 'block';
+    anaWrap.style.display = 'none';
+    tabRaw.classList.add('on');
+    tabAna.classList.remove('on');
+  } else {
+    rawWrap.style.display = 'none';
+    anaWrap.style.display = 'block';
+    tabRaw.classList.remove('on');
+    tabAna.classList.add('on');
+  }
+}
+
+function insGetRawText() {
+  const ta = document.getElementById('ins-raw-ta');
+  if (ta) return ta.value.trim();
+  return (document.getElementById('ins-raw').textContent || '').trim();
+}
+
+async function insAnalyze() {
+  const text = insGetRawText();
+  if (!text || text.length < 50) {
+    alert('请先抓取文章内容或粘贴原文'); return;
+  }
+  const btn = document.getElementById('ins-analyze-btn');
+  const status = document.getElementById('ins-status');
+  if (btn) { btn.disabled = true; btn.textContent = '分析中...'; }
+  insTabSwitch('analysis');
+  const anaEl = document.getElementById('ins-analysis');
+  anaEl.innerHTML = '<div class="ana-loading"><div class="ana-loading-dot"></div><div class="ana-loading-dot"></div><div class="ana-loading-dot"></div><span style="margin-left:.5rem;color:#888;font-size:12px">AI 分析中，预计 30-60 秒...</span></div>';
+  status.textContent = 'AI 分析中，请稍候...';
+  try {
+    const res = await fetch('/analyze', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({text}),
+      signal: AbortSignal.timeout(120000)
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      if (data.error === 'no_api_key') {
+        anaEl.innerHTML = '<div style="padding:1rem;color:#e57373">未配置 API Key，请先配置后重试。</div>';
+        insOpenApiMo();
+      } else {
+        anaEl.innerHTML = `<div style="padding:1rem;color:#e57373">分析失败：${data.error||'未知错误'}</div>`;
+      }
+      status.textContent = '分析失败';
+      return;
+    }
+    insRenderAnalysis(data.analysis);
+    status.textContent = '✦ AI 分析完成 · 可参考填写右侧表单';
+    insAutoFill(data.analysis);
+  } catch(e) {
+    anaEl.innerHTML = `<div style="padding:1rem;color:#e57373">请求超时或网络错误：${e.message}</div>`;
+    status.textContent = '分析失败';
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '✦ 开始分析'; }
+  }
+}
+
+function insRenderAnalysis(md) {
+  const anaEl = document.getElementById('ins-analysis');
+  let html = '';
+  const lines = md.split('\n');
+  let inList = false;
+  for (const line of lines) {
+    const t = line.trim();
+    if (!t) { if (inList) { html += '</ul>'; inList = false; } html += '<div style="height:.4rem"></div>'; continue; }
+    if (/^(一|二|三|四|五|六|七|八|九|十)[、，：:]/.test(t) || /^#+\s/.test(t)) {
+      if (inList) { html += '</ul>'; inList = false; }
+      const text = t.replace(/^#+\s*/, '').replace(/^(一|二|三|四|五|六|七|八|九|十)[、，：:]\s*/, (m)=>`<span class="ana-num">${m.trim()}</span> `);
+      html += `<div class="ana-h">${text}</div>`;
+    } else if (/^\d+\.\s/.test(t)) {
+      if (inList) { html += '</ul>'; inList = false; }
+      const text = t.replace(/^\d+\.\s*/, '').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      html += `<div class="ana-p" style="padding-left:1rem">• ${text}</div>`;
+    } else if (/^[\*\-]\s/.test(t)) {
+      if (!inList) { html += '<ul style="margin:0 0 0 1rem;padding:0">'; inList = true; }
+      const text = t.replace(/^[\*\-]\s*/, '').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      html += `<li class="ana-bullet">${text}</li>`;
+    } else if (/^[\*＊][\*＊](.+?)[\*＊][\*＊]/.test(t)) {
+      if (inList) { html += '</ul>'; inList = false; }
+      html += `<div class="ana-sub">${t.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div>`;
+    } else {
+      if (inList) { html += '</ul>'; inList = false; }
+      html += `<div class="ana-p">${t.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div>`;
+    }
+  }
+  if (inList) html += '</ul>';
+  anaEl.innerHTML = html;
+}
+
+function insAutoFill(analysis) {
+  const get = id => document.getElementById(id);
+  const clean = s => s.replace(/\*\*/g,'').replace(/^[\s\-\*•#]+/gm,'').trim();
+
+  // 一、文章一句话总结 → 标题 + 摘要
+  const sec1 = analysis.match(/一[、.．]\s*[^\n]*\n+([\s\S]{10,300}?)(?=\n\s*\n|\n二[、.．])/);
+  if (sec1) {
+    const text = clean(sec1[1]).slice(0, 200);
+    const titleEl = get('ins-f-title');
+    if (titleEl && !titleEl.value.trim()) titleEl.value = text;
+    const summaryEl = get('ins-f-summary');
+    if (summaryEl && !summaryEl.value.trim()) summaryEl.value = text;
+  }
+
+  // 二、文章核心观点 → 关键数据/观点
+  const sec2 = analysis.match(/二[、.．]\s*[^\n]*\n+([\s\S]{50,1200}?)(?=\n\s*\n三[、.．])/);
+  if (sec2) {
+    const kpEl = get('ins-f-kp');
+    if (kpEl && !kpEl.value.trim()) {
+      const lines = sec2[1].split('\n').map(l=>clean(l)).filter(l=>l.length>8).slice(0,8);
+      kpEl.value = lines.map(l=>'• '+l).join('\n');
+    }
+  }
+
+  // 五、可迁移价值 → 我的判断
+  const sec5 = analysis.match(/五[、.．]\s*[^\n]*\n+([\s\S]{30,600}?)(?=\n\s*\n六[、.．])/);
+  if (sec5) {
+    const takeEl = get('ins-f-take');
+    if (takeEl && !takeEl.value.trim()) takeEl.value = clean(sec5[1]).slice(0, 400);
+  }
+
+  // 自动推断类型
+  const typeEl = get('ins-f-type');
+  if (typeEl && !typeEl.value) {
+    const lower = analysis.toLowerCase();
+    if (lower.includes('数据') || lower.includes('报告') || lower.includes('%')) typeEl.value = '数据报告';
+    else if (lower.includes('案例') || lower.includes('品牌')) typeEl.value = '案例分析';
+    else if (lower.includes('趋势') || lower.includes('行业')) typeEl.value = '行业趋势';
+    else if (lower.includes('用户') || lower.includes('消费者')) typeEl.value = '用户研究';
+    else if (lower.includes('方法') || lower.includes('模型') || lower.includes('框架')) typeEl.value = '方法论';
+    else typeEl.value = '行业趋势';
+  }
+
+  // 从九、关键词提取标签
+  const tagsEl = get('ins-f-tags');
+  if (tagsEl && !tagsEl.value.trim()) {
+    const kwMatch = analysis.match(/九[、.．][\s\S]{0,200}?记住.*?[:：]\s*\n+([\s\S]{0,300}?)(?=\n\s*\n|\n最值得)/);
+    if (kwMatch) {
+      const tags = kwMatch[1].split('\n').map(l=>clean(l)).filter(l=>l.length>2&&l.length<20).slice(0,5);
+      if (tags.length) tagsEl.value = tags.join(', ');
+    }
+  }
+}
+
+// ─── Insight Detail / Edit ────────────────────────────────────────
+let _insDetailId = null;
+function insOpenDetail(id) {
+  const rec = S.get('insights').find(r=>r._id===id);
+  if (!rec) return;
+  _insDetailId = id;
+  document.getElementById('ins-det-title').value  = rec.title||'';
+  document.getElementById('ins-det-type').value   = rec.type||'';
+  document.getElementById('ins-det-tags').value   = rec.tags||'';
+  document.getElementById('ins-det-summary').value= rec.summary||'';
+  document.getElementById('ins-det-kp').value     = rec.key_points||'';
+  document.getElementById('ins-det-take').value   = rec.my_take||'';
+  document.getElementById('ins-det-apply').value  = rec.apply_to||'';
+  document.getElementById('ins-det-source').value = rec.source||'';
+  document.getElementById('ins-det-starred').checked = !!rec.starred;
+  document.getElementById('ins-detail-modal').style.display='flex';
+}
+function insCloseDetail() {
+  document.getElementById('ins-detail-modal').style.display='none';
+  _insDetailId=null;
+}
+function insDetailSave() {
+  if (!_insDetailId) return;
+  const title = document.getElementById('ins-det-title').value.trim();
+  if (!title) { alert('标题不能为空'); return; }
+  const all = S.get('insights');
+  const idx = all.findIndex(r=>r._id===_insDetailId);
+  if (idx===-1) return;
+  all[idx] = Object.assign(all[idx], {
+    title,
+    type:       document.getElementById('ins-det-type').value,
+    tags:       document.getElementById('ins-det-tags').value.trim(),
+    summary:    document.getElementById('ins-det-summary').value.trim(),
+    key_points: document.getElementById('ins-det-kp').value.trim(),
+    my_take:    document.getElementById('ins-det-take').value.trim(),
+    apply_to:   document.getElementById('ins-det-apply').value.trim(),
+    starred:    document.getElementById('ins-det-starred').checked,
+  });
+  localStorage.setItem('sysdb_insights', JSON.stringify(all));
+  insCloseDetail();
+  if (document.getElementById('insights').classList.contains('active')) renderInsights();
+  if (document.getElementById('inslib').classList.contains('active')) renderInsightLib();
+}
+
+// ─── 洞察库 ───────────────────────────────────────────────────────
+function renderInsightLib(kw, typeF, tagF) {
+  const typeColors = {'行业趋势':'dp-blue','数据报告':'dp-purple','竞品分析':'dp-amber','用户研究':'dp-green','政策解读':'dp-accent','方法论':'dp-blue','案例分析':'dp-green','其他':'dp-default'};
+  const all = S.get('insights');
+  // collect unique types & tags
+  const allTypes = [...new Set(all.map(r=>r.type).filter(Boolean))];
+  const allTags  = [...new Set(all.flatMap(r=>(r.tags||'').split(',').map(t=>t.trim()).filter(Boolean)))];
+
+  let records = all;
+  if (kw)    records = records.filter(r=>JSON.stringify(r).toLowerCase().includes(kw.toLowerCase()));
+  if (typeF) records = records.filter(r=>r.type===typeF);
+  if (tagF)  records = records.filter(r=>(r.tags||'').split(',').map(t=>t.trim()).includes(tagF));
+
+  const cards = records.length ? records.map(r=>`
+    <div class="ilib-card" onclick="insOpenDetail(${r._id})">
+      <div class="ilib-card-head">
+        <span class="ilib-title">${r.title||'—'}</span>
+        ${r.type?`<span class="db-prop ${typeColors[r.type]||'dp-default'}" style="flex-shrink:0">${r.type}</span>`:''}
+      </div>
+      ${r.tags?`<div class="ilib-tags">${r.tags.split(',').map(t=>`<span class="ilib-tag">${t.trim()}</span>`).join('')}</div>`:''}
+      <div class="ilib-summary">${r.summary||'暂无摘要'}</div>
+      <div class="ilib-foot">
+        <span>${r.date||''}</span>
+        <span onclick="event.stopPropagation();insToggleStar(${r._id})" style="cursor:pointer;font-size:16px;line-height:1" title="${r.starred?'取消重点':'标记为重点'}">${r.starred?'⭐':'☆'}</span>
+      </div>
+    </div>`).join('') : `<div style="color:#9ca3af;padding:40px;text-align:center">暂无匹配洞察</div>`;
+
+  document.getElementById('inslib').innerHTML = `
+    <div class="ph"><h1><span>◈</span>洞察库</h1><div class="remind">搜索、筛选你积累的所有行业洞察</div></div>
+    <div class="ilib-filters">
+      <input class="sinput" id="ilib-kw" placeholder="🔍 搜索关键词..." value="${kw||''}"
+        oninput="renderInsightLib(this.value,document.getElementById('ilib-type').value,document.getElementById('ilib-tag').value)"
+        style="flex:2;min-width:180px">
+      <select class="ins-sel" id="ilib-type" style="flex:1;min-width:120px"
+        onchange="renderInsightLib(document.getElementById('ilib-kw').value,this.value,document.getElementById('ilib-tag').value)">
+        <option value="">全部类型</option>
+        ${allTypes.map(t=>`<option${t===typeF?' selected':''}>${t}</option>`).join('')}
+      </select>
+      <select class="ins-sel" id="ilib-tag" style="flex:1;min-width:120px"
+        onchange="renderInsightLib(document.getElementById('ilib-kw').value,document.getElementById('ilib-type').value,this.value)">
+        <option value="">全部标签</option>
+        ${allTags.map(t=>`<option${t===tagF?' selected':''}>${t}</option>`).join('')}
+      </select>
+      <span style="font-size:11px;color:#9ca3af;white-space:nowrap">${records.length} / ${all.length} 条</span>
+    </div>
+    <div class="ilib-grid">${cards}</div>
+  `;
+}
+
+// ─── 资产库（搜索检索页）────────────────────────────────────────────
+function renderAssetLib(kw, typeF, statusF) {
+  const typeColors = {'项目案例':'dp-blue','方案模板':'dp-purple','SOP':'dp-amber','数据分析':'dp-green','汇报话术':'dp-accent','行业观察':'dp-blue','简历素材':'dp-green','作品集素材':'dp-purple','内容选题':'dp-amber','管理经验':'dp-green'};
+  const all = S.get('assets');
+  const allTypes   = [...new Set(all.map(r=>r.type).filter(Boolean))];
+  const allStatus  = [...new Set(all.map(r=>r.status).filter(Boolean))];
+
+  let records = all;
+  if (kw)      records = records.filter(r=>JSON.stringify(r).toLowerCase().includes(kw.toLowerCase()));
+  if (typeF)   records = records.filter(r=>r.type===typeF);
+  if (statusF) records = records.filter(r=>r.status===statusF);
+
+  const cards = records.length ? records.map(r=>`
+    <div class="ilib-card" onclick="showRecordDetail('assets',${r._id})">
+      <div class="ilib-card-head">
+        <span class="ilib-title">${r.name||'—'}</span>
+        ${r.type?`<span class="db-prop ${typeColors[r.type]||'dp-default'}" style="flex-shrink:0">${r.type}</span>`:''}
+      </div>
+      ${r.source_proj?`<div style="font-size:11px;color:#9ca3af;margin-bottom:4px">来源：${r.source_proj}</div>`:''}
+      <div class="ilib-summary">${r.content||'暂无内容'}</div>
+      <div class="ilib-foot">
+        <span>${r.status?`<span class="db-prop dp-${r.status==='已发布'||r.status==='已优化'?'green':'amber'}">${r.status}</span>`:''}</span>
+        ${r.use_for?`<span style="font-size:11px">📌 ${r.use_for}</span>`:''}
+      </div>
+    </div>`).join('')
+  : `<div style="color:#9ca3af;padding:40px;text-align:center">暂无匹配资产</div>`;
+
+  document.getElementById('assetlib').innerHTML = `
+    <div class="ph"><h1><span>◉</span>资产库</h1><div class="remind">快速检索你积累的所有职业资产</div></div>
+    <div class="ilib-filters">
+      <input class="sinput" id="alib-kw" placeholder="🔍 搜索关键词..." value="${kw||''}"
+        oninput="renderAssetLib(this.value,document.getElementById('alib-type').value,document.getElementById('alib-status').value)"
+        style="flex:2;min-width:180px">
+      <select class="ins-sel" id="alib-type" style="flex:1;min-width:120px"
+        onchange="renderAssetLib(document.getElementById('alib-kw').value,this.value,document.getElementById('alib-status').value)">
+        <option value="">全部类型</option>
+        ${allTypes.map(t=>`<option${t===typeF?' selected':''}>${t}</option>`).join('')}
+      </select>
+      <select class="ins-sel" id="alib-status" style="flex:1;min-width:110px"
+        onchange="renderAssetLib(document.getElementById('alib-kw').value,document.getElementById('alib-type').value,this.value)">
+        <option value="">全部状态</option>
+        ${allStatus.map(s=>`<option${s===statusF?' selected':''}>${s}</option>`).join('')}
+      </select>
+      <span style="font-size:11px;color:#9ca3af;white-space:nowrap">${records.length} / ${all.length} 条</span>
+    </div>
+    <div class="ilib-grid">${cards}</div>
+  `;
+}
+
+// ─── 成功案例页 ──────────────────────────────────────────────────────
+function renderAssetWin() {
+  const all = S.get('assets');
+  const wins = all.filter(r=>
+    r.status==='已发布' || r.status==='已优化' ||
+    r.portfolio==='是'  || r.resume==='是'
+  );
+
+  const cards = wins.length ? wins.map(r=>`
+    <div class="istar-card" style="background:#f0fdf4;border-color:#bbf7d0" onclick="showRecordDetail('assets',${r._id})">
+      <div class="istar-card-head">
+        <span class="istar-badge" style="background:#dcfce7;color:#166534">🏆 成果</span>
+        ${r.type?`<span class="db-prop dp-green">${r.type}</span>`:''}
+        ${r.status?`<span class="db-prop dp-green">${r.status}</span>`:''}
+      </div>
+      <div class="istar-title">${r.name||'—'}</div>
+      ${r.source_proj?`<div style="font-size:11px;color:#6b7280;margin-bottom:6px">来源项目：${r.source_proj}</div>`:''}
+      ${r.content?`<div class="istar-section"><div class="istar-sec-label">内容摘要</div><div class="istar-text">${r.content}</div></div>`:''}
+      ${r.use_for?`<div class="istar-section"><div class="istar-sec-label">可用于</div><div class="istar-text istar-take">${r.use_for}</div></div>`:''}
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">
+        ${r.portfolio==='是'?'<span class="db-prop dp-blue">📁 作品集</span>':''}
+        ${r.resume==='是'?'<span class="db-prop dp-purple">📄 简历</span>':''}
+        ${r.article==='是'?'<span class="db-prop dp-amber">✐ 可变文章</span>':''}
+        ${r.method==='是'?'<span class="db-prop dp-green">⚙ 可变方法论</span>':''}
+      </div>
+    </div>`).join('')
+  : `<div class="istar-empty"><div style="font-size:40px;margin-bottom:12px">🏆</div><div>还没有成功案例</div><div style="font-size:12px;margin-top:6px;color:#9ca3af">在「我的案例」里把资产状态设为「已发布/已优化」或「可放作品集」，会自动出现在这里</div></div>`;
+
+  document.getElementById('assetwin').innerHTML = `
+    <div class="ph"><h1><span>🏆</span>成功案例</h1><div class="remind">有成果、可展示、能沉淀的职业资产</div></div>
+    <div class="istar-grid">${cards}</div>
+  `;
+}
+
+// ─── 知识库（Obsidian 搜索）────────────────────────────────────────
+async function renderObsidian(kw, folder) {
+  const el = document.getElementById('obsidian');
+  el.innerHTML = `
+    <div class="ph"><h1><span>🗂</span>知识库</h1><div class="remind">搜索 Obsidian vault 里的所有历史记录与笔记</div></div>
+    <div class="ilib-filters">
+      <input class="sinput" id="ob-kw" placeholder="🔍 搜索知识库..." value="${kw||''}"
+        style="flex:2;min-width:200px"
+        onkeydown="if(event.key==='Enter')renderObsidian(this.value,document.getElementById('ob-folder').value)">
+      <select class="ins-sel" id="ob-folder" style="flex:1;min-width:120px"
+        onchange="renderObsidian(document.getElementById('ob-kw').value,this.value)">
+        <option value="">全部</option>
+        <option${folder==='Projects'?' selected':''}>Projects</option>
+        <option${folder==='Insights'?' selected':''}>Insights</option>
+        <option${folder==='Assets'?' selected':''}>Assets</option>
+        <option${folder==='Ideas'?' selected':''}>Ideas</option>
+      </select>
+      <span class="btn" onclick="renderObsidian(document.getElementById('ob-kw').value,document.getElementById('ob-folder').value)">搜索</span>
+    </div>
+    <div id="ob-results"><div style="color:#9ca3af;padding:40px;text-align:center">输入关键词后按回车搜索</div></div>
+  `;
+  if (!kw) {
+    // 无关键词时列出最近文件
+    try {
+      const res = await fetch(`/obsidian/list${folder?'?folder='+folder:''}`);
+      const data = await res.json();
+      document.getElementById('ob-results').innerHTML = data.files.length
+        ? `<div style="font-size:11px;color:#9ca3af;margin-bottom:8px">最近记录（${data.files.length} 条）</div>` +
+          data.files.map(f=>`
+            <div class="ins-sug-item" style="margin-bottom:6px">
+              <div style="font-size:13px;font-weight:600;color:#1e2040;margin-bottom:3px">📄 ${f.title}</div>
+              <div style="font-size:11px;color:#9ca3af">${f.path}</div>
+              ${f.preview?`<div style="font-size:12px;color:#6b7280;margin-top:4px">${f.preview}</div>`:''}
+            </div>`).join('')
+        : `<div style="color:#9ca3af;padding:40px;text-align:center">暂无记录</div>`;
+    } catch(e) {}
+    return;
+  }
+  try {
+    const res = await fetch(`/obsidian/search?q=${encodeURIComponent(kw)}${folder?'&folder='+folder:''}`);
+    const data = await res.json();
+    document.getElementById('ob-results').innerHTML = data.results.length
+      ? `<div style="font-size:11px;color:#9ca3af;margin-bottom:8px">找到 ${data.results.length} 条匹配</div>` +
+        data.results.map(r=>`
+          <div class="ins-sug-item" style="margin-bottom:6px">
+            <div style="font-size:13px;font-weight:600;color:#1e2040;margin-bottom:3px">📄 ${r.title}</div>
+            <div style="font-size:11px;color:#9ca3af;margin-bottom:4px">${r.path}</div>
+            ${r.preview?`<div style="font-size:12px;color:#4a4f70;background:#f3f4f6;padding:5px 8px;border-radius:4px">...${r.preview}...</div>`:''}
+          </div>`).join('')
+      : `<div style="color:#9ca3af;padding:40px;text-align:center">未找到「${kw}」相关记录</div>`;
+  } catch(e) {
+    document.getElementById('ob-results').innerHTML = `<div style="color:#ef4444;padding:20px">搜索失败，请确认服务器已重启</div>`;
+  }
+}
+
+function showRecordDetail(modKey, id) {
+  const mod = MOD[modKey];
+  const rec = S.get(modKey).find(r=>r._id===id);
+  if (!rec || !mod) return;
+  const fields = mod.fields || [];
+  const title = rec[mod.titleField] || rec.title || rec.name || '详情';
+  document.getElementById('rec-det-heading').textContent = `${mod.icon||''} ${title}`;
+  document.getElementById('rec-det-body').innerHTML = fields
+    .filter(f=>rec[f.k])
+    .map(f=>`
+      <div style="margin-bottom:10px">
+        <div style="font-size:10px;font-weight:700;color:#9ca3af;letter-spacing:.06em;margin-bottom:3px">${f.l.toUpperCase()}</div>
+        <div style="font-size:13px;color:#1e2040;line-height:1.7;white-space:pre-wrap;background:#f8f9ff;border-radius:6px;padding:7px 10px">${rec[f.k]}</div>
+      </div>`).join('');
+  document.getElementById('rec-detail-modal').style.display = 'flex';
+}
+
+function showProjectSuggestion(projName, insights, assets, ideas) {
+  const typeColors = {'行业趋势':'dp-blue','数据报告':'dp-purple','竞品分析':'dp-amber','用户研究':'dp-green','政策解读':'dp-accent','方法论':'dp-blue','案例分析':'dp-green','其他':'dp-default'};
+  const total = insights.length + assets.length + ideas.length;
+  document.getElementById('ins-sug-title').textContent = `💡 发现 ${total} 条相关内容`;
+  document.getElementById('ins-sug-desc').textContent = `以下内容可能对「${projName}」有参考价值，点击查看详情：`;
+
+  const closeModal = `document.getElementById('ins-suggest-modal').style.display='none'`;
+
+  const insHtml = insights.length ? `
+    <div class="sug-section-label">◉ 行业洞察（${insights.length}）</div>
+    ${insights.slice(0,5).map(r=>`
+      <div class="ins-sug-item" onclick="${closeModal};insOpenDetail(${r._id})">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+          ${r.starred?'<span>⭐</span>':''}
+          <span style="font-size:13px;font-weight:600;color:#1e2040;flex:1">${r.title||'—'}</span>
+          ${r.type?`<span class="db-prop ${typeColors[r.type]||'dp-default'}">${r.type}</span>`:''}
+        </div>
+        ${r.summary?`<div style="font-size:12px;color:#6b7280;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${r.summary}</div>`:''}
+        ${r.tags?`<div style="margin-top:4px">${r.tags.split(',').map(t=>`<span class="ilib-tag">${t.trim()}</span>`).join(' ')}</div>`:''}
+      </div>`).join('')}` : '';
+
+  const assetsHtml = assets.length ? `
+    <div class="sug-section-label">◈ 资产库（${assets.length}）</div>
+    ${assets.slice(0,5).map(r=>`
+      <div class="ins-sug-item" onclick="showRecordDetail('assets',${r._id})">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+          <span style="font-size:13px;font-weight:600;color:#1e2040;flex:1">${r.name||'—'}</span>
+          ${r.type?`<span class="db-prop dp-blue">${r.type}</span>`:''}
+          ${r.status?`<span class="db-prop dp-green">${r.status}</span>`:''}
+        </div>
+        ${r.content?`<div style="font-size:12px;color:#6b7280;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${r.content}</div>`:''}
+        ${r.use_for?`<div style="font-size:11px;color:#9ca3af;margin-top:3px">可用于：${r.use_for}</div>`:''}
+      </div>`).join('')}` : '';
+
+  const ideasHtml = ideas.length ? `
+    <div class="sug-section-label">✦ 想法池（${ideas.length}）</div>
+    ${ideas.slice(0,5).map(r=>`
+      <div class="ins-sug-item" onclick="showRecordDetail('ideas',${r._id})">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+          <span style="font-size:13px;font-weight:600;color:#1e2040;flex:1">${r.title||'—'}</span>
+          ${r.type?`<span class="db-prop dp-purple">${r.type}</span>`:''}
+        </div>
+        ${r.content?`<div style="font-size:12px;color:#6b7280;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${r.content}</div>`:''}
+        ${r.next?`<div style="font-size:11px;color:#9ca3af;margin-top:3px">下一步：${r.next}</div>`:''}
+      </div>`).join('')}` : '';
+
+  document.getElementById('ins-sug-list').innerHTML = insHtml + assetsHtml + ideasHtml;
+  document.getElementById('ins-suggest-modal').style.display = 'flex';
+}
+
+function insToggleStar(id) {
+  const all = S.get('insights');
+  const idx = all.findIndex(r=>r._id===id);
+  if (idx===-1) return;
+  all[idx].starred = !all[idx].starred;
+  localStorage.setItem('sysdb_insights', JSON.stringify(all));
+  const active = document.querySelector('.page.active');
+  if (active && active.id==='inslib') renderInsightLib(
+    document.getElementById('ilib-kw')?.value,
+    document.getElementById('ilib-type')?.value,
+    document.getElementById('ilib-tag')?.value
+  );
+  if (active && active.id==='insstar') renderInsightStar();
+}
+
+function renderInsightStar() {
+  const typeColors = {'行业趋势':'dp-blue','数据报告':'dp-purple','竞品分析':'dp-amber','用户研究':'dp-green','政策解读':'dp-accent','方法论':'dp-blue','案例分析':'dp-green','其他':'dp-default'};
+  const starred = S.get('insights').filter(r=>r.starred);
+
+  const cards = starred.length ? starred.map(r=>`
+    <div class="istar-card" onclick="insOpenDetail(${r._id})">
+      <div class="istar-card-head">
+        <span class="istar-badge">⭐ 重点</span>
+        ${r.type?`<span class="db-prop ${typeColors[r.type]||'dp-default'}">${r.type}</span>`:''}
+        <span onclick="event.stopPropagation();insToggleStar(${r._id})" class="istar-unpin" title="取消重点">✕</span>
+      </div>
+      <div class="istar-title">${r.title||'—'}</div>
+      ${r.tags?`<div class="ilib-tags">${r.tags.split(',').map(t=>`<span class="ilib-tag">${t.trim()}</span>`).join('')}</div>`:''}
+      ${r.summary?`<div class="istar-section"><div class="istar-sec-label">核心摘要</div><div class="istar-text">${r.summary}</div></div>`:''}
+      ${r.key_points?`<div class="istar-section"><div class="istar-sec-label">关键观点</div><div class="istar-text">${r.key_points}</div></div>`:''}
+      ${r.my_take?`<div class="istar-section"><div class="istar-sec-label">我的判断</div><div class="istar-text istar-take">${r.my_take}</div></div>`:''}
+      <div class="ilib-foot" style="margin-top:10px">
+        <span>${r.date||''}</span>
+        ${r.apply_to?`<span>📌 ${r.apply_to}</span>`:''}
+        ${r.source?`<a href="${r.source}" target="_blank" onclick="event.stopPropagation()" style="color:#5b5cf6;font-size:11px">原文 ↗</a>`:''}
+      </div>
+    </div>`).join('')
+  : `<div class="istar-empty"><div style="font-size:40px;margin-bottom:12px">☆</div><div>还没有重点洞察</div><div style="font-size:12px;margin-top:6px;color:#9ca3af">在洞察库卡片右下角点 ☆ 或编辑时勾选「标记为重点」</div></div>`;
+
+  document.getElementById('insstar').innerHTML = `
+    <div class="ph"><h1><span>★</span>重点洞察</h1><div class="remind">精选出的重要洞察，随时查阅与回顾</div></div>
+    <div class="istar-grid">${cards}</div>
+  `;
+}
+
+function insOpenApiMo() {
+  document.getElementById('api-key-modal').style.display = 'flex';
+  fetch('/config').then(r=>r.json()).then(d=>{
+    if (d.doubao_preview) {
+      document.getElementById('api-key-inp').placeholder = d.doubao_preview + ' (已配置，输入新 Key 以更换)';
+    }
+    const modelInp = document.getElementById('doubao-model-inp');
+    if (modelInp && d.doubao_model) modelInp.value = d.doubao_model;
+  }).catch(()=>{});
+}
+
+function insCloseApiMo() {
+  document.getElementById('api-key-modal').style.display = 'none';
+}
+
+async function insSaveApiKey() {
+  const key = document.getElementById('api-key-inp').value.trim();
+  if (!key) { alert('请输入 API Key'); return; }
+  if (key.length < 10) { alert('Key 格式不对，请检查是否完整复制'); return; }
+  const model = (document.getElementById('doubao-model-inp')?.value || '').trim() || 'doubao-pro-32k-241215';
+  try {
+    const res = await fetch('/config', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ doubao_api_key: key, doubao_model: model })
+    });
+    const d = await res.json();
+    if (d.ok) {
+      insCloseApiMo();
+      document.getElementById('api-key-inp').value = '';
+      insCheckApiKey();
+      showToast('豆包 API Key 已保存 ✓ 现在可以分析文章了');
+    } else {
+      alert('保存失败：' + (d.error||'未知错误'));
+    }
+  } catch(e) {
+    alert('保存失败：' + e.message);
+  }
+}
+
+// ─── Server酱 推送 ─────────────────────────────────────────────────
+function scOpenModal() {
+  document.getElementById('sc-key-modal').style.display = 'flex';
+  fetch('/config').then(r=>r.json()).then(d=>{
+    if (d.sc_preview) document.getElementById('sc-key-inp').placeholder = d.sc_preview + ' (已配置，输入新 Key 以更换)';
+  }).catch(()=>{});
+}
+
+async function scSaveKey() {
+  const key = document.getElementById('sc-key-inp').value.trim();
+  if (!key) { alert('请输入 SendKey'); return; }
+  try {
+    const res = await fetch('/config', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({serverchan_key: key})
+    });
+    const d = await res.json();
+    if (d.ok) {
+      document.getElementById('sc-key-modal').style.display = 'none';
+      document.getElementById('sc-key-inp').value = '';
+      alert('SendKey 已保存 ✓');
+    } else {
+      alert('保存失败：' + (d.error||''));
+    }
+  } catch(e) { alert('保存失败：' + e.message); }
+}
+
+async function todoNotifyWeChat() {
+  const today = new Date().toISOString().slice(0,10);
+  const all = TODO.get().filter(t => !t.done);
+  const overdue = all.filter(t => t.due && t.due < today);
+  const dueToday = all.filter(t => t.due === today);
+  const noDue = all.filter(t => !t.due);
+
+  if (all.length === 0) { alert('没有待处理的任务'); return; }
+
+  let desp = '';
+  if (overdue.length) {
+    desp += '### ⚠️ 已超期\n' + overdue.map(t=>`- [${t.priority||'--'}] ${t.title}（${t.due}）`).join('\n') + '\n\n';
+  }
+  if (dueToday.length) {
+    desp += '### 📅 今日到期\n' + dueToday.map(t=>`- [${t.priority||'--'}] ${t.title}`).join('\n') + '\n\n';
+  }
+  if (noDue.length) {
+    desp += '### 📋 其他待办\n' + noDue.map(t=>`- ${t.title}`).join('\n') + '\n';
+  }
+
+  const title = `待办提醒：${overdue.length>0?`${overdue.length}条已超期 · `:''}${dueToday.length>0?`${dueToday.length}条今日到期 · `:''}共${all.length}条`;
+
+  try {
+    const res = await fetch('/notify', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ title, desp })
+    });
+    const d = await res.json();
+    if (d.ok) {
+      alert('已推送到微信 ✓');
+    } else if (d.error === 'no_serverchan_key') {
+      if (confirm('还没有配置 Server酱 SendKey，现在去配置？')) scOpenModal();
+    } else {
+      alert('推送失败：' + d.error);
+    }
+  } catch(e) { alert('推送失败：' + e.message); }
+}
+
+// ─── 任务待办 ──────────────────────────────────────────────────────
+const TODO = {
+  get: () => JSON.parse(localStorage.getItem('sys_todos')||'[]'),
+  save: (d) => localStorage.setItem('sys_todos', JSON.stringify(d)),
+  add: (t) => { const d=TODO.get(); t.id='todo_'+Date.now(); t.createdAt=new Date().toISOString(); d.unshift(t); TODO.save(d); },
+  toggle: (id) => { const d=TODO.get(); const t=d.find(x=>x.id===id); if(t) t.done=!t.done; TODO.save(d); },
+  del: (id) => { TODO.save(TODO.get().filter(x=>x.id!==id)); },
+};
+
+let _todoFilter = 'all';
+let _todoShowForm = false;
+
+function renderTodos() {
+  const page = document.getElementById('todos');
+  if (!page) return;
+  const today = new Date().toISOString().slice(0,10);
+  let recs = TODO.get();
+  if (_todoFilter === 'today') recs = recs.filter(t => !t.done && (!t.due || t.due <= today));
+  else if (_todoFilter === 'done') recs = recs.filter(t => t.done);
+  else if (_todoFilter === 'all') recs = recs.filter(t => !t.done);
+
+  const allCount = TODO.get().filter(t=>!t.done).length;
+  const todayCount = TODO.get().filter(t=>!t.done && t.due && t.due<=today).length;
+  const doneCount = TODO.get().filter(t=>t.done).length;
+
+  page.innerHTML = `
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.25rem">
+    <h2 class="ph" style="margin:0">☑ 任务待办</h2>
+    <div style="display:flex;gap:.5rem">
+      <span class="btn" onclick="scOpenModal()" title="配置微信推送">⚙ 微信推送</span>
+      <span class="btn pri" onclick="todoNotifyWeChat()" title="推送待办到微信">📲 推送到微信</span>
+    </div>
+  </div>
+
+  <div class="todo-quick">
+    <input class="todo-quick-inp" id="todo-inp" placeholder="快速添加任务，回车保存..." onkeydown="if(event.key==='Enter')todoQuickAdd()">
+    <span class="btn" onclick="_todoShowForm=!_todoShowForm;renderTodos()">${_todoShowForm?'收起':'+ 详细'}</span>
+  </div>
+
+  ${_todoShowForm ? `
+  <div class="todo-add-form">
+    <input class="fi" id="tf-title" placeholder="任务标题 *" style="width:100%;margin-bottom:.5rem">
+    <div class="todo-add-row">
+      <select class="fs" id="tf-pri"><option value="">优先级</option><option value="P0">🔴 P0 紧急</option><option value="P1">🟡 P1 重要</option><option value="P2">🔵 P2 一般</option><option value="P3">⚪ P3 随手</option></select>
+      <input class="fi" type="date" id="tf-due" placeholder="截止日期">
+    </div>
+    <div class="todo-add-row" style="margin-top:.5rem">
+      <input class="fi" id="tf-cat" placeholder="分类（如：工作、私域、学习）">
+      <input class="fi" id="tf-note" placeholder="备注">
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:.5rem;margin-top:.75rem">
+      <span class="btn" onclick="_todoShowForm=false;renderTodos()">取消</span>
+      <span class="btn pri" onclick="todoDetailAdd()">保存任务</span>
+    </div>
+  </div>` : ''}
+
+  <div class="todo-filters">
+    <div class="todo-filter ${_todoFilter==='all'?'on':''}" onclick="_todoFilter='all';renderTodos()">全部 ${allCount>0?`<span style="background:#5b5cf6;color:#fff;border-radius:10px;padding:0 5px;font-size:10px">${allCount}</span>`:''}</div>
+    <div class="todo-filter ${_todoFilter==='today'?'on':''}" onclick="_todoFilter='today';renderTodos()">今日到期 ${todayCount>0?`<span style="background:#e05a6a;color:#fff;border-radius:10px;padding:0 5px;font-size:10px">${todayCount}</span>`:''}</div>
+    <div class="todo-filter ${_todoFilter==='done'?'on':''}" onclick="_todoFilter='done';renderTodos()">已完成 ${doneCount>0?`<span style="background:#9ca3af;color:#fff;border-radius:10px;padding:0 5px;font-size:10px">${doneCount}</span>`:''}</div>
+  </div>
+
+  <div class="todo-list">
+    ${recs.length===0 ? `<div class="todo-empty">${_todoFilter==='done'?'还没有完成的任务':'暂无任务 · 快速添加一条吧 🎯'}</div>` :
+      recs.map(t => {
+        const priClass = {P0:'p0',P1:'p1',P2:'p2',P3:'p3'}[t.priority]||'p3';
+        let dueTag = '';
+        if (t.due) {
+          if (t.due < today) dueTag = `<span class="todo-tag due-over">⚠ ${t.due} 已超期</span>`;
+          else if (t.due === today) dueTag = `<span class="todo-tag due-today">📅 今天到期</span>`;
+          else dueTag = `<span class="todo-tag due-ok">📅 ${t.due}</span>`;
+        }
+        return `<div class="todo-item ${t.done?'done':''}">
+          <div class="todo-cb ${t.done?'checked':''}" onclick="TODO.toggle('${t.id}');renderTodos()">${t.done?'✓':''}</div>
+          <div class="todo-body">
+            <div class="todo-title">${t.title}</div>
+            <div class="todo-meta">
+              ${t.priority?`<span class="todo-tag ${priClass}">${t.priority}</span>`:''}
+              ${t.category?`<span class="todo-tag cat">${t.category}</span>`:''}
+              ${dueTag}
+              ${t.note?`<span style="font-size:11px;color:#9ca3af">${t.note}</span>`:''}
+            </div>
+          </div>
+          <div class="todo-actions">
+            <div class="todo-del" onclick="TODO.del('${t.id}');renderTodos()">✕</div>
+          </div>
+        </div>`;
+      }).join('')
+    }
+  </div>`;
+
+  // auto-focus quick input
+  const inp = document.getElementById('todo-inp');
+  if (inp && !_todoShowForm) setTimeout(()=>inp.focus(), 50);
+}
+
+function todoQuickAdd() {
+  const inp = document.getElementById('todo-inp');
+  const title = inp?.value.trim();
+  if (!title) return;
+  TODO.add({ title, done: false, priority: '', category: '', due: '', note: '' });
+  inp.value = '';
+  renderTodos();
+}
+
+function todoDetailAdd() {
+  const title = document.getElementById('tf-title')?.value.trim();
+  if (!title) { alert('请填写任务标题'); return; }
+  TODO.add({
+    title,
+    done: false,
+    priority: document.getElementById('tf-pri')?.value || '',
+    due: document.getElementById('tf-due')?.value || '',
+    category: document.getElementById('tf-cat')?.value.trim() || '',
+    note: document.getElementById('tf-note')?.value.trim() || '',
+  });
+  _todoShowForm = false;
+  renderTodos();
+}
+
+// ─── 语音输入 ──────────────────────────────────────────────────────
+let _voiceRec = null;
+let _voiceField = null;
+
+function voiceToggle(fieldKey) {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    alert('当前浏览器不支持语音输入，请使用 Chrome 或 Edge'); return;
+  }
+  const btn = document.getElementById('vbtn-' + fieldKey);
+  const el = document.getElementById('vta-' + fieldKey); // textarea or input
+
+  if (_voiceRec && _voiceField === fieldKey) { _voiceRec.stop(); return; }
+  if (_voiceRec) { _voiceRec.stop(); }
+
+  const rec = new SpeechRecognition();
+  rec.lang = 'zh-CN';
+  rec.continuous = true;
+  rec.interimResults = true;
+
+  let interim = '';
+  let base = el ? el.value : '';
+
+  rec.onstart = () => {
+    _voiceRec = rec; _voiceField = fieldKey;
+    base = el ? el.value : '';
+    if (btn) { btn.classList.add('recording'); btn.textContent = '⏹'; btn.title = '点击停止'; }
+  };
+
+  rec.onresult = (e) => {
+    interim = '';
+    let final = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) final += e.results[i][0].transcript;
+      else interim += e.results[i][0].transcript;
+    }
+    if (el) el.value = base + final + interim;
+  };
+
+  rec.onend = () => {
+    _voiceRec = null; _voiceField = null;
+    if (btn) { btn.classList.remove('recording'); btn.textContent = '🎤'; btn.title = '语音输入'; }
+    if (el && interim) el.value = el.value.replace(interim, '');
+  };
+
+  rec.onerror = (e) => {
+    rec.stop();
+    if (e.error === 'not-allowed') alert('请在浏览器中允许麦克风权限后重试');
+  };
+
+  rec.start();
+}
+
+// ─── 跨页面联动 ──────────────────────────────────────────────────
+
+// 今日经营台 → 导入今日待办到 tasks 字段
+function importTodayTodos(modKey) {
+  const today = new Date().toISOString().slice(0,10);
+  const todos = TODO.get().filter(t => !t.done && (!t.due || t.due <= today));
+  if (!todos.length) { alert('今天没有待处理的任务'); return; }
+  const el = document.querySelector(`#form-${modKey} [name="tasks"]`);
+  if (!el) return;
+  const lines = todos.map(t => `· ${t.title}${t.priority && t.priority!=='P3'?' ['+t.priority+']':''}`).join('\n');
+  el.value = el.value ? el.value + '\n' + lines : lines;
+}
+
+// 项目池 → 把"今天第一步"推送到任务待办
+function pushStepToTodo(modKey) {
+  const el = document.querySelector(`#form-${modKey} [name="today_step"]`);
+  const nameEl = document.querySelector(`#form-${modKey} [name="name"]`);
+  const step = el ? el.value.trim() : '';
+  if (!step) { alert('请先填写"今天第一步"字段'); return; }
+  const projName = nameEl ? nameEl.value.trim() : '';
+  TODO.add({ title: step, priority: 'P1', category: projName ? `项目：${projName}` : '项目', due: '' });
+  alert(`已加入待办：${step}`);
+}
+
+// 今日经营台 → 把"今日可沉淀资产"推送到资产库
+function pushAssetFromDaily(modKey) {
+  const assetEl = document.querySelector(`#form-${modKey} [name="asset"]`);
+  const resultEl = document.querySelector(`#form-${modKey} [name="result"]`);
+  const asset = assetEl ? assetEl.value.trim() : '';
+  const result = resultEl ? resultEl.value.trim() : '';
+  if (!asset && !result) { alert('请先填写"今日可见成果"或"今日可沉淀资产"字段'); return; }
+  const today = new Date().toISOString().slice(0,10);
+  S.add('assets', {
+    name: asset || result,
+    type: '项目案例',
+    source_event: today,
+    content: result,
+    use_for: asset,
+    status: '草稿',
+    portfolio: '待评估',
+    resume: '待评估',
+  });
+  alert('已存入资产库 ✓');
+  go('assets');
+}
+
+// 想法池 → 转为项目（从表单读取当前数据）
+function convertIdeaToProject(modKey) {
+  const form = document.getElementById(`form-${modKey}`);
+  const get = k => { const el = form?.querySelector(`[name="${k}"]`); return el ? el.value.trim() : ''; };
+  const title = get('title'), content = get('content'), next = get('next');
+  if (!title) { alert('请先填写想法标题'); return; }
+  // pre-fill project form and navigate there
+  go('projects');
+  setTimeout(() => {
+    const pf = document.getElementById('form-projects');
+    if (!pf) return;
+    pf.classList.add('open');
+    const set = (k,v) => { const el = pf.querySelector(`[name="${k}"]`); if(el && v) el.value = v; };
+    set('name', title);
+    set('background', content);
+    set('today_step', next);
+    set('status', '规划中');
+    set('priority', 'A');
+  }, 200);
+}
+
+// 复盘中心 → 汇总本周日志到 progress 字段
+function importWeeklyProgress(modKey) {
+  const now = new Date();
+  const weekStart = new Date(now);
+  weekStart.setDate(now.getDate() - now.getDay() + 1); // Monday
+  const weekStartStr = weekStart.toISOString().slice(0,10);
+  const todayStr = now.toISOString().slice(0,10);
+  const dailys = S.get('daily').filter(r => r.date >= weekStartStr && r.date <= todayStr);
+  if (!dailys.length) { alert('本周还没有今日经营台记录'); return; }
+  const lines = dailys.sort((a,b)=>a.date>b.date?1:-1).map(r =>
+    `【${r.date}】${r.top1||''}${r.result?' → '+r.result:''}`
+  ).join('\n');
+  const el = document.querySelector(`#form-${modKey} [name="progress"]`);
+  if (!el) return;
+  el.value = el.value ? el.value + '\n' + lines : lines;
+}
+
+// 资产库 → 从项目池选择来源项目
+function pickProjectForAsset(modKey) {
+  const projects = S.get('projects');
+  if (!projects.length) { alert('项目池暂无数据'); return; }
+  const list = projects.slice(0,10).map((p,i)=>`${i+1}. ${p.name}`).join('\n');
+  const idx = prompt(`选择来源项目（输入序号）：\n${list}`);
+  if (!idx) return;
+  const proj = projects[parseInt(idx)-1];
+  if (!proj) return;
+  const el = document.querySelector(`#form-${modKey} [name="source_proj"]`);
+  if (el) el.value = proj.name;
+}
+
+// ── 新增跨页联动函数 ─────────────────────────────────────────────
+
+// Toast 提示
+function showToast(msg) {
+  let t = document.getElementById('sys-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'sys-toast';
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e2040;color:#fff;font-size:13px;padding:8px 18px;border-radius:20px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.2);transition:opacity .3s;pointer-events:none';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg; t.style.opacity = '1';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.style.opacity='0', 2500);
+}
+
+// 今日经营台 mood → 同步到情绪判断（新建一条）
+function syncMoodToEmotion() {
+  const form = document.getElementById('form-daily');
+  const mood = form?.querySelector('[name="mood"]')?.value || '';
+  if (!mood) { alert('请先选择今日状态表情'); return; }
+  go('emotions');
+  setTimeout(() => {
+    const ef = document.getElementById('form-emotions');
+    if (!ef) return;
+    ef.classList.add('open');
+    formAutoFill('emotions', null, ef);
+    // 用当前 mood 覆盖 emotion picker
+    const item = ef.querySelector(`.ep-item[data-val="${mood}"]`);
+    if (item) epSelect(item, 'emotion');
+  }, 200);
+}
+
+// 情绪判断 emotion → 同步今日状态
+function syncEmotionToDaily() {
+  const form = document.getElementById('form-emotions');
+  const emotion = form?.querySelector('[name="emotion"]')?.value || '';
+  if (!emotion) { alert('请先选择情绪表情'); return; }
+  const today = new Date().toISOString().slice(0,10);
+  const recs = S.get('daily');
+  const idx = recs.findIndex(r => r.date === today);
+  if (idx >= 0) {
+    recs[idx].mood = emotion; S.set('daily', recs);
+    showToast(`已同步「${emotion}」到今日经营台 ✓`);
+  } else {
+    alert('今天还没有今日经营台记录，请先填写今日经营台');
+  }
+}
+
+// 今日经营台 tomorrow → 加入待办
+function pushTomorrowToTodo(modKey) {
+  const el = document.querySelector(`#form-${modKey} [name="tomorrow"]`);
+  const step = el?.value?.trim();
+  if (!step) { alert('请先填写"明日最重要的一件事"'); return; }
+  const tomorrow = new Date(Date.now()+86400000).toISOString().slice(0,10);
+  TODO.add({ title: step, priority: 'P0', category: '每日首要', due: tomorrow });
+  showToast('已加入明日待办 ✓');
+}
+
+// 项目池 final_asset → 资产库
+function pushProjectAsset(modKey) {
+  const form = document.getElementById(`form-${modKey}`);
+  const get = k => form?.querySelector(`[name="${k}"]`)?.value?.trim() || '';
+  const name = get('name'), asset = get('final_asset');
+  if (!asset) { alert('请先填写"最终资产"字段'); return; }
+  S.add('assets', { name: name||asset, type:'项目案例', source_proj:name, content:asset, use_for:'作品集/汇报', status:'草稿', portfolio:'待评估', resume:'待评估' });
+  showToast('已存入资产库 ✓');
+}
+
+// 能力训练 good/improve → 资产库
+function pushSkillAsset(modKey) {
+  const form = document.getElementById(`form-${modKey}`);
+  const get = k => form?.querySelector(`[name="${k}"]`)?.value?.trim() || '';
+  const event = get('event'), good = get('good'), improve = get('improve'), skill = get('skill');
+  if (!event) { alert('请先填写"事件"字段'); return; }
+  S.add('assets', { name:event, type:'管理经验', content:`做得好：${good}\n下次改进：${improve}`, use_for:`${skill}能力/面试/汇报`, status:'草稿', portfolio:'待评估' });
+  showToast('已存入资产库 ✓');
+}
+
+// 内容/IP → 资产库
+function pushContentAsset(modKey) {
+  const form = document.getElementById(`form-${modKey}`);
+  const get = k => form?.querySelector(`[name="${k}"]`)?.value?.trim() || '';
+  const topic = get('topic'), viewpoint = get('viewpoint'), platform = get('platform');
+  if (!topic) { alert('请先填写"选题"字段'); return; }
+  S.add('assets', { name:topic, type:'内容选题', content:viewpoint, use_for:`发布于${platform}`, status:'草稿', portfolio:'待评估', article:'是' });
+  showToast('已存入资产库 ✓');
+}
+
+// 行业洞察 → 内容/IP 选题
+function convertInsightToContent(modKey) {
+  const form = document.getElementById(`form-${modKey}`);
+  const get = k => form?.querySelector(`[name="${k}"]`)?.value?.trim() || '';
+  const title = get('title'), summary = get('summary'), apply = get('apply_to');
+  if (!title) { alert('请先填写洞察标题'); return; }
+  go('content');
+  setTimeout(() => {
+    const cf = document.getElementById('form-content');
+    if (!cf) return;
+    cf.classList.add('open');
+    const set = (k,v) => { const el = cf.querySelector(`[name="${k}"]`); if(el&&v) el.value=v; };
+    set('topic', title);
+    set('viewpoint', summary);
+    set('source', apply);
+    set('published', '未发布');
+  }, 200);
+}
+
+// 内容/IP → 从行业洞察挑选选题
+function pickInsightForContent(modKey) {
+  const insights = S.get('insights');
+  if (!insights.length) { alert('行业洞察暂无数据'); return; }
+  const list = insights.slice(0,8).map((s,i)=>`${i+1}. ${s.title||'—'}`).join('\n');
+  const idx = prompt(`从行业洞察选题（输入序号）：\n${list}`);
+  if (!idx) return;
+  const ins = insights[parseInt(idx)-1];
+  if (!ins) return;
+  const form = document.getElementById(`form-${modKey}`);
+  const set = (k,v) => { const el = form?.querySelector(`[name="${k}"]`); if(el&&v) el.value=v; };
+  set('topic', ins.title);
+  set('viewpoint', ins.summary);
+  set('source', ins.source);
+}
+
+// 人脉资源 next → 任务待办
+function pushNetworkNextToTodo(modKey) {
+  const form = document.getElementById(`form-${modKey}`);
+  const name = form?.querySelector('[name="name"]')?.value?.trim() || '';
+  const next = form?.querySelector('[name="next"]')?.value?.trim() || '';
+  if (!next) { alert('请先填写"下一步维护动作"'); return; }
+  TODO.add({ title: next, priority: 'P2', category: name ? `人脉：${name}` : '人脉', due: '' });
+  showToast('已加入任务待办 ✓');
+}
+
+// 财务生活 → 从记账本导入当月数据
+function importLedgerToFinance(modKey) {
+  const form = document.getElementById(`form-${modKey}`);
+  const monthEl = form?.querySelector('[name="month"]');
+  const month = monthEl?.value || new Date().toISOString().slice(0,7);
+  const recs = LDG.get().records.filter(r => r.date?.startsWith(month));
+  if (!recs.length) { alert(`${month} 暂无记账记录`); return; }
+  const expense = recs.filter(r=>r.type==='expense').reduce((s,r)=>s+parseFloat(r.amount||0),0);
+  const income  = recs.filter(r=>r.type==='income').reduce((s,r)=>s+parseFloat(r.amount||0),0);
+  const catSum = {};
+  recs.filter(r=>r.type==='expense').forEach(r=>{ catSum[r.cat]=(catSum[r.cat]||0)+parseFloat(r.amount||0); });
+  const set = (k,v) => { const el = form?.querySelector(`[name="${k}"]`); if(el) el.value=v; };
+  set('income', income.toFixed(0));
+  // 按分类填入对应字段
+  set('food',      (catSum['餐饮']||0).toFixed(0));
+  set('transport', (catSum['交通']||0).toFixed(0));
+  set('personal',  ((catSum['购物']||0)+(catSum['日用']||0)).toFixed(0));
+  set('other',     expense.toFixed(0));
+  showToast(`已导入 ${month} 记账数据 ✓`);
+}
+
+// 复盘 → 从项目池导入本周有进展项目
+function importProjectResults(modKey) {
+  const projects = S.get('projects').filter(p => ['推进中','已完成','已复盘'].includes(p.status));
+  if (!projects.length) { alert('没有进行中或已完成的项目'); return; }
+  const lines = projects.map(p => `【${p.priority||'—'}】${p.name}：${p.today_step||p.goal||'进行中'}`).join('\n');
+  const el = document.querySelector(`#form-${modKey} [name="results"]`);
+  if (!el) return;
+  el.value = el.value ? el.value+'\n'+lines : lines;
+  showToast('已导入项目进展 ✓');
+}
+
+// ─── 喵喵记账 ─────────────────────────────────────────────────────
+const LEDGER_CATS = {
+  expense:[
+    {k:'餐饮',e:'🍜',c:'#FF8A80'},{k:'购物',e:'🛍',c:'#F48FB1'},{k:'日用',e:'🧻',c:'#80CBC4'},
+    {k:'交通',e:'🚌',c:'#81D4FA'},{k:'娱乐',e:'🎮',c:'#CE93D8'},{k:'医疗',e:'💊',c:'#EF9A9A'},
+    {k:'学习',e:'📚',c:'#FFCC80'},{k:'居家',e:'🏠',c:'#A5D6A7'},{k:'社交',e:'🤝',c:'#FFAB91'},
+    {k:'旅行',e:'✈️',c:'#80DEEA'},{k:'零食',e:'🍪',c:'#FFF176'},{k:'其他',e:'💰',c:'#E0E0E0'},
+  ],
+  income:[
+    {k:'工资',e:'💼',c:'#A5D6A7'},{k:'兼职',e:'💻',c:'#80DEEA'},{k:'转账',e:'💸',c:'#FFD54F'},
+    {k:'奖金',e:'🎁',c:'#F48FB1'},{k:'理财',e:'📈',c:'#81D4FA'},{k:'其他',e:'💰',c:'#E0E0E0'},
+  ]
+};
+
+const LDG = {
+  get: () => JSON.parse(localStorage.getItem('sys_ledger')||'{"records":[]}'),
+  save: (d) => localStorage.setItem('sys_ledger', JSON.stringify(d)),
+  add: (rec) => { const d=LDG.get(); rec.id='ldg_'+Date.now(); rec.createdAt=new Date().toISOString(); d.records.unshift(rec); LDG.save(d); },
+  del: (id) => { const d=LDG.get(); d.records=d.records.filter(r=>r.id!==id); LDG.save(d); },
+};
+
+let ldgState = { tab:'input', type:'expense', cat:'', amount:'0', note:'', date:'' };
+
+function ldgCatIcon(cat) {
+  const all = [...LEDGER_CATS.expense,...LEDGER_CATS.income];
+  const f = all.find(c=>c.k===cat);
+  return f ? `<div class="ldg-row-icon" style="background:${f.c}">${f.e}</div>` : `<div class="ldg-row-icon" style="background:#eee">💰</div>`;
+}
+
+function renderLedger() {
+  const page = document.getElementById('ledger');
+  if (!page) return;
+  const s = ldgState;
+  const cats = LEDGER_CATS[s.type];
+  const today = new Date().toISOString().slice(0,10);
+  if (!s.date) s.date = today;
+
+  page.innerHTML = `
+  <h2 class="ph">🐱 记账本</h2>
+  <div class="ldg-wrap">
+    <div class="ldg-tabs">
+      <div class="ldg-tab ${s.tab==='input'?'on':''}" onclick="ldgTab('input')">＋ 记一笔</div>
+      <div class="ldg-tab ${s.tab==='detail'?'on':''}" onclick="ldgTab('detail')">明细</div>
+      <div class="ldg-tab ${s.tab==='stat'?'on':''}" onclick="ldgTab('stat')">统计</div>
+    </div>
+    ${s.tab==='input' ? ldgInputHTML(cats, s) : ''}
+    ${s.tab==='detail' ? ldgDetailHTML() : ''}
+    ${s.tab==='stat' ? ldgStatHTML() : ''}
+  </div>`;
+}
+
+function ldgInputHTML(cats, s) {
+  const selCat = cats.find(c=>c.k===s.cat) || cats[0];
+  const displayAmt = s.amount==='0' ? '0.00' : s.amount;
+  return `
+  <div class="ldg-type">
+    <div class="ldg-type-btn ${s.type==='expense'?'on':''}" onclick="ldgSetType('expense')">支出</div>
+    <div class="ldg-type-btn income ${s.type==='income'?'on':''}" onclick="ldgSetType('income')">收入</div>
+  </div>
+  <div class="cat-grid">
+    ${cats.map(c=>`<div class="cat-item ${(s.cat||cats[0].k)===c.k?'on':''}" onclick="ldgSetCat('${c.k}')">
+      <div class="cat-icon" style="background:${c.c}">${c.e}</div>
+      <div class="cat-name">${c.k}</div>
+    </div>`).join('')}
+  </div>
+  <div class="ldg-display">
+    <div class="ldg-display-icon" style="background:${selCat.c}">${selCat.e}</div>
+    <input class="ldg-note" id="ldg-note" placeholder="备注（可选）" value="${s.note}" oninput="ldgState.note=this.value">
+    <div class="ldg-amount" id="ldg-amt">¥ ${displayAmt}</div>
+  </div>
+  <div class="kp-wrap">
+    <div class="kp-row">
+      <div class="kp-btn" onclick="ldgKp('7')">7</div>
+      <div class="kp-btn" onclick="ldgKp('8')">8</div>
+      <div class="kp-btn" onclick="ldgKp('9')">9</div>
+      <div class="kp-btn kp-date" onclick="ldgPickDate()">${s.date===new Date().toISOString().slice(0,10)?'📅 今天':s.date.slice(5)}</div>
+    </div>
+    <div class="kp-row">
+      <div class="kp-btn" onclick="ldgKp('4')">4</div>
+      <div class="kp-btn" onclick="ldgKp('5')">5</div>
+      <div class="kp-btn" onclick="ldgKp('6')">6</div>
+      <div class="kp-btn kp-op" onclick="ldgKp('+')">+</div>
+    </div>
+    <div class="kp-row">
+      <div class="kp-btn" onclick="ldgKp('1')">1</div>
+      <div class="kp-btn" onclick="ldgKp('2')">2</div>
+      <div class="kp-btn" onclick="ldgKp('3')">3</div>
+      <div class="kp-btn kp-op" onclick="ldgKp('-')">−</div>
+    </div>
+    <div class="kp-row">
+      <div class="kp-btn" onclick="ldgKp('.')">.</div>
+      <div class="kp-btn" onclick="ldgKp('0')">0</div>
+      <div class="kp-btn kp-del" onclick="ldgKp('del')">⌫</div>
+      <div class="kp-btn kp-done" onclick="ldgSave()">完成</div>
+    </div>
+  </div>`;
+}
+
+function ldgDetailHTML() {
+  const all = LDG.get().records;
+  const months = [...new Set(all.map(r=>r.date.slice(0,7)))].sort().reverse();
+  const selMonth = ldgState._detailMonth || (months[0] || new Date().toISOString().slice(0,7));
+  ldgState._detailMonth = selMonth;
+  const recs = all.filter(r=>r.date.startsWith(selMonth));
+  const totalExp = recs.filter(r=>r.type==='expense').reduce((s,r)=>s+r.amount,0);
+  const totalInc = recs.filter(r=>r.type==='income').reduce((s,r)=>s+r.amount,0);
+  const byDay = {};
+  recs.forEach(r=>{ if(!byDay[r.date]) byDay[r.date]=[]; byDay[r.date].push(r); });
+  const days = Object.keys(byDay).sort().reverse();
+  return `
+  <div class="ldg-month-bar">
+    <select class="ldg-month-sel" onchange="ldgState._detailMonth=this.value;renderLedger()">
+      ${(months.length?months:[selMonth]).map(m=>`<option value="${m}" ${m===selMonth?'selected':''}>${m}</option>`).join('')}
+    </select>
+    <div class="ldg-month-sum">
+      <div class="ldg-sum-item">支出 <strong style="color:#e05a6a">¥${totalExp.toFixed(2)}</strong></div>
+      <div class="ldg-sum-item">收入 <strong style="color:#059669">¥${totalInc.toFixed(2)}</strong></div>
+    </div>
+  </div>
+  <div style="overflow-y:auto;flex:1">
+    ${days.length===0 ? '<div style="text-align:center;color:#c4c8d8;padding:3rem;font-size:13px">本月暂无记录</div>' : days.map(day=>{
+      const rows = byDay[day];
+      const dayExp = rows.filter(r=>r.type==='expense').reduce((s,r)=>s+r.amount,0);
+      const dayInc = rows.filter(r=>r.type==='income').reduce((s,r)=>s+r.amount,0);
+      return `<div class="ldg-day-group">
+        <div class="ldg-day-hd"><span>${day.slice(5).replace('-','月')}日</span><span>${dayInc>0?`+¥${dayInc.toFixed(2)} `:''}${dayExp>0?`-¥${dayExp.toFixed(2)}`:''}</span></div>
+        ${rows.map(r=>`<div class="ldg-row">
+          ${ldgCatIcon(r.category)}
+          <div class="ldg-row-info">
+            <div class="ldg-row-cat">${r.category}</div>
+            ${r.note?`<div class="ldg-row-note">${r.note}</div>`:''}
+          </div>
+          <div class="ldg-row-amt ${r.type==='income'?'income':''}">${r.type==='income'?'+':'-'}¥${r.amount.toFixed(2)}</div>
+          <span class="ldg-row-del" onclick="ldgDel('${r.id}')">✕</span>
+        </div>`).join('')}
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function ldgStatFilter(all) {
+  const now = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  const mode = ldgState._statMode || 'month';
+  let recs = [], label = '';
+  if (mode === 'day') {
+    const d = ldgState._statDay || now.toISOString().slice(0,10);
+    ldgState._statDay = d;
+    recs = all.filter(r=>r.date === d);
+    label = d;
+  } else if (mode === 'month') {
+    const ym = ldgState._statMonth || `${now.getFullYear()}-${pad(now.getMonth()+1)}`;
+    ldgState._statMonth = ym;
+    recs = all.filter(r=>r.date.startsWith(ym));
+    label = ym;
+  } else if (mode === 'year') {
+    const y = ldgState._statYear || String(now.getFullYear());
+    ldgState._statYear = y;
+    recs = all.filter(r=>r.date.startsWith(y));
+    label = y + '年';
+  } else if (mode === 'custom') {
+    const from = ldgState._statFrom || now.toISOString().slice(0,10);
+    const to = ldgState._statTo || now.toISOString().slice(0,10);
+    ldgState._statFrom = from; ldgState._statTo = to;
+    recs = all.filter(r=>r.date >= from && r.date <= to);
+    label = `${from} ~ ${to}`;
+  }
+  return { recs, label, mode };
+}
+
+function ldgStatHTML() {
+  const all = LDG.get().records;
+  const now = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  const mode = ldgState._statMode || 'month';
+  const { recs, label } = ldgStatFilter(all);
+
+  const totalExp = recs.filter(r=>r.type==='expense').reduce((s,r)=>s+r.amount,0);
+  const totalInc = recs.filter(r=>r.type==='income').reduce((s,r)=>s+r.amount,0);
+  const balance = totalInc - totalExp;
+  const catMap = {};
+  recs.filter(r=>r.type==='expense').forEach(r=>{ catMap[r.category]=(catMap[r.category]||0)+r.amount; });
+  const cats = Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
+  const maxAmt = cats[0]?cats[0][1]:1;
+
+  // period selector UI
+  let selectorHTML = '';
+  if (mode === 'day') {
+    const days = [...new Set(all.map(r=>r.date))].sort().reverse();
+    const sel = ldgState._statDay || now.toISOString().slice(0,10);
+    selectorHTML = `<select class="ldg-month-sel" onchange="ldgState._statDay=this.value;renderLedger()">
+      ${(days.length?days:[sel]).map(d=>`<option value="${d}" ${d===sel?'selected':''}>${d}</option>`).join('')}
+    </select>`;
+  } else if (mode === 'month') {
+    const months = [...new Set(all.map(r=>r.date.slice(0,7)))].sort().reverse();
+    const sel = ldgState._statMonth || `${now.getFullYear()}-${pad(now.getMonth()+1)}`;
+    selectorHTML = `<select class="ldg-month-sel" onchange="ldgState._statMonth=this.value;renderLedger()">
+      ${(months.length?months:[sel]).map(m=>`<option value="${m}" ${m===sel?'selected':''}>${m}</option>`).join('')}
+    </select>`;
+  } else if (mode === 'year') {
+    const years = [...new Set(all.map(r=>r.date.slice(0,4)))].sort().reverse();
+    const sel = ldgState._statYear || String(now.getFullYear());
+    selectorHTML = `<select class="ldg-month-sel" onchange="ldgState._statYear=this.value;renderLedger()">
+      ${(years.length?years:[sel]).map(y=>`<option value="${y}" ${y===sel?'selected':''}>${y}年</option>`).join('')}
+    </select>`;
+  } else if (mode === 'custom') {
+    const from = ldgState._statFrom || now.toISOString().slice(0,10);
+    const to = ldgState._statTo || now.toISOString().slice(0,10);
+    selectorHTML = `<input type="date" class="ldg-month-sel" value="${from}" onchange="ldgState._statFrom=this.value;renderLedger()">
+      <span style="font-size:12px;color:#9ca3af">至</span>
+      <input type="date" class="ldg-month-sel" value="${to}" onchange="ldgState._statTo=this.value;renderLedger()">`;
+  }
+
+  const modeLabel = {day:'按天',month:'按月',year:'按年',custom:'自定义'};
+  return `
+  <div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:.75rem">
+    ${['day','month','year','custom'].map(m=>`<span class="stat-mode-btn ${mode===m?'on':''}" onclick="ldgState._statMode='${m}';renderLedger()">${modeLabel[m]}</span>`).join('')}
+  </div>
+  <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem">
+    ${selectorHTML}
+  </div>
+  <div class="ldg-stat-cards">
+    <div class="ldg-stat-card">
+      <div class="ldg-stat-label">结余</div>
+      <div class="ldg-stat-val ${balance<0?'neg':'pos'}">¥${balance.toFixed(2)}</div>
+    </div>
+    <div class="ldg-stat-card">
+      <div class="ldg-stat-label" style="display:flex;justify-content:space-between"><span>支出</span><span style="color:#059669">收入</span></div>
+      <div style="margin-top:.25rem">
+        <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.375rem">
+          <div style="flex:1;height:8px;background:#f0f2f7;border-radius:4px;overflow:hidden"><div style="height:100%;background:#FFAA00;border-radius:4px;width:${totalExp+totalInc>0?(totalExp/(totalExp+totalInc)*100).toFixed(0):0}%"></div></div>
+          <span style="font-size:11px;color:#e05a6a;font-weight:700">-¥${totalExp.toFixed(2)}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:.5rem">
+          <div style="flex:1;height:8px;background:#f0f2f7;border-radius:4px;overflow:hidden"><div style="height:100%;background:#4CAF50;border-radius:4px;width:${totalExp+totalInc>0?(totalInc/(totalExp+totalInc)*100).toFixed(0):0}%"></div></div>
+          <span style="font-size:11px;color:#059669;font-weight:700">+¥${totalInc.toFixed(2)}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="font-size:12px;font-weight:700;color:#1e2040;margin-bottom:.625rem">支出类目排行</div>
+  <div class="ldg-cat-bar-wrap">
+    ${cats.length===0 ? '<div style="color:#c4c8d8;font-size:13px;text-align:center;padding:1.5rem">暂无支出记录</div>' : cats.map(([k,v])=>{
+      const all2 = [...LEDGER_CATS.expense,...LEDGER_CATS.income];
+      const cat = all2.find(c=>c.k===k)||{e:'💰',c:'#eee'};
+      return `<div class="ldg-cat-bar-row">
+        <div class="ldg-cat-bar-icon" style="background:${cat.c}">${cat.e}</div>
+        <div class="ldg-cat-bar-info">
+          <div class="ldg-cat-bar-top"><span>${k}</span><span style="color:#e05a6a">¥${v.toFixed(2)}</span></div>
+          <div class="ldg-cat-bar-track"><div class="ldg-cat-bar-fill" style="width:${(v/maxAmt*100).toFixed(0)}%;background:${cat.c}"></div></div>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function ldgTab(tab) { ldgState.tab = tab; renderLedger(); }
+function ldgSetType(type) { ldgState.type = type; ldgState.cat = ''; renderLedger(); }
+function ldgSetCat(cat) { ldgState.cat = cat; renderLedger(); }
+
+function ldgKp(key) {
+  let v = ldgState.amount;
+  if (key === 'del') {
+    if (v.length <= 1) v = '0'; else v = v.slice(0,-1);
+  } else if (key === '+' || key === '-') {
+    // evaluate any pending operation
+    try { const n = Function('"use strict";return ('+v+')')(); v = n.toFixed(2).replace(/\.00$/,'') + key; } catch(e) { v += key; }
+  } else if (key === '.') {
+    const parts = v.split(/[+\-]/); const last = parts[parts.length-1];
+    if (!last.includes('.')) v += '.';
+  } else {
+    if (v === '0') v = key; else v += key;
+  }
+  ldgState.amount = v;
+  const el = document.getElementById('ldg-amt');
+  if (el) el.textContent = '¥ ' + (v || '0');
+}
+
+function ldgPickDate() {
+  const d = prompt('输入日期（格式 2026-06-26）：', ldgState.date);
+  if (d && /^\d{4}-\d{2}-\d{2}$/.test(d)) { ldgState.date = d; renderLedger(); }
+}
+
+function ldgSave() {
+  const cats = LEDGER_CATS[ldgState.type];
+  const cat = ldgState.cat || cats[0].k;
+  let amount = 0;
+  try { amount = Math.abs(Function('"use strict";return ('+ldgState.amount+')')()) ; } catch(e) {}
+  if (!amount || amount <= 0) { alert('请输入金额'); return; }
+  LDG.add({ date: ldgState.date, type: ldgState.type, category: cat, amount, note: ldgState.note });
+  ldgState.amount = '0'; ldgState.note = '';
+  ldgState.tab = 'detail';
+  renderLedger();
+}
+
+function ldgDel(id) {
+  if (!confirm('删除这条记录？')) return;
+  LDG.del(id); renderLedger();
+}
+
+// ─── Page Router ──────────────────────────────────────────────────
+function renderPage(id) {
+  if (id === 'home') { renderHome(); return; }
+  if (id === 'reviews') { renderReviews(); return; }
+  if (id === 'strategy') { renderStrategy(); return; }
+  if (id === 'insights') { renderInsights(); return; }
+  if (id === 'inslib')   { renderInsightLib(); return; }
+  if (id === 'insstar')  { renderInsightStar(); return; }
+  if (id === 'assetlib') { renderAssetLib(); return; }
+  if (id === 'assetwin') { renderAssetWin(); return; }
+  if (id === 'obsidian') { renderObsidian(); return; }
+  if (id === 'ledger') { renderLedger(); return; }
+  if (id === 'todos') { renderTodos(); return; }
+  if (MOD[id]) { renderStdPage(id); return; }
+}
+
+// ─── Export Markdown ──────────────────────────────────────────────
+function exportMD() {
+  let md = `# 小袁人生经营系统数据导出\n\n导出时间：${new Date().toLocaleString('zh-CN')}\n\n`;
+  Object.keys(MOD).forEach(k=>{
+    const m = MOD[k];
+    const records = S.get(k);
+    if (!records.length) return;
+    md += `## ${m.name}\n\n`;
+    records.slice(0,20).forEach((r,i)=>{
+      const title = r[m.titleField] || `记录 ${i+1}`;
+      md += `### ${title}\n\n`;
+      const allFields = m.fields || Object.values(m.tabFields||{}).flat();
+      allFields.forEach(f=>{
+        if (r[f.k]) md += `**${f.l}**：${r[f.k]}\n\n`;
+      });
+      md += '---\n\n';
+    });
+  });
+  document.getElementById('export-ta').value = md;
+  document.getElementById('export-modal').classList.add('open');
+}
+
+function copyExport() {
+  const ta = document.getElementById('export-ta');
+  ta.select();
+  document.execCommand('copy');
+  alert('已复制到剪贴板');
+}
+
+function closeModal() {
+  document.getElementById('export-modal').classList.remove('open');
+}
+
+// ─── Pomodoro ─────────────────────────────────────────────────────
+const POMO = {
+  work: 25*60, break: 5*60,
+  state: { mode:'work', running:false, left:25*60, sessions:0, totalMins:0, timer:null }
+};
+function pomoRender() {
+  const s = POMO.state;
+  const el = {
+    time: document.getElementById('pomo-time'),
+    mode: document.getElementById('pomo-mode'),
+    btn:  document.getElementById('pomo-btn'),
+    bar:  document.getElementById('pomo-bar'),
+    cnt:  document.getElementById('pomo-count'),
+    mins: document.getElementById('pomo-mins'),
+    tip:  document.getElementById('pomo-task-tip'),
+    w:    document.getElementById('pomo-widget')
+  };
+  if (!el.time) return;
+  const total = s.mode==='work' ? POMO.work : POMO.break;
+  const m = String(Math.floor(s.left/60)).padStart(2,'0');
+  const sec = String(s.left%60).padStart(2,'0');
+  el.time.textContent = `${m}:${sec}`;
+  el.mode.textContent = s.mode==='work' ? '专注时间' : '休息一下 ☕';
+  el.btn.textContent = s.running ? '⏸ 暂停' : '▶ 开始';
+  el.bar.style.width = `${((total-s.left)/total*100).toFixed(1)}%`;
+  el.cnt.textContent = s.sessions;
+  el.mins.textContent = s.totalMins;
+  el.w.className = 'pomodoro pomo-' + s.mode;
+  if (s.running) {
+    const tips = ['保持专注，关掉通知','深呼吸，慢慢来','一次只做一件事','进入心流状态中...'];
+    el.tip.textContent = tips[s.sessions % tips.length];
+  } else if (s.mode==='break') {
+    el.tip.textContent = '休息一下，起来走走 🚶';
+  } else {
+    el.tip.textContent = '每次专注前，先确认手头只做一件事';
+  }
+}
+function pomoToggle() {
+  const s = POMO.state;
+  if (s.running) {
+    clearInterval(s.timer); s.running = false;
+  } else {
+    s.running = true;
+    s.timer = setInterval(()=>{
+      s.left--;
+      if (s.left<=0) {
+        clearInterval(s.timer); s.running = false;
+        if (s.mode==='work') { s.sessions++; s.totalMins+=25; s.mode='break'; s.left=POMO.break; }
+        else { s.mode='work'; s.left=POMO.work; }
+        try { new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAA').play(); } catch(e){}
+      }
+      pomoRender();
+    }, 1000);
+  }
+  pomoRender();
+}
+function pomoReset() {
+  const s = POMO.state;
+  clearInterval(s.timer); s.running=false;
+  s.left = s.mode==='work' ? POMO.work : POMO.break;
+  pomoRender();
+}
+function pomoSwitch() {
+  const s = POMO.state;
+  clearInterval(s.timer); s.running=false;
+  s.mode = s.mode==='work' ? 'break' : 'work';
+  s.left = s.mode==='work' ? POMO.work : POMO.break;
+  pomoRender();
+}
+
+// ─── Init ─────────────────────────────────────────────────────────
+renderHome();
+</script>
+</body>
+</html>
