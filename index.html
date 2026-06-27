@@ -1399,7 +1399,7 @@ async function qqmSearch() {
 
     // fetch covers via song/detail (batch)
     const ids = songs.map(s=>s.id).join(',');
-    const det = await fetch(`/music/song/detail?ids=${ids}`).then(r=>r.json()).catch(()=>({songs:[]}));
+   const det = await fetch(`/music/song/detail?ids=${ids}`).then(r=>r.json()).catch(()=>({songs:[]}));
     const coverMap = {};
     (det.songs||[]).forEach(s => { coverMap[s.id] = s.al?.picUrl || ''; });
 
