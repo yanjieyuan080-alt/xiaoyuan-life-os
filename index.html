@@ -359,9 +359,28 @@ textarea.fta{resize:vertical;min-height:62px}
 /* 跨页面联动按钮 */
 .field-action{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#5b5cf6;background:#f0f0ff;border:1px solid #d4d4ff;border-radius:5px;padding:2px 8px;cursor:pointer;margin-bottom:4px;transition:all .12s}
 .field-action:hover{background:#e8e8ff;color:#4040cc}
+/* 访问密码锁屏 */
+.lock-screen{position:fixed;inset:0;background:#1e2040;display:flex;align-items:center;justify-content:center;z-index:9999}
+.lock-box{background:#fff;border-radius:16px;padding:2rem 2.25rem;width:320px;max-width:88vw;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.lock-box h2{font-size:16px;color:#1e2040;margin-bottom:.25rem}
+.lock-box p{font-size:12px;color:#9ca3af;margin-bottom:1.25rem}
+.lock-inp{width:100%;padding:10px 12px;font-size:14px;border:1.5px solid #e2e4ef;border-radius:8px;text-align:center;letter-spacing:2px;margin-bottom:.75rem;font-family:inherit;box-sizing:border-box}
+.lock-inp:focus{outline:none;border-color:#5b5cf6}
+.lock-err{font-size:11px;color:#e05a6a;min-height:16px;margin-bottom:.5rem}
 </style>
 </head>
 <body>
+
+<!-- 访问密码锁屏 -->
+<div class="lock-screen" id="lock-screen">
+  <div class="lock-box">
+    <h2>🔒 小袁人生经营系统</h2>
+    <p>请输入访问密码</p>
+    <input type="password" class="lock-inp" id="lock-inp" placeholder="密码" autocomplete="off">
+    <div class="lock-err" id="lock-err"></div>
+    <span class="btn pri" style="width:100%;justify-content:center;box-sizing:border-box" onclick="checkLockPassword()">进入</span>
+  </div>
+</div>
 
 <nav class="sb">
   <div class="sb-logo"><h2>小袁人生经营系统</h2><p>餐饮 · 运营 · 私域 · 成长</p></div>
@@ -425,7 +444,7 @@ textarea.fta{resize:vertical;min-height:62px}
 <div class="api-mo" id="api-key-modal">
   <div class="api-mo-box">
     <h3>配置豆包 API Key</h3>
-    <p>Key 保存在本地，仅用于行业洞察 AI 分析，不会上传。<br>
+    <p>Key 只保存在你这台设备的浏览器里（localStorage），分析时临时发给分析服务转一道手，不落库、不共享给其他访客。<br>
     获取方式：登录 <a href="https://console.volcengine.com/ark" target="_blank" style="color:#5b5cf6">火山方舟控制台</a> → 左侧「API Key管理」→ 创建 API Key 复制即可。</p>
     <input class="api-key-inp" id="api-key-inp" type="password" placeholder="请粘贴 API Key（格式：xxxxx）">
     <div style="margin-bottom:.75rem">
@@ -822,6 +841,31 @@ const MOD = {
     colorMap:{sleep:{好:'green',差:'accent'},energy:{充沛:'green','低迷':'accent'},affect_work:{没有:'green','明显影响':'accent'}}
   },
 };
+
+// ─── 访问密码保护（仅挡普通访客，不是真正的安全机制）──────────────
+const LOCK_HASH = 'a72e397e625fb71287990881c34b608971d8e2ab0c3359aba5e25a64983bcf73';
+async function sha256Hex(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+async function checkLockPassword() {
+  const inp = document.getElementById('lock-inp');
+  const err = document.getElementById('lock-err');
+  const hash = await sha256Hex(inp.value);
+  if (hash === LOCK_HASH) {
+    localStorage.setItem('sys_unlocked', '1');
+    document.getElementById('lock-screen')?.remove();
+    renderHome();
+  } else {
+    err.textContent = '密码不对，再试试';
+    inp.value = '';
+    inp.focus();
+  }
+}
+document.getElementById('lock-inp')?.addEventListener('keydown', e => { if (e.key === 'Enter') checkLockPassword(); });
+
+// ─── 行业洞察 AI 分析 · 后端 Worker 地址 ───────────────────────────
+const ANALYZE_WORKER_URL = 'https://xiaoyuan-analyze.yanjieyuan080.workers.dev/analyze';
 
 // ─── Storage ──────────────────────────────────────────────────────
 const S = {
@@ -1683,20 +1727,17 @@ function insSave() {
 }
 
 // ─── Insights AI Analysis ──────────────────────────────────────────
-async function insCheckApiKey() {
-  try {
-    const res = await fetch('/config');
-    const data = await res.json();
-    const banner = document.getElementById('ins-api-banner');
-    const btn = document.getElementById('ins-analyze-btn');
-    if (data.has_doubao) {
-      if (banner) banner.style.display = 'none';
-      if (btn) btn.style.display = 'inline-block';
-    } else {
-      if (banner) banner.style.display = 'flex';
-      if (btn) btn.style.display = 'none';
-    }
-  } catch(e) {}
+function insCheckApiKey() {
+  const banner = document.getElementById('ins-api-banner');
+  const btn = document.getElementById('ins-analyze-btn');
+  const hasKey = !!localStorage.getItem('sys_doubao_key');
+  if (hasKey) {
+    if (banner) banner.style.display = 'none';
+    if (btn) btn.style.display = 'inline-block';
+  } else {
+    if (banner) banner.style.display = 'flex';
+    if (btn) btn.style.display = 'none';
+  }
 }
 
 function insTabSwitch(tab) {
@@ -1728,6 +1769,12 @@ async function insAnalyze() {
   if (!text || text.length < 50) {
     alert('请先抓取文章内容或粘贴原文'); return;
   }
+  const apiKey = localStorage.getItem('sys_doubao_key') || '';
+  const model = localStorage.getItem('sys_doubao_model') || 'doubao-pro-32k-241215';
+  if (!apiKey) {
+    insOpenApiMo();
+    return;
+  }
   const btn = document.getElementById('ins-analyze-btn');
   const status = document.getElementById('ins-status');
   if (btn) { btn.disabled = true; btn.textContent = '分析中...'; }
@@ -1736,10 +1783,10 @@ async function insAnalyze() {
   anaEl.innerHTML = '<div class="ana-loading"><div class="ana-loading-dot"></div><div class="ana-loading-dot"></div><div class="ana-loading-dot"></div><span style="margin-left:.5rem;color:#888;font-size:12px">AI 分析中，预计 30-60 秒...</span></div>';
   status.textContent = 'AI 分析中，请稍候...';
   try {
-    const res = await fetch('/analyze', {
+    const res = await fetch(ANALYZE_WORKER_URL, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({text}),
+      body: JSON.stringify({text, apiKey, model}),
       signal: AbortSignal.timeout(120000)
     });
     const data = await res.json();
@@ -2195,42 +2242,30 @@ function renderInsightStar() {
 
 function insOpenApiMo() {
   document.getElementById('api-key-modal').style.display = 'flex';
-  fetch('/config').then(r=>r.json()).then(d=>{
-    if (d.doubao_preview) {
-      document.getElementById('api-key-inp').placeholder = d.doubao_preview + ' (已配置，输入新 Key 以更换)';
-    }
-    const modelInp = document.getElementById('doubao-model-inp');
-    if (modelInp && d.doubao_model) modelInp.value = d.doubao_model;
-  }).catch(()=>{});
+  const savedKey = localStorage.getItem('sys_doubao_key') || '';
+  const savedModel = localStorage.getItem('sys_doubao_model') || '';
+  if (savedKey) {
+    document.getElementById('api-key-inp').placeholder = savedKey.slice(0,12) + '... (已配置，输入新 Key 以更换)';
+  }
+  const modelInp = document.getElementById('doubao-model-inp');
+  if (modelInp && savedModel) modelInp.value = savedModel;
 }
 
 function insCloseApiMo() {
   document.getElementById('api-key-modal').style.display = 'none';
 }
 
-async function insSaveApiKey() {
+function insSaveApiKey() {
   const key = document.getElementById('api-key-inp').value.trim();
   if (!key) { alert('请输入 API Key'); return; }
   if (key.length < 10) { alert('Key 格式不对，请检查是否完整复制'); return; }
   const model = (document.getElementById('doubao-model-inp')?.value || '').trim() || 'doubao-pro-32k-241215';
-  try {
-    const res = await fetch('/config', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ doubao_api_key: key, doubao_model: model })
-    });
-    const d = await res.json();
-    if (d.ok) {
-      insCloseApiMo();
-      document.getElementById('api-key-inp').value = '';
-      insCheckApiKey();
-      showToast('豆包 API Key 已保存 ✓ 现在可以分析文章了');
-    } else {
-      alert('保存失败：' + (d.error||'未知错误'));
-    }
-  } catch(e) {
-    alert('保存失败：' + e.message);
-  }
+  localStorage.setItem('sys_doubao_key', key);
+  localStorage.setItem('sys_doubao_model', model);
+  insCloseApiMo();
+  document.getElementById('api-key-inp').value = '';
+  insCheckApiKey();
+  showToast('豆包 API Key 已保存到本机浏览器 ✓ 现在可以分析文章了');
 }
 
 // ─── Server酱 推送 ─────────────────────────────────────────────────
@@ -3156,7 +3191,12 @@ function pomoSwitch() {
 }
 
 // ─── Init ─────────────────────────────────────────────────────────
-renderHome();
+if (localStorage.getItem('sys_unlocked') === '1') {
+  document.getElementById('lock-screen')?.remove();
+  renderHome();
+} else {
+  document.getElementById('lock-inp')?.focus();
+}
 </script>
 </body>
 </html>
