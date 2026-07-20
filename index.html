@@ -864,8 +864,9 @@ async function checkLockPassword() {
 }
 document.getElementById('lock-inp')?.addEventListener('keydown', e => { if (e.key === 'Enter') checkLockPassword(); });
 
-// ─── 行业洞察 AI 分析 · 后端 Worker 地址 ───────────────────────────
-const ANALYZE_WORKER_URL = 'https://xiaoyuan-analyze.yanjieyuan080.workers.dev/analyze';
+// ─── 行业洞察 AI 分析 / 抓取 · 后端 Worker 地址 ────────────────────
+const XY_WORKER_BASE = 'https://xiaoyuan-analyze.yanjieyuan080.workers.dev';
+const ANALYZE_WORKER_URL = XY_WORKER_BASE + '/analyze';
 
 // ─── Storage ──────────────────────────────────────────────────────
 const S = {
@@ -1667,8 +1668,7 @@ async function insFetch() {
 
   let html = null;
   try {
-    // 优先走本地代理（serve.py 提供）
-    const proxyUrl = `/proxy?url=${encodeURIComponent(url)}`;
+    const proxyUrl = `${XY_WORKER_BASE}/proxy?url=${encodeURIComponent(url)}`;
     const res = await fetch(proxyUrl, {signal: AbortSignal.timeout(15000)});
     if (res.ok) {
       html = await res.text();
