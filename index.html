@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>小袁人生经营系统</title>
+<title id="doc-title">人生经营系统</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Segoe UI',sans-serif;background:#f0f2f7;color:#1e2040;display:flex;min-height:100vh;font-size:14px}
@@ -374,7 +374,7 @@ textarea.fta{resize:vertical;min-height:62px}
 <!-- 访问密码锁屏 -->
 <div class="lock-screen" id="lock-screen">
   <div class="lock-box">
-    <h2>🔒 小袁人生经营系统</h2>
+    <h2>🔒 <span id="lock-title">人生经营系统</span></h2>
     <p>请输入访问密码</p>
     <input type="password" class="lock-inp" id="lock-inp" placeholder="密码" autocomplete="off">
     <div class="lock-err" id="lock-err"></div>
@@ -383,7 +383,7 @@ textarea.fta{resize:vertical;min-height:62px}
 </div>
 
 <nav class="sb">
-  <div class="sb-logo"><h2>小袁人生经营系统</h2><p>餐饮 · 运营 · 私域 · 成长</p></div>
+  <div class="sb-logo"><h2 id="sb-logo-name">人生经营系统</h2><p id="sb-logo-sub">餐饮 · 运营 · 私域 · 成长</p></div>
   <div class="nav on" onclick="go('home')"><span class="nav-ic">⌂</span>首页总览</div>
   <div class="nav-sec">日常核心</div>
   <div class="nav" onclick="go('daily')"><span class="nav-ic">⊙</span>今日经营台</div>
@@ -470,6 +470,40 @@ textarea.fta{resize:vertical;min-height:62px}
     <div style="display:flex;gap:.5rem;justify-content:flex-end">
       <span class="btn" onclick="document.getElementById('sc-key-modal').style.display='none'">取消</span>
       <span class="btn pri" onclick="scSaveKey()">保存</span>
+    </div>
+  </div>
+</div>
+
+<!-- 系统信息编辑弹窗 -->
+<div class="api-mo" id="profile-modal">
+  <div class="api-mo-box" style="max-width:480px">
+    <h3>编辑系统信息</h3>
+    <p>这些信息只存在你这台设备的浏览器里，随时可以改。</p>
+    <div style="display:flex;flex-direction:column;gap:.625rem;margin-bottom:1rem">
+      <div>
+        <label style="font-size:12px;color:#6b7280;display:block;margin-bottom:4px">系统名称</label>
+        <input class="api-key-inp" id="profile-name-inp" type="text" placeholder="人生经营系统" style="margin-bottom:0">
+      </div>
+      <div>
+        <label style="font-size:12px;color:#6b7280;display:block;margin-bottom:4px">副标题</label>
+        <input class="api-key-inp" id="profile-sub-inp" type="text" placeholder="餐饮 · 运营 · 私域 · 成长" style="margin-bottom:0">
+      </div>
+      <div>
+        <label style="font-size:12px;color:#6b7280;display:block;margin-bottom:4px">主线</label>
+        <input class="api-key-inp" id="profile-mainline-inp" type="text" placeholder="餐饮 / 用户运营 / 私域 / 会员体系 / 加盟协同" style="margin-bottom:0">
+      </div>
+      <div>
+        <label style="font-size:12px;color:#6b7280;display:block;margin-bottom:4px">年度关键词</label>
+        <input class="api-key-inp" id="profile-keyword-inp" type="text" placeholder="沉淀" style="margin-bottom:0">
+      </div>
+      <div>
+        <label style="font-size:12px;color:#6b7280;display:block;margin-bottom:4px">年度目标（每行一条）</label>
+        <textarea class="api-key-inp" id="profile-goals-inp" rows="4" style="margin-bottom:0;font-family:inherit;resize:vertical"></textarea>
+      </div>
+    </div>
+    <div style="display:flex;gap:.5rem;justify-content:flex-end">
+      <span class="btn" onclick="document.getElementById('profile-modal').style.display='none'">取消</span>
+      <span class="btn pri" onclick="saveProfile()">保存</span>
     </div>
   </div>
 </div>
@@ -867,6 +901,57 @@ document.getElementById('lock-inp')?.addEventListener('keydown', e => { if (e.ke
 // ─── 行业洞察 AI 分析 / 抓取 · 后端 Worker 地址 ────────────────────
 const XY_WORKER_BASE = 'https://xiaoyuan-analyze.yanjieyuan080.workers.dev';
 const ANALYZE_WORKER_URL = XY_WORKER_BASE + '/analyze';
+
+// ─── 系统信息（名称/主线/年度目标，可编辑）───────────────────────
+const PROFILE_DEFAULTS = {
+  name: '人生经营系统',
+  subtitle: '餐饮 · 运营 · 私域 · 成长',
+  mainline: '餐饮 / 用户运营 / 私域 / 会员体系 / 加盟协同',
+  keyword: '沉淀',
+  goals: [
+    '找到能让我从执行者升级到项目型/增长型人才的工作',
+    '搭建个人作品集，沉淀5个可展示案例',
+    '稳定输出行业内容，完成3篇高质量文章',
+  ],
+};
+function getProfile() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('sys_profile') || 'null');
+    if (!saved) return {...PROFILE_DEFAULTS};
+    return {...PROFILE_DEFAULTS, ...saved, goals: (saved.goals && saved.goals.length) ? saved.goals : PROFILE_DEFAULTS.goals};
+  } catch(e) { return {...PROFILE_DEFAULTS}; }
+}
+function renderProfile() {
+  const p = getProfile();
+  document.title = p.name;
+  const lockTitle = document.getElementById('lock-title');
+  if (lockTitle) lockTitle.textContent = p.name;
+  const sbName = document.getElementById('sb-logo-name');
+  if (sbName) sbName.textContent = p.name;
+  const sbSub = document.getElementById('sb-logo-sub');
+  if (sbSub) sbSub.textContent = p.subtitle;
+}
+function openProfileEditor() {
+  const p = getProfile();
+  document.getElementById('profile-name-inp').value = p.name;
+  document.getElementById('profile-sub-inp').value = p.subtitle;
+  document.getElementById('profile-mainline-inp').value = p.mainline;
+  document.getElementById('profile-keyword-inp').value = p.keyword;
+  document.getElementById('profile-goals-inp').value = p.goals.join('\n');
+  document.getElementById('profile-modal').style.display = 'flex';
+}
+function saveProfile() {
+  const name = document.getElementById('profile-name-inp').value.trim() || PROFILE_DEFAULTS.name;
+  const subtitle = document.getElementById('profile-sub-inp').value.trim() || PROFILE_DEFAULTS.subtitle;
+  const mainline = document.getElementById('profile-mainline-inp').value.trim() || PROFILE_DEFAULTS.mainline;
+  const keyword = document.getElementById('profile-keyword-inp').value.trim() || PROFILE_DEFAULTS.keyword;
+  const goals = document.getElementById('profile-goals-inp').value.split('\n').map(s=>s.trim()).filter(Boolean);
+  localStorage.setItem('sys_profile', JSON.stringify({name, subtitle, mainline, keyword, goals: goals.length ? goals : PROFILE_DEFAULTS.goals}));
+  document.getElementById('profile-modal').style.display = 'none';
+  renderProfile();
+  if (currentPage === 'home') renderHome();
+  showToast('系统信息已保存 ✓');
+}
 
 // ─── Storage ──────────────────────────────────────────────────────
 const S = {
@@ -1308,6 +1393,7 @@ function renderStrategy() {
 
 // ─── Home Page ────────────────────────────────────────────────────
 function renderHome() {
+  const profile = getProfile();
   const today = new Date().toISOString().slice(0,10);
   const dailyRecs = S.get('daily');
   const todayRec = dailyRecs.find(r=>r.date===today);
@@ -1350,13 +1436,12 @@ function renderHome() {
 
   document.getElementById('home').innerHTML = `
     ${tomorrowBanner}
-    <div class="hero-card" style="background:linear-gradient(135deg,#f5f6fe 0%,#fff 100%)">
-      <h2>小袁人生经营系统</h2>
-      <div class="ml" style="margin-bottom:.875rem">主线：餐饮 / 用户运营 / 私域 / 会员体系 / 加盟协同 · 年度关键词：<strong style="color:#1e2040">沉淀</strong></div>
+    <div class="hero-card" style="background:linear-gradient(135deg,#f5f6fe 0%,#fff 100%);position:relative">
+      <span class="btn" style="position:absolute;top:1rem;right:1rem;font-size:11px;padding:3px 10px" onclick="openProfileEditor()">✏️ 编辑</span>
+      <h2>${profile.name}</h2>
+      <div class="ml" style="margin-bottom:.875rem">主线：${profile.mainline} · 年度关键词：<strong style="color:#1e2040">${profile.keyword}</strong></div>
       <ul>
-        <li>找到能让我从执行者升级到项目型/增长型人才的工作</li>
-        <li>搭建个人作品集，沉淀5个可展示案例</li>
-        <li>稳定输出行业内容，完成3篇高质量文章</li>
+        ${profile.goals.map(g=>`<li>${g}</li>`).join('')}
       </ul>
     </div>
     <div class="stats-strip">
@@ -3089,7 +3174,7 @@ function renderPage(id) {
 
 // ─── Export Markdown ──────────────────────────────────────────────
 function exportMD() {
-  let md = `# 小袁人生经营系统数据导出\n\n导出时间：${new Date().toLocaleString('zh-CN')}\n\n`;
+  let md = `# ${getProfile().name}数据导出\n\n导出时间：${new Date().toLocaleString('zh-CN')}\n\n`;
   Object.keys(MOD).forEach(k=>{
     const m = MOD[k];
     const records = S.get(k);
@@ -3191,6 +3276,7 @@ function pomoSwitch() {
 }
 
 // ─── Init ─────────────────────────────────────────────────────────
+renderProfile();
 if (localStorage.getItem('sys_unlocked') === '1') {
   document.getElementById('lock-screen')?.remove();
   renderHome();
