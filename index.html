@@ -683,6 +683,11 @@ const MOD = {
       {k:'report',l:'向上汇报口径',t:'ta',cls:'full'},
       {k:'final_asset',l:'最终资产',t:'ta',cls:'full'},
       {k:'review',l:'项目复盘',t:'ta',cls:'full'},
+      {k:'file_name',l:'项目文件',t:'hidden'},
+      {k:'file_type',l:'文件类型',t:'hidden'},
+      {k:'file_size',l:'文件大小',t:'hidden'},
+      {k:'file_content',l:'文件解析内容',t:'hidden'},
+      {k:'file_images',l:'文件图片',t:'hidden'},
     ],
     listFields:['priority','status','type','today_step','blocker_now'],
     colorMap:{priority:{S:'accent',A:'purple',B:'green',C:'',D:''},status:{推进中:'green','卡住了':'accent',已完成:'blue',想法中:'',规划中:'amber'}}
@@ -1110,7 +1115,7 @@ function fieldActionBtn(modKey, fieldKey) {
 
 // ─── Generic Form ─────────────────────────────────────────────────
 function formHTML(modKey, fields) {
-  return `<div class="fgrid">${modKey==='assets'?assetUploadHTML():''}${fields.map(f=>f.t==='hidden'?`<input type="hidden" name="${f.k}">`:`
+  return `<div class="fgrid">${modKey==='assets'?assetUploadHTML():modKey==='projects'?projectUploadHTML():''}${fields.map(f=>f.t==='hidden'?`<input type="hidden" name="${f.k}">`:`
     <div class="fg ${f.cls||''}">
       <label class="fl">${f.l}${f.req?'<span style="color:#e05a6a;margin-left:2px">*</span>':''}
         ${fieldActionBtn(modKey, f.k)}
@@ -1139,6 +1144,15 @@ function assetUploadHTML(){
   </div>`;
 }
 
+function projectUploadHTML(){
+  return `<div class="asset-upload" id="project-upload-box" onclick="document.getElementById('project-file-input').click()">
+    <input id="project-file-input" type="file" hidden accept=".pdf,.docx,.pptx,.xlsx,.xls,.txt,.md,.csv,.json,.html,.htm" onchange="readProjectFile(this.files[0])">
+    <div class="asset-upload-ic">⇧</div><div class="asset-upload-main"><div class="asset-upload-title">上传项目资料，自动读取背景信息</div>
+    <div class="asset-upload-tip">支持 PDF、Word（DOCX）、PPTX、Excel 等，最大 20MB。正文会参与场景理解和案例匹配，图片会随项目保存。</div>
+    <div class="asset-upload-status" id="project-upload-status">上传后请确认“项目背景”和“要解决的问题”，再选择关联案例。</div></div><span class="asset-upload-btn">选择文件</span>
+  </div>`;
+}
+
 function loadBrowserScript(src,globalName){
   if(window[globalName])return Promise.resolve(window[globalName]);
   return new Promise((resolve,reject)=>{const old=document.querySelector(`script[data-lib="${globalName}"]`);if(old){old.addEventListener('load',()=>resolve(window[globalName]),{once:true});old.addEventListener('error',reject,{once:true});return;}const s=document.createElement('script');s.src=src;s.dataset.lib=globalName;s.onload=()=>resolve(window[globalName]);s.onerror=()=>reject(new Error('解析组件加载失败'));document.head.appendChild(s);});
@@ -1164,8 +1178,15 @@ async function readAssetFile(file){
   try{const result=await extractAssetFile(file),text=result.text||'',images=result.images||[];if(!text&&!images.length)throw new Error('没有读取到可用文字或图片');const set=(k,v)=>{const el=form.querySelector(`[name="${k}"]`);if(el)el.value=v;};const base=file.name.replace(/\.[^.]+$/,'');const name=form.querySelector('[name="name"]');if(name&&!name.value.trim())name.value=base;const content=form.querySelector('[name="content"]');if(content)content.value=text||`该文件已提取 ${images.length} 张图片预览。`;set('file_name',file.name);set('file_type',file.type||(file.name.split('.').pop()||''));set('file_size',String(file.size));set('file_images',JSON.stringify(images));if(status)status.textContent=`已读取：${file.name} · ${text.length.toLocaleString()} 字 · ${images.length} 张图片，保存后同步到云端。`;showToast(`已读取正文和 ${images.length} 张图片，请检查后保存 ✓`);}
   catch(e){if(status)status.textContent=`读取失败：${e.message}`;showToast(`读取失败：${e.message}`);}finally{box?.classList.remove('busy');}
 }
+async function readProjectFile(file){
+  if(!file)return;if(file.size>20*1024*1024){showToast('文件不能超过 20MB');return;}
+  const form=document.getElementById('form-projects'),box=document.getElementById('project-upload-box'),status=document.getElementById('project-upload-status');if(!form)return;box?.classList.add('busy');if(status)status.textContent=`正在读取「${file.name}」…`;
+  try{const result=await extractAssetFile(file),text=result.text||'',images=result.images||[];if(!text&&!images.length)throw new Error('没有读取到可用文字或图片');const set=(k,v)=>{const el=form.querySelector(`[name="${k}"]`);if(el)el.value=v;},base=file.name.replace(/\.[^.]+$/,'');const name=form.querySelector('[name="name"]'),background=form.querySelector('[name="background"]');if(name&&!name.value.trim())name.value=base;if(background&&!background.value.trim()&&text)background.value=text.slice(0,6000);set('file_name',file.name);set('file_type',file.type||(file.name.split('.').pop()||''));set('file_size',String(file.size));set('file_content',text);set('file_images',JSON.stringify(images));if(status)status.textContent=`已读取：${file.name} · ${text.length.toLocaleString()} 字 · ${images.length} 张图片。请补充或确认要解决的问题。`;refreshProjectMatches();showToast('项目资料已读取，请确认问题后保存 ✓');}
+  catch(e){if(status)status.textContent=`读取失败：${e.message}`;showToast(`读取失败：${e.message}`);}finally{box?.classList.remove('busy');}
+}
 function openAssetUpload(){go('assets');setTimeout(()=>{const form=document.getElementById('form-assets');if(form&&!form.classList.contains('open'))toggleForm('assets');setTimeout(()=>document.getElementById('asset-file-input')?.click(),50);},50);}
 function assetImages(rec){try{const a=Array.isArray(rec?.file_images)?rec.file_images:JSON.parse(rec?.file_images||'[]');return a.filter(x=>typeof x==='string'&&x.startsWith('data:image/')).slice(0,8);}catch(e){return [];}}
+function escapeHTML(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function assetGalleryHTML(rec){const imgs=assetImages(rec);return imgs.length?`<div class="asset-gallery">${imgs.map((src,i)=>`<img src="${src}" alt="${rec.name||'案例'}图片 ${i+1}" onclick="event.stopPropagation();window.open(this.src,'_blank')">`).join('')}</div>`:'';}
 
 function projectMatchPanelHTML() {
@@ -1208,7 +1229,7 @@ function projectFormData() {
 }
 
 function sceneText(data) {
-  return ['name','type','background','problem','goal','biz_value','org_value','kpi','key_actions','resources','key_people','blockers','interest_bind']
+  return ['name','type','background','problem','goal','biz_value','org_value','kpi','key_actions','resources','key_people','blockers','interest_bind','file_content']
     .map(k=>data[k]).filter(Boolean).join(' ').toLowerCase();
 }
 
@@ -2490,7 +2511,7 @@ function showRecordDetail(modKey, id) {
   </div>` : '';
   const canEdit=modKey==='projects'&&(!rec._shared||rec._invite_role==='editor');
   const collaborate=modKey==='projects'?`<div style="margin-top:14px;display:flex;gap:8px;justify-content:flex-end">${canEdit?`<span class="btn" onclick="editProjectBasics(${rec._id})">编辑项目</span>`:''}${rec._cloud_id&&!rec._shared?`<span class="btn" onclick="openProjectInvite('${rec._cloud_id}','${String(title).replace(/'/g,"\\'")}')">＋ 邀请协作</span>`:''}</div>${rec._shared?`<div class="pm-empty" style="margin-top:8px">这是协作项目，你的权限：${rec._invite_role==='editor'?'可编辑':'仅查看'}。</div>`:''}`:'';
-  const fileBlock=modKey==='assets'&&(rec.file_name||assetImages(rec).length)?`<div class="linked-case-block"><div style="font-size:11px;font-weight:700;color:#555b7a">📎 来源文件${rec.file_name?` · ${rec.file_name}`:''}</div>${assetGalleryHTML(rec)}</div>`:'';
+  const fileBlock=['assets','projects'].includes(modKey)&&(rec.file_name||assetImages(rec).length)?`<div class="linked-case-block"><div style="font-size:11px;font-weight:700;color:#555b7a">📎 ${modKey==='projects'?'项目资料':'来源文件'}${rec.file_name?` · ${escapeHTML(rec.file_name)}`:''}</div>${assetGalleryHTML(rec)}${modKey==='projects'&&rec.file_content?`<details style="margin-top:8px"><summary style="font-size:11px;color:#5b5cf6;cursor:pointer">查看文件解析文字</summary><div style="font-size:11px;color:#6b7280;line-height:1.7;white-space:pre-wrap;max-height:240px;overflow:auto;margin-top:6px;background:#f8f9fc;padding:8px;border-radius:6px">${escapeHTML(rec.file_content)}</div></details>`:''}</div>`:'';
   document.getElementById('rec-det-body').innerHTML = standard + fileBlock + linked + collaborate;
   document.getElementById('rec-detail-modal').style.display = 'flex';
 }
@@ -2499,7 +2520,7 @@ function editProjectBasics(id){
   const rec=S.get('projects').find(r=>String(r._id)===String(id));if(!rec)return;if(rec._shared&&rec._invite_role!=='editor'){showToast('你只有查看权限，不能修改这个项目');return;}
   document.getElementById('rec-detail-modal').style.display='none';if(currentPage!=='projects')go('projects');else renderPage('projects');
   const form=document.getElementById('form-projects');if(!form)return;if(!form.classList.contains('open'))toggleForm('projects');editingRecord={module:'projects',id:rec._id};
-  MOD.projects.fields.forEach(f=>{const el=form.querySelector(`[name="${f.k}"]`);if(el)el.value=rec[f.k]||'';});currentProjectMatches=Array.isArray(rec.related_cases)?rec.related_cases.map(x=>({...x})):[];refreshProjectMatches();
+  MOD.projects.fields.forEach(f=>{const el=form.querySelector(`[name="${f.k}"]`);if(el)el.value=rec[f.k]||'';});const uploadStatus=document.getElementById('project-upload-status');if(uploadStatus&&rec.file_name)uploadStatus.textContent=`已关联文件：${rec.file_name}，重新上传会替换当前文件。`;currentProjectMatches=Array.isArray(rec.related_cases)?rec.related_cases.map(x=>({...x})):[];refreshProjectMatches();
   const btn=document.getElementById('form-submit-projects');if(btn)btn.textContent='保存修改';form.scrollIntoView({behavior:'smooth',block:'start'});showToast('已进入项目编辑模式');
 }
 
