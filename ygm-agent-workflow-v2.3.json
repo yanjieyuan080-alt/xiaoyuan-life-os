@@ -1,0 +1,94 @@
+{
+  "workflow_id": "YGM_MULTI_STAGE_DIAGNOSIS_V2.3",
+  "source_master": "小袁餐饮品牌用户经营诊断Agent完整母版V2.2",
+  "rule_registry": "ygm-rule-engine-v2.3.json",
+  "state_contract_version": 3,
+  "principles": [
+    "项目资料中的问题、原因、结论和建议只能作为SOURCE_CLAIM，必须依据事实重新诊断",
+    "单一指标不得形成核心结论，Unknown不得补值",
+    "每个主要判断必须给出证据、反证、置信度和可推翻条件",
+    "只有缺失信息会改变核心判断时才STOP，每轮只问1至5个最小问题",
+    "新证据优先于旧结论，允许回退节点、重排根因和再次诊断",
+    "SOLUTION_GATE通过前不得输出正式解决方案"
+  ],
+  "stages": [
+    {
+      "id": "SOURCE_DATA_GATE",
+      "order": 1,
+      "name": "来源隔离与数据质量闸门",
+      "master_nodes": ["CORE-018", "STEP -1", "DATA_QUALITY_GATE"],
+      "modules": ["CORE"],
+      "objective": "逐份隔离事实与原项目方判断，核对GMV/实收、会员、复购、门店、渠道、企微和社群口径。",
+      "required_outputs": ["source_claims", "source_conflicts", "facts", "data_quality", "questions"],
+      "hard_stop": true,
+      "next": "BUSINESS_GOAL_GATE"
+    },
+    {
+      "id": "BUSINESS_GOAL_GATE",
+      "order": 2,
+      "name": "经营模型、基本盘与真实目标",
+      "master_nodes": ["STEP 0", "STEP 1", "STEP 2", "CORE-016"],
+      "modules": ["CORE", "BASE", "TARGET"],
+      "objective": "识别生意模型、门店属性与状态、季节和成熟度；经营模型变化时重估历史资产；把工具目标追溯为用户目标和经营目的，并验证容量、投入和周期。",
+      "required_outputs": ["business_state", "business_goal", "judgments", "hypotheses", "questions"],
+      "hard_stop": true,
+      "next": "OWNERSHIP_DEPOSIT_GATE"
+    },
+    {
+      "id": "OWNERSHIP_DEPOSIT_GATE",
+      "order": 3,
+      "name": "渠道归属与用户沉淀",
+      "master_nodes": ["STEP 3", "STEP 4A", "CORE-017"],
+      "modules": ["CORE", "CHANNEL", "DEPOSIT"],
+      "objective": "确认自然人身份唯一性与跨渠道口径，判断流量、交易、身份和持续关系归属，并沿真实机会池至有效资产定位沉淀断点。",
+      "required_outputs": ["identity_gate", "channel_state", "deposit_funnel", "judgments", "questions", "route_requests"],
+      "hard_stop": true,
+      "next": "USER_EFFICIENCY_GATE"
+    },
+    {
+      "id": "USER_EFFICIENCY_GATE",
+      "order": 4,
+      "name": "用户资产与经营效率",
+      "master_nodes": ["STEP 4B", "经营结果分解"],
+      "modules": ["CORE", "USER"],
+      "objective": "按身份资产、有效资产、触达资产、经营资产和生命周期闭环诊断；复购必须拆回来人数与回来次数，结果异常不得直接当根因。",
+      "required_outputs": ["user_asset_state", "efficiency_funnel", "judgments", "hypotheses", "questions", "route_requests"],
+      "hard_stop": false,
+      "next": "SPECIALIST_TREES"
+    },
+    {
+      "id": "SPECIALIST_TREES",
+      "order": 5,
+      "name": "按需专项树",
+      "master_nodes": ["STEP 5", "STEP 6", "专项A", "专项B"],
+      "modules": ["ORG", "TOOL", "PRODUCT", "ECON"],
+      "objective": "只按前序路由进入组织利益执行、工具数据闭环、商品场景价值和经济模型；禁止用执行力、工具有无或单次活动替代根因。",
+      "required_outputs": ["specialist_findings", "judgments", "counter_evidence", "questions"],
+      "hard_stop": false,
+      "conditional": true,
+      "next": "CAUSAL_PRIORITY_GATE"
+    },
+    {
+      "id": "CAUSAL_PRIORITY_GATE",
+      "order": 6,
+      "name": "跨层因果、反证与优先级",
+      "master_nodes": ["STEP 7", "STEP 8", "STOP", "反证机制"],
+      "modules": ["CORE"],
+      "objective": "从事实到单点判断、关联判断、根因、目标影响形成可审计因果链，主动反证，并按目标相关性、上游程度、影响规模和前置依赖排序P0/P1/P2。",
+      "required_outputs": ["causal_chain", "root_causes", "problem_map", "priority_problem", "missing_evidence", "questions"],
+      "hard_stop": true,
+      "next": "CONCLUSION_SOLUTION_GATE"
+    },
+    {
+      "id": "CONCLUSION_SOLUTION_GATE",
+      "order": 7,
+      "name": "正式结论与方案闸门",
+      "master_nodes": ["STEP 9", "SOLUTION_GATE", "最终报告结构"],
+      "modules": ["CORE"],
+      "objective": "直接回答项目被诊断成什么、为什么、造成什么经营影响和当前决策；只有目标、证据链、反证、资源约束和优先级均通过时才输出唯一第一动作。",
+      "required_outputs": ["diagnosis_conclusion", "executive_summary", "first_action", "validation_metrics", "quality_gate"],
+      "hard_stop": false,
+      "terminal": true
+    }
+  ]
+}
