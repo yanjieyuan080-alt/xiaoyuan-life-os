@@ -133,6 +133,7 @@ textarea.fta{resize:vertical;min-height:62px}
 .linked-case-block{margin-top:14px;border-top:1px solid #ececf5;padding-top:12px}.linked-case{background:#f7f7ff;border:1px solid #e4e4fb;border-radius:7px;padding:8px 10px;margin-top:7px}
 .asset-upload{grid-column:span 2;background:#f8f9ff;border:1.5px dashed #bfc1f7;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .15s}.asset-upload:hover{background:#f0f0ff;border-color:#7779ee}.asset-upload.busy{opacity:.7;pointer-events:none}.asset-upload-ic{width:38px;height:38px;border-radius:9px;background:#e7e7ff;color:#5b5cf6;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}.asset-upload-main{flex:1;min-width:0}.asset-upload-title{font-size:12.5px;font-weight:700;color:#34375c}.asset-upload-tip{font-size:10.5px;color:#8d92aa;line-height:1.55;margin-top:2px}.asset-upload-status{font-size:11px;color:#5b5cf6;margin-top:5px;word-break:break-all}.asset-upload-btn{font-size:11px;color:#fff;background:#5b5cf6;border-radius:6px;padding:5px 10px;white-space:nowrap}
 .asset-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-top:10px}.asset-gallery img{width:100%;height:110px;object-fit:contain;background:#f4f5f9;border:1px solid #e5e7eb;border-radius:7px;cursor:zoom-in}.asset-thumb{width:100%;height:130px;object-fit:cover;background:#f4f5f9;border-radius:7px;margin:7px 0;border:1px solid #e5e7eb}
+.diag-entry{grid-column:span 2;background:linear-gradient(135deg,#f8f7ff,#fff);border:1px solid #dddafe;border-radius:12px;padding:14px;margin-top:4px}.diag-entry-head{display:flex;align-items:flex-start;gap:10px}.diag-entry-icon{width:34px;height:34px;border-radius:9px;background:#e9e7ff;color:#5b5cf6;display:flex;align-items:center;justify-content:center;font-size:17px}.diag-entry-main{flex:1}.diag-entry-title{font-size:13px;font-weight:700;color:#25284b}.diag-entry-desc{font-size:10.5px;color:#858aa5;line-height:1.6;margin-top:2px}.diag-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:11px}.diag-step{font-size:10px;color:#9ca3af;background:#fff;border:1px solid #e7e8f2;border-radius:7px;padding:7px;text-align:center}.diag-step.done{color:#047857;background:#ecfdf5;border-color:#a7f3d0}.diag-step.active{color:#5b5cf6;background:#efefff;border-color:#c7c8f8}.diag-step b{display:block;font-size:12px;margin-bottom:2px}.diag-modal-box{background:#f5f6fa;border-radius:14px;width:min(980px,94vw);height:min(86vh,820px);display:flex;flex-direction:column;box-shadow:0 24px 70px rgba(30,32,64,.25);overflow:hidden}.diag-modal-head{background:#fff;border-bottom:1px solid #e8eaf0;padding:14px 18px;display:flex;align-items:center;gap:10px}.diag-modal-head-main{flex:1}.diag-modal-title{font-size:15px;font-weight:700;color:#1e2040}.diag-modal-sub{font-size:10.5px;color:#9ca3af;margin-top:2px}.diag-body{padding:16px;overflow-y:auto}.diag-status{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:10px 12px;margin-bottom:12px}.diag-status-dot{width:8px;height:8px;border-radius:50%;background:#f59e0b}.diag-status-text{font-size:11.5px;color:#555b7a;flex:1}.diag-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.diag-card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:12px;min-height:120px}.diag-card.full{grid-column:span 2}.diag-card-title{font-size:11px;font-weight:700;color:#555b7a;margin-bottom:7px;display:flex;align-items:center;gap:5px}.diag-card-content{font-size:11.5px;color:#4b506f;line-height:1.75;white-space:pre-wrap}.diag-empty{color:#b0b4c5;border:1px dashed #dfe1eb;border-radius:7px;padding:14px;text-align:center;font-size:10.5px}.diag-chain{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;align-items:stretch}.diag-chain-node{background:#f8f9ff;border:1px solid #dedffd;border-radius:8px;padding:8px;font-size:10.5px;color:#555b7a;line-height:1.5;position:relative}.diag-chain-node:not(:last-child)::after{content:'→';position:absolute;right:-7px;top:50%;transform:translate(50%,-50%);color:#8b8cf8;font-weight:700;z-index:2}.diag-priority{background:#fff7ed;border:1px solid #fed7aa}.diag-action{background:#ecfdf5;border:1px solid #a7f3d0}@media(max-width:720px){.diag-grid{grid-template-columns:1fr}.diag-card.full{grid-column:span 1}.diag-chain{grid-template-columns:1fr}.diag-chain-node:not(:last-child)::after{content:'↓';right:50%;top:auto;bottom:-8px;transform:translate(50%,50%)}.diag-steps{grid-template-columns:1fr 1fr}}
 
 /* 重点洞察 */
 .istar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
@@ -557,6 +558,14 @@ textarea.fta{resize:vertical;min-height:62px}
   </div>
 </div>
 
+<!-- 项目诊断报告弹窗 -->
+<div class="api-mo" id="project-diagnosis-modal" style="display:none;align-items:flex-start;padding-top:35px">
+  <div class="diag-modal-box">
+    <div class="diag-modal-head"><div style="font-size:20px">◫</div><div class="diag-modal-head-main"><div class="diag-modal-title" id="diag-modal-title">项目诊断</div><div class="diag-modal-sub" id="diag-modal-sub">事实 → 判断 → 根因 → 经营目标 → 第一优先动作</div></div><span class="btn" onclick="document.getElementById('project-diagnosis-modal').style.display='none'">关闭</span></div>
+    <div class="diag-body" id="project-diagnosis-body"></div>
+  </div>
+</div>
+
 <!-- 项目相关洞察推荐弹窗 -->
 <div class="api-mo" id="ins-suggest-modal" style="display:none;align-items:flex-start;padding-top:60px">
   <div class="api-mo-box" style="max-width:600px;width:95%;max-height:80vh;overflow-y:auto">
@@ -688,6 +697,8 @@ const MOD = {
       {k:'file_size',l:'文件大小',t:'hidden'},
       {k:'file_content',l:'文件解析内容',t:'hidden'},
       {k:'file_images',l:'文件图片',t:'hidden'},
+      {k:'diagnosis_status',l:'诊断状态',t:'hidden'},
+      {k:'diagnosis_json',l:'诊断结果',t:'hidden'},
     ],
     listFields:['priority','status','type','today_step','blocker_now'],
     colorMap:{priority:{S:'accent',A:'purple',B:'green',C:'',D:''},status:{推进中:'green','卡住了':'accent',已完成:'blue',想法中:'',规划中:'amber'}}
@@ -1127,7 +1138,7 @@ function formHTML(modKey, fields) {
         : `<div class="voice-wrap"><input class="fi has-voice" type="text" name="${f.k}" id="vta-${f.k}"><span class="voice-btn" id="vbtn-${f.k}" onclick="voiceToggle('${f.k}')" title="语音输入">🎤</span><span class="voice-tip">点击语音输入</span></div>`
       }
     </div>`).join('')}
-    ${modKey==='projects' ? projectMatchPanelHTML() : ''}
+    ${modKey==='projects' ? projectDiagnosisEntryHTML()+projectMatchPanelHTML() : ''}
   </div>
   <div class="factions">
     <span class="btn pri" id="form-submit-${modKey}" onclick="submitForm('${modKey}')">保存记录</span>
@@ -1152,6 +1163,14 @@ function projectUploadHTML(){
     <div class="asset-upload-status" id="project-upload-status">上传后将自动拆解并填充项目字段，再生成案例推荐。</div></div><span class="asset-upload-btn">选择文件</span>
   </div>`;
 }
+
+function projectDiagnosisEntryHTML(){return `<div class="diag-entry"><div class="diag-entry-head"><div class="diag-entry-icon">⌁</div><div class="diag-entry-main"><div class="diag-entry-title">项目经营诊断</div><div class="diag-entry-desc">前端报告页已就绪。项目资料读取后进入诊断队列，后续由你的诊断 Agent 按证据链生成完整结论。</div></div><span class="btn" onclick="previewFormDiagnosis()">查看诊断页</span></div><div class="diag-steps"><div class="diag-step" id="diag-form-step-source"><b>1</b>材料读取</div><div class="diag-step" id="diag-form-step-analyze"><b>2</b>经营诊断</div><div class="diag-step"><b>3</b>证据链</div><div class="diag-step"><b>4</b>优先动作</div></div></div>`;}
+
+function diagnosisShell(fileName='',text='',imageCount=0){return {version:1,status:text?'material_ready':'waiting_material',source:{file_name:fileName,char_count:text.length,image_count:imageCount,read_at:new Date().toISOString()},facts:[],data_points:[],phenomena:[],hypotheses:[],judgments:[],causal_chain:[],goal_validation:'',root_causes:[],priority_problem:'',first_action:'',validation_metrics:[],missing_evidence:[],case_links:[]};}
+function initProjectDiagnosis(fileName,text,images){const form=document.getElementById('form-projects');if(!form)return;const shell=diagnosisShell(fileName,text,(images||[]).length),json=form.querySelector('[name="diagnosis_json"]'),status=form.querySelector('[name="diagnosis_status"]');if(json)json.value=JSON.stringify(shell);if(status)status.value='材料已读取，等待诊断';renderDiagnosisFormState(shell);}
+function parseDiagnosis(raw,fallback={}){try{return typeof raw==='string'?{...fallback,...JSON.parse(raw||'{}')}:{...fallback,...(raw||{})};}catch(e){return fallback;}}
+function renderDiagnosisFormState(diag){const source=document.getElementById('diag-form-step-source'),analyze=document.getElementById('diag-form-step-analyze');if(source)source.className='diag-step '+(diag?.status&&diag.status!=='waiting_material'?'done':'');if(analyze)analyze.className='diag-step '+(diag?.status==='complete'?'done':diag?.status==='material_ready'?'active':'');}
+function previewFormDiagnosis(){const form=document.getElementById('form-projects');if(!form)return;const raw=form.querySelector('[name="diagnosis_json"]')?.value,diag=parseDiagnosis(raw,diagnosisShell(form.querySelector('[name="file_name"]')?.value||'',form.querySelector('[name="file_content"]')?.value||'',assetImages({file_images:form.querySelector('[name="file_images"]')?.value}).length));showProjectDiagnosisReport(form.querySelector('[name="name"]')?.value||'未命名项目',diag);}
 
 function loadBrowserScript(src,globalName){
   if(window[globalName])return Promise.resolve(window[globalName]);
@@ -1204,7 +1223,7 @@ function refillProjectFromFile(){const form=document.getElementById('form-projec
 async function readProjectFile(file){
   if(!file)return;if(file.size>20*1024*1024){showToast('文件不能超过 20MB');return;}
   const form=document.getElementById('form-projects'),box=document.getElementById('project-upload-box'),status=document.getElementById('project-upload-status');if(!form)return;box?.classList.add('busy');if(status)status.textContent=`正在读取「${file.name}」…`;
-  try{const result=await extractAssetFile(file),text=result.text||'',images=result.images||[];if(!text&&!images.length)throw new Error('没有读取到可用文字或图片');const set=(k,v)=>{const el=form.querySelector(`[name="${k}"]`);if(el)el.value=v;},base=file.name.replace(/\.[^.]+$/,'');set('file_name',file.name);set('file_type',file.type||(file.name.split('.').pop()||''));set('file_size',String(file.size));set('file_content',text);set('file_images',JSON.stringify(images));const filled=autoFillProjectFields(text,base);if(status)status.innerHTML=`已读取：${file.name} · ${text.length.toLocaleString()} 字 · ${images.length} 张图片 · 已填充 ${filled.length} 个字段。<span class="pm-refresh" style="margin-left:6px" onclick="event.stopPropagation();refillProjectFromFile()">重新自动填充</span>`;refreshProjectMatches();showToast(`项目资料已读取并自动填充 ${filled.length} 个字段 ✓`);}
+  try{const result=await extractAssetFile(file),text=result.text||'',images=result.images||[];if(!text&&!images.length)throw new Error('没有读取到可用文字或图片');const set=(k,v)=>{const el=form.querySelector(`[name="${k}"]`);if(el)el.value=v;},base=file.name.replace(/\.[^.]+$/,'');set('file_name',file.name);set('file_type',file.type||(file.name.split('.').pop()||''));set('file_size',String(file.size));set('file_content',text);set('file_images',JSON.stringify(images));initProjectDiagnosis(file.name,text,images);const filled=autoFillProjectFields(text,base);if(status)status.innerHTML=`已读取：${file.name} · ${text.length.toLocaleString()} 字 · ${images.length} 张图片 · 已填充 ${filled.length} 个字段。<span class="pm-refresh" style="margin-left:6px" onclick="event.stopPropagation();refillProjectFromFile()">重新自动填充</span>`;refreshProjectMatches();showToast(`项目资料已读取并自动填充 ${filled.length} 个字段 ✓`);}
   catch(e){if(status)status.textContent=`读取失败：${e.message}`;showToast(`读取失败：${e.message}`);}finally{box?.classList.remove('busy');}
 }
 function openAssetUpload(){go('assets');setTimeout(()=>{const form=document.getElementById('form-assets');if(form&&!form.classList.contains('open'))toggleForm('assets');setTimeout(()=>document.getElementById('asset-file-input')?.click(),50);},50);}
@@ -1537,6 +1556,7 @@ function recordRow(modKey, rec, colFields) {
     <td><div class="db-title-cell">
       <span class="db-title-text" title="${title}" ${modKey==='projects'?`style="cursor:pointer;color:#5b5cf6" onclick="showRecordDetail('projects',${rec._id})"`:''}>${title}${modKey==='projects'&&rec._shared?' <span class="db-prop dp-purple">协作</span>':''}</span>
       <span class="db-actions" ${modKey==='projects'?'style="display:flex"':''}>
+        ${modKey==='projects'?`<span class="btn" style="padding:2px 8px;font-size:11px" onclick="openProjectDiagnosis(${rec._id})">诊断</span>`:''}
         ${modKey==='projects'&&(!rec._shared||rec._invite_role==='editor')?`<span class="btn" style="padding:2px 8px;font-size:11px" onclick="editProjectBasics(${rec._id})">编辑</span>`:''}
         ${rec._shared?'':`<span class="btn danger" style="padding:2px 8px;font-size:11px" onclick="delRecord('${modKey}',${rec._id})">删除</span>`}
       </span>
@@ -2510,6 +2530,22 @@ async function renderObsidian(kw, folder) {
   }
 }
 
+function diagValueHTML(value,empty='等待诊断 Agent 输出'){
+  if(Array.isArray(value)&&value.length)return value.map(x=>`<div style="margin-bottom:5px">• ${escapeHTML(typeof x==='string'?x:(x.text||x.conclusion||JSON.stringify(x)))}</div>`).join('');
+  if(value&&typeof value==='object')return escapeHTML(JSON.stringify(value,null,2));
+  if(String(value||'').trim())return escapeHTML(value);
+  return `<div class="diag-empty">${empty}</div>`;
+}
+function showProjectDiagnosisReport(title,diag){
+  diag=parseDiagnosis(diag,diagnosisShell());const complete=diag.status==='complete',source=diag.source||{};document.getElementById('diag-modal-title').textContent=`${title} · 项目诊断`;
+  document.getElementById('diag-modal-sub').textContent=`${source.file_name?`资料：${source.file_name} · `:''}${Number(source.char_count||0).toLocaleString()} 字 · ${source.image_count||0} 张图片`;
+  const chain=Array.isArray(diag.causal_chain)?diag.causal_chain:[],nodes=chain.length?chain.slice(0,5):['事实/数据','中间判断','核心根因','经营目标','第一优先动作'];
+  document.getElementById('project-diagnosis-body').innerHTML=`<div class="diag-status"><span class="diag-status-dot" style="background:${complete?'#10b981':'#f59e0b'}"></span><div class="diag-status-text">${complete?'诊断已完成，可根据证据链推进第一优先动作。':'材料已读取，等待接入你的项目诊断 Agent。当前页面仅展示报告结构，不生成虚假结论。'}</div><span class="db-prop ${complete?'dp-green':'dp-amber'}">${complete?'诊断完成':'待诊断'}</span></div>
+  <div class="diag-card full" style="margin-bottom:10px"><div class="diag-card-title">因果推理证据链</div><div class="diag-chain">${nodes.map((n,i)=>`<div class="diag-chain-node ${i===nodes.length-1?'diag-action':''}">${diagValueHTML(n,'待输出')}</div>`).join('')}</div></div>
+  <div class="diag-grid"><div class="diag-card"><div class="diag-card-title">① 经营事实与数据</div><div class="diag-card-content">${diagValueHTML([...(diag.facts||[]),...(diag.data_points||[])])}</div></div><div class="diag-card"><div class="diag-card-title">② 现象、问题与待验证假设</div><div class="diag-card-content">${diagValueHTML([...(diag.phenomena||[]),...(diag.hypotheses||[])])}</div></div><div class="diag-card"><div class="diag-card-title">③ 中间判断</div><div class="diag-card-content">${diagValueHTML(diag.judgments)}</div></div><div class="diag-card"><div class="diag-card-title">④ 经营目标有效性</div><div class="diag-card-content">${diagValueHTML(diag.goal_validation)}</div></div><div class="diag-card"><div class="diag-card-title">⑤ 核心根因</div><div class="diag-card-content">${diagValueHTML(diag.root_causes)}</div></div><div class="diag-card diag-priority"><div class="diag-card-title">⑥ 第一优先问题</div><div class="diag-card-content">${diagValueHTML(diag.priority_problem)}</div></div><div class="diag-card diag-action"><div class="diag-card-title">⑦ 第一优先动作</div><div class="diag-card-content">${diagValueHTML(diag.first_action)}</div></div><div class="diag-card"><div class="diag-card-title">⑧ 验证指标</div><div class="diag-card-content">${diagValueHTML(diag.validation_metrics)}</div></div><div class="diag-card"><div class="diag-card-title">⑨ 缺失证据与待补材料</div><div class="diag-card-content">${diagValueHTML(diag.missing_evidence)}</div></div><div class="diag-card"><div class="diag-card-title">⑩ 可关联案例</div><div class="diag-card-content">${diagValueHTML(diag.case_links)}</div></div></div>`;document.getElementById('project-diagnosis-modal').style.display='flex';
+}
+function openProjectDiagnosis(id){const rec=S.get('projects').find(r=>String(r._id)===String(id));if(!rec)return;showProjectDiagnosisReport(rec.name||'未命名项目',parseDiagnosis(rec.diagnosis_json,diagnosisShell(rec.file_name||'',rec.file_content||'',assetImages(rec).length)));}
+
 function showRecordDetail(modKey, id) {
   const mod = MOD[modKey];
   const rec = S.get(modKey).find(r=>r._id===id);
@@ -2533,7 +2569,7 @@ function showRecordDetail(modKey, id) {
     </div>`).join('') : '<div class="pm-empty" style="margin-top:7px">这个项目还没有关联案例。</div>'}
   </div>` : '';
   const canEdit=modKey==='projects'&&(!rec._shared||rec._invite_role==='editor');
-  const collaborate=modKey==='projects'?`<div style="margin-top:14px;display:flex;gap:8px;justify-content:flex-end">${canEdit?`<span class="btn" onclick="editProjectBasics(${rec._id})">编辑项目</span>`:''}${rec._cloud_id&&!rec._shared?`<span class="btn" onclick="openProjectInvite('${rec._cloud_id}','${String(title).replace(/'/g,"\\'")}')">＋ 邀请协作</span>`:''}</div>${rec._shared?`<div class="pm-empty" style="margin-top:8px">这是协作项目，你的权限：${rec._invite_role==='editor'?'可编辑':'仅查看'}。</div>`:''}`:'';
+  const collaborate=modKey==='projects'?`<div style="margin-top:14px;display:flex;gap:8px;justify-content:flex-end"><span class="btn pri" onclick="openProjectDiagnosis(${rec._id})">查看项目诊断</span>${canEdit?`<span class="btn" onclick="editProjectBasics(${rec._id})">编辑项目</span>`:''}${rec._cloud_id&&!rec._shared?`<span class="btn" onclick="openProjectInvite('${rec._cloud_id}','${String(title).replace(/'/g,"\\'")}')">＋ 邀请协作</span>`:''}</div>${rec._shared?`<div class="pm-empty" style="margin-top:8px">这是协作项目，你的权限：${rec._invite_role==='editor'?'可编辑':'仅查看'}。</div>`:''}`:'';
   const fileBlock=['assets','projects'].includes(modKey)&&(rec.file_name||assetImages(rec).length)?`<div class="linked-case-block"><div style="font-size:11px;font-weight:700;color:#555b7a">📎 ${modKey==='projects'?'项目资料':'来源文件'}${rec.file_name?` · ${escapeHTML(rec.file_name)}`:''}</div>${assetGalleryHTML(rec)}${modKey==='projects'&&rec.file_content?`<details style="margin-top:8px"><summary style="font-size:11px;color:#5b5cf6;cursor:pointer">查看文件解析文字</summary><div style="font-size:11px;color:#6b7280;line-height:1.7;white-space:pre-wrap;max-height:240px;overflow:auto;margin-top:6px;background:#f8f9fc;padding:8px;border-radius:6px">${escapeHTML(rec.file_content)}</div></details>`:''}</div>`:'';
   document.getElementById('rec-det-body').innerHTML = standard + fileBlock + linked + collaborate;
   document.getElementById('rec-detail-modal').style.display = 'flex';
@@ -2543,7 +2579,7 @@ function editProjectBasics(id){
   const rec=S.get('projects').find(r=>String(r._id)===String(id));if(!rec)return;if(rec._shared&&rec._invite_role!=='editor'){showToast('你只有查看权限，不能修改这个项目');return;}
   document.getElementById('rec-detail-modal').style.display='none';if(currentPage!=='projects')go('projects');else renderPage('projects');
   const form=document.getElementById('form-projects');if(!form)return;if(!form.classList.contains('open'))toggleForm('projects');editingRecord={module:'projects',id:rec._id};
-  MOD.projects.fields.forEach(f=>{const el=form.querySelector(`[name="${f.k}"]`);if(el)el.value=rec[f.k]||'';});const uploadStatus=document.getElementById('project-upload-status');if(uploadStatus&&rec.file_name)uploadStatus.textContent=`已关联文件：${rec.file_name}，重新上传会替换当前文件。`;currentProjectMatches=Array.isArray(rec.related_cases)?rec.related_cases.map(x=>({...x})):[];refreshProjectMatches();
+  MOD.projects.fields.forEach(f=>{const el=form.querySelector(`[name="${f.k}"]`);if(el)el.value=rec[f.k]||'';});const uploadStatus=document.getElementById('project-upload-status');if(uploadStatus&&rec.file_name)uploadStatus.textContent=`已关联文件：${rec.file_name}，重新上传会替换当前文件。`;renderDiagnosisFormState(parseDiagnosis(rec.diagnosis_json,diagnosisShell(rec.file_name||'',rec.file_content||'',assetImages(rec).length)));currentProjectMatches=Array.isArray(rec.related_cases)?rec.related_cases.map(x=>({...x})):[];refreshProjectMatches();
   const btn=document.getElementById('form-submit-projects');if(btn)btn.textContent='保存修改';form.scrollIntoView({behavior:'smooth',block:'start'});showToast('已进入项目编辑模式');
 }
 
