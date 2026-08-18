@@ -3,6 +3,16 @@
   "source_master": "小袁餐饮品牌用户经营诊断Agent完整母版V2.2",
   "rule_registry": "ygm-rule-engine-v2.3.json",
   "state_contract_version": 3,
+  "rule_execution": {
+    "total_rules": 208,
+    "load_policy": "原始规则全文保留；已编译规则直接执行，未编译规则在加载时按统一契约补齐全部字段",
+    "contract_chain": "Input -> Derived Variable -> Trigger -> Exclusion -> Judgment -> Evidence -> Counter Evidence -> STOP -> P Candidate -> NEXT_NODE"
+  },
+  "material_strategy": {
+    "text": "按文件边界和段落切分为不超过14000字符的分块，逐块读取并分层合并，不截断后半部分",
+    "images": "每4张为一批进入视觉读取，只提取清晰可见事实，无法辨认时标记Unknown",
+    "checkpoint": "每个文字分块和图片批次完成后保存到项目诊断状态，可断点续跑"
+  },
   "principles": [
     "项目资料中的问题、原因、结论和建议只能作为SOURCE_CLAIM，必须依据事实重新诊断",
     "单一指标不得形成核心结论，Unknown不得补值",
