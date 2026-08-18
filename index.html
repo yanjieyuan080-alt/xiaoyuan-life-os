@@ -1125,7 +1125,7 @@ function formHTML(modKey, fields) {
     ${modKey==='projects' ? projectMatchPanelHTML() : ''}
   </div>
   <div class="factions">
-    <span class="btn pri" onclick="submitForm('${modKey}')">保存记录</span>
+    <span class="btn pri" id="form-submit-${modKey}" onclick="submitForm('${modKey}')">保存记录</span>
     <span class="btn" onclick="toggleForm('${modKey}')">取消</span>
   </div>`;
 }
@@ -1197,6 +1197,7 @@ const PROJECT_SCENES = [
 
 let projectMatchTimer = null;
 let currentProjectMatches = [];
+let editingRecord = null;
 
 function projectFormData() {
   const el = document.getElementById('form-projects');
@@ -1282,6 +1283,7 @@ function refreshProjectMatches(force=false) {
   const data=projectFormData();
   if(!data.background||!data.problem){ body.className='pm-empty'; body.innerHTML='至少填写项目背景和要解决的问题，系统才会开始匹配。'; return; }
   const result=buildProjectMatches(data);
+  currentProjectMatches.forEach(m=>{const group=m.kind==='success'?result.success:result.mine;if(!group.some(x=>String(x.id)===String(m.id)))group.push(m);});
   body.className='';
   const sceneHTML=result.scenes.length?result.scenes.map(s=>`<span class="pm-tag">${s}</span>`).join(''):'<span style="font-size:11px;color:#9ca3af">暂未识别出明确业务场景，请补充品牌类型、用户阶段、门店问题或经营目标。</span>';
   body.innerHTML=`<div class="pm-scene"><div class="pm-scene-title">系统理解的项目场景</div><div class="pm-tags">${sceneHTML}</div></div>`+
@@ -1305,6 +1307,7 @@ function toggleForm(modKey, tabName) {
   if (!el) return;
   const wasOpen = el.classList.contains('open');
   el.classList.toggle('open');
+  if(wasOpen&&editingRecord?.module===modKey){editingRecord=null;const btn=document.getElementById(`form-submit-${modKey}`);if(btn)btn.textContent='保存记录';}
   if (!wasOpen) {
     if (modKey==='projects') currentProjectMatches=[];
     formAutoFill(modKey, tabName, el);
@@ -1366,7 +1369,7 @@ function submitForm(modKey, tabName) {
   const el = document.getElementById(`form-${modKey}`);
   if (!el) return;
   const fields = tabName ? MOD[modKey].tabFields[tabName] : MOD[modKey].fields;
-  const r = {};
+  let r = {};
   const req = [];
   fields.forEach(f=>{
     const inp = el.querySelector(`[name="${f.k}"]`);
@@ -1381,15 +1384,17 @@ function submitForm(modKey, tabName) {
     r.related_cases=currentProjectMatches;
     r.scene_tags=detectProjectScenes(sceneText(r));
   }
-  S.add(modKey, r);
+  const editing=editingRecord?.module===modKey?editingRecord:null;
+  if(editing){const all=S.get(modKey),idx=all.findIndex(x=>String(x._id)===String(editing.id));if(idx<0){showToast('没有找到要修改的记录');return;}r={...all[idx],...r,_id:all[idx]._id};all[idx]=r;S.set(modKey,all);}else S.add(modKey, r);
   el.classList.remove('open');
   el.querySelectorAll('input,select,textarea').forEach(i=>i.value='');
   // reset emoji pickers
   el.querySelectorAll('.ep-item').forEach(i=>i.classList.remove('on'));
   el.querySelectorAll('.emoji-picker input[type=hidden]').forEach(i=>i.value='');
   if (modKey==='projects') currentProjectMatches=[];
+  editingRecord=null;
   renderPage(modKey);
-  postSaveHook(modKey, r);
+  if(editing)showToast('修改已保存并同步 ✓');else postSaveHook(modKey, r);
 }
 
 // ─── Obsidian 同步 ────────────────────────────────────────────────
@@ -1487,7 +1492,8 @@ function recordRow(modKey, rec, colFields) {
   return `<tr>
     <td><div class="db-title-cell">
       <span class="db-title-text" title="${title}" ${modKey==='projects'?`style="cursor:pointer;color:#5b5cf6" onclick="showRecordDetail('projects',${rec._id})"`:''}>${title}${modKey==='projects'&&rec._shared?' <span class="db-prop dp-purple">协作</span>':''}</span>
-      <span class="db-actions">
+      <span class="db-actions" ${modKey==='projects'?'style="display:flex"':''}>
+        ${modKey==='projects'&&(!rec._shared||rec._invite_role==='editor')?`<span class="btn" style="padding:2px 8px;font-size:11px" onclick="editProjectBasics(${rec._id})">编辑</span>`:''}
         ${rec._shared?'':`<span class="btn danger" style="padding:2px 8px;font-size:11px" onclick="delRecord('${modKey}',${rec._id})">删除</span>`}
       </span>
     </div></td>
@@ -2490,9 +2496,11 @@ function showRecordDetail(modKey, id) {
 }
 
 function editProjectBasics(id){
-  const all=S.get('projects'),idx=all.findIndex(r=>r._id===id);if(idx<0)return;const rec=all[idx];
-  const background=prompt('项目背景',rec.background||'');if(background===null)return;const problem=prompt('要解决的问题',rec.problem||'');if(problem===null)return;const status=prompt('项目状态（想法中 / 规划中 / 推进中 / 卡住了 / 已完成 / 已复盘 / 已沉淀）',rec.status||'规划中');if(status===null)return;
-  rec.background=background.trim();rec.problem=problem.trim();rec.status=status.trim()||rec.status;all[idx]=rec;S.set('projects',all);document.getElementById('rec-detail-modal').style.display='none';renderPage('projects');showToast('项目已更新并同步 ✓');
+  const rec=S.get('projects').find(r=>String(r._id)===String(id));if(!rec)return;if(rec._shared&&rec._invite_role!=='editor'){showToast('你只有查看权限，不能修改这个项目');return;}
+  document.getElementById('rec-detail-modal').style.display='none';if(currentPage!=='projects')go('projects');else renderPage('projects');
+  const form=document.getElementById('form-projects');if(!form)return;if(!form.classList.contains('open'))toggleForm('projects');editingRecord={module:'projects',id:rec._id};
+  MOD.projects.fields.forEach(f=>{const el=form.querySelector(`[name="${f.k}"]`);if(el)el.value=rec[f.k]||'';});currentProjectMatches=Array.isArray(rec.related_cases)?rec.related_cases.map(x=>({...x})):[];refreshProjectMatches();
+  const btn=document.getElementById('form-submit-projects');if(btn)btn.textContent='保存修改';form.scrollIntoView({behavior:'smooth',block:'start'});showToast('已进入项目编辑模式');
 }
 
 async function openProjectInvite(projectId,title){AUTH.inviteProjectId=projectId;document.getElementById('invite-heading').textContent=`邀请协作「${title}」`;document.getElementById('invite-email').value='';document.getElementById('invite-error').textContent='';document.getElementById('project-invite-modal').style.display='flex';await loadProjectInvites();}
