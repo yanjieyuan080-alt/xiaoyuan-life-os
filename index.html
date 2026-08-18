@@ -132,6 +132,7 @@ textarea.fta{resize:vertical;min-height:62px}
 .pm-status{font-size:10px;color:#8a8fac;white-space:nowrap}.pm-refresh{cursor:pointer;color:#5b5cf6}
 .linked-case-block{margin-top:14px;border-top:1px solid #ececf5;padding-top:12px}.linked-case{background:#f7f7ff;border:1px solid #e4e4fb;border-radius:7px;padding:8px 10px;margin-top:7px}
 .asset-upload{grid-column:span 2;background:#f8f9ff;border:1.5px dashed #bfc1f7;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .15s}.asset-upload:hover{background:#f0f0ff;border-color:#7779ee}.asset-upload.busy{opacity:.7;pointer-events:none}.asset-upload-ic{width:38px;height:38px;border-radius:9px;background:#e7e7ff;color:#5b5cf6;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}.asset-upload-main{flex:1;min-width:0}.asset-upload-title{font-size:12.5px;font-weight:700;color:#34375c}.asset-upload-tip{font-size:10.5px;color:#8d92aa;line-height:1.55;margin-top:2px}.asset-upload-status{font-size:11px;color:#5b5cf6;margin-top:5px;word-break:break-all}.asset-upload-btn{font-size:11px;color:#fff;background:#5b5cf6;border-radius:6px;padding:5px 10px;white-space:nowrap}
+.asset-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-top:10px}.asset-gallery img{width:100%;height:110px;object-fit:contain;background:#f4f5f9;border:1px solid #e5e7eb;border-radius:7px;cursor:zoom-in}.asset-thumb{width:100%;height:130px;object-fit:cover;background:#f4f5f9;border-radius:7px;margin:7px 0;border:1px solid #e5e7eb}
 
 /* 重点洞察 */
 .istar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
@@ -728,6 +729,7 @@ const MOD = {
       {k:'file_name',l:'来源文件',t:'hidden'},
       {k:'file_type',l:'文件类型',t:'hidden'},
       {k:'file_size',l:'文件大小',t:'hidden'},
+      {k:'file_images',l:'文件图片',t:'hidden'},
     ],
     listFields:['type','source_proj','use_for','status','portfolio'],
     colorMap:{status:{'草稿':'amber','可用':'green','已优化':'blue','已发布':'green'},portfolio:{是:'green',否:'',待评估:'amber'}}
@@ -1130,9 +1132,9 @@ function formHTML(modKey, fields) {
 
 function assetUploadHTML(){
   return `<div class="asset-upload" id="asset-upload-box" onclick="document.getElementById('asset-file-input').click()">
-    <input id="asset-file-input" type="file" hidden accept=".pdf,.docx,.xlsx,.xls,.txt,.md,.csv,.json,.html,.htm" onchange="readAssetFile(this.files[0])">
+    <input id="asset-file-input" type="file" hidden accept=".pdf,.docx,.pptx,.xlsx,.xls,.txt,.md,.csv,.json,.html,.htm" onchange="readAssetFile(this.files[0])">
     <div class="asset-upload-ic">⇧</div><div class="asset-upload-main"><div class="asset-upload-title">上传文件，自动生成案例内容</div>
-    <div class="asset-upload-tip">支持 PDF、Word（DOCX）、Excel、TXT、Markdown、CSV、JSON、HTML，最大 10MB。解析出的正文会保存到云端并参与项目匹配。</div>
+    <div class="asset-upload-tip">支持 PDF、Word（DOCX）、PPT（PPTX）、Excel、TXT、Markdown、CSV、JSON、HTML，最大 20MB。正文和压缩后的图片预览会保存到云端。</div>
     <div class="asset-upload-status" id="asset-upload-status">选择文件后，系统会自动填写资产名称和内容摘要。</div></div><span class="asset-upload-btn">选择文件</span>
   </div>`;
 }
@@ -1142,24 +1144,29 @@ function loadBrowserScript(src,globalName){
   return new Promise((resolve,reject)=>{const old=document.querySelector(`script[data-lib="${globalName}"]`);if(old){old.addEventListener('load',()=>resolve(window[globalName]),{once:true});old.addEventListener('error',reject,{once:true});return;}const s=document.createElement('script');s.src=src;s.dataset.lib=globalName;s.onload=()=>resolve(window[globalName]);s.onerror=()=>reject(new Error('解析组件加载失败'));document.head.appendChild(s);});
 }
 function cleanExtractedText(text){return String(text||'').replace(/\u0000/g,'').replace(/[ \t]+\n/g,'\n').replace(/\n{4,}/g,'\n\n\n').trim();}
+function blobToImageData(blob,maxSide=900,quality=.68){return new Promise((resolve,reject)=>{const url=URL.createObjectURL(blob),img=new Image();img.onload=()=>{try{const ratio=Math.min(1,maxSide/Math.max(img.naturalWidth||1,img.naturalHeight||1)),w=Math.max(1,Math.round(img.naturalWidth*ratio)),h=Math.max(1,Math.round(img.naturalHeight*ratio)),canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);URL.revokeObjectURL(url);resolve(canvas.toDataURL('image/jpeg',quality));}catch(e){URL.revokeObjectURL(url);reject(e);}};img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('图片读取失败'));};img.src=url;});}
+async function zipMediaImages(buffer,prefixes){const JSZip=await loadBrowserScript('https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js','JSZip'),zip=await JSZip.loadAsync(buffer),files=Object.values(zip.files).filter(f=>!f.dir&&prefixes.some(p=>f.name.startsWith(p))&&/\.(png|jpe?g|webp|gif|bmp)$/i.test(f.name)).slice(0,8),images=[];for(const f of files){try{images.push(await blobToImageData(await f.async('blob')));}catch(e){console.warn('skip image',f.name,e);}}return {zip,images};}
 async function extractAssetFile(file){
   const ext=(file.name.split('.').pop()||'').toLowerCase();
-  if(['txt','md','csv'].includes(ext))return cleanExtractedText(await file.text());
-  if(ext==='json'){const raw=await file.text();try{return JSON.stringify(JSON.parse(raw),null,2);}catch(e){return cleanExtractedText(raw);}}
-  if(['html','htm'].includes(ext)){const doc=new DOMParser().parseFromString(await file.text(),'text/html');doc.querySelectorAll('script,style,noscript').forEach(x=>x.remove());return cleanExtractedText(doc.body?.innerText||'');}
-  if(ext==='docx'){const mammoth=await loadBrowserScript('https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js','mammoth');const out=await mammoth.extractRawText({arrayBuffer:await file.arrayBuffer()});return cleanExtractedText(out.value);}
-  if(['xlsx','xls'].includes(ext)){const XLSX=await loadBrowserScript('https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js','XLSX');const wb=XLSX.read(await file.arrayBuffer(),{type:'array'});return cleanExtractedText(wb.SheetNames.map(n=>`【${n}】\n${XLSX.utils.sheet_to_csv(wb.Sheets[n])}`).join('\n\n'));}
-  if(ext==='pdf'){const pdfjsLib=await loadBrowserScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js','pdfjsLib');pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';const pdf=await pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise;const pages=[];for(let i=1;i<=pdf.numPages;i++){const page=await pdf.getPage(i),tc=await page.getTextContent();pages.push(`【第 ${i} 页】\n`+tc.items.map(x=>x.str).join(' '));}return cleanExtractedText(pages.join('\n\n'));}
+  if(['txt','md','csv'].includes(ext))return {text:cleanExtractedText(await file.text()),images:[]};
+  if(ext==='json'){const raw=await file.text();try{return {text:JSON.stringify(JSON.parse(raw),null,2),images:[]};}catch(e){return {text:cleanExtractedText(raw),images:[]};}}
+  if(['html','htm'].includes(ext)){const doc=new DOMParser().parseFromString(await file.text(),'text/html');doc.querySelectorAll('script,style,noscript').forEach(x=>x.remove());return {text:cleanExtractedText(doc.body?.innerText||''),images:[]};}
+  if(ext==='docx'){const buffer=await file.arrayBuffer(),mammoth=await loadBrowserScript('https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js','mammoth'),out=await mammoth.extractRawText({arrayBuffer:buffer}),media=await zipMediaImages(buffer,['word/media/']);return {text:cleanExtractedText(out.value),images:media.images};}
+  if(ext==='pptx'){const buffer=await file.arrayBuffer(),media=await zipMediaImages(buffer,['ppt/media/']),slides=Object.values(media.zip.files).filter(f=>/^ppt\/slides\/slide\d+\.xml$/i.test(f.name)).sort((a,b)=>a.name.localeCompare(b.name,undefined,{numeric:true})),parts=[];for(let i=0;i<slides.length;i++){const xml=new DOMParser().parseFromString(await slides[i].async('text'),'application/xml'),nodes=[...xml.getElementsByTagName('a:t')];parts.push(`【第 ${i+1} 页】\n`+nodes.map(n=>n.textContent).join(' '));}return {text:cleanExtractedText(parts.join('\n\n')),images:media.images};}
+  if(['xlsx','xls'].includes(ext)){const XLSX=await loadBrowserScript('https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js','XLSX'),wb=XLSX.read(await file.arrayBuffer(),{type:'array'});return {text:cleanExtractedText(wb.SheetNames.map(n=>`【${n}】\n${XLSX.utils.sheet_to_csv(wb.Sheets[n])}`).join('\n\n')),images:[]};}
+  if(ext==='pdf'){const pdfjsLib=await loadBrowserScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js','pdfjsLib');pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';const pdf=await pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise,pages=[],images=[];for(let i=1;i<=pdf.numPages;i++){const page=await pdf.getPage(i),tc=await page.getTextContent();pages.push(`【第 ${i} 页】\n`+tc.items.map(x=>x.str).join(' '));if(i<=8){const viewport=page.getViewport({scale:1.15}),canvas=document.createElement('canvas');canvas.width=viewport.width;canvas.height=viewport.height;await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;images.push(canvas.toDataURL('image/jpeg',.62));}}return {text:cleanExtractedText(pages.join('\n\n')),images};}
   throw new Error('暂不支持这种文件格式');
 }
 async function readAssetFile(file){
-  if(!file)return;if(file.size>10*1024*1024){showToast('文件不能超过 10MB');return;}
+  if(!file)return;if(file.size>20*1024*1024){showToast('文件不能超过 20MB');return;}
   const form=document.getElementById('form-assets'),box=document.getElementById('asset-upload-box'),status=document.getElementById('asset-upload-status');if(!form)return;
   box?.classList.add('busy');if(status)status.textContent=`正在读取「${file.name}」…`;
-  try{const text=await extractAssetFile(file);if(!text)throw new Error('没有读取到可用文字，请确认文件不是扫描图片');const set=(k,v)=>{const el=form.querySelector(`[name="${k}"]`);if(el)el.value=v;};const base=file.name.replace(/\.[^.]+$/,'');const name=form.querySelector('[name="name"]');if(name&&!name.value.trim())name.value=base;const content=form.querySelector('[name="content"]');if(content)content.value=text;set('file_name',file.name);set('file_type',file.type||(file.name.split('.').pop()||''));set('file_size',String(file.size));if(status)status.textContent=`已读取：${file.name} · ${text.length.toLocaleString()} 字，保存案例后会同步到云端。`;showToast('文件内容已读取，请检查后保存 ✓');}
+  try{const result=await extractAssetFile(file),text=result.text||'',images=result.images||[];if(!text&&!images.length)throw new Error('没有读取到可用文字或图片');const set=(k,v)=>{const el=form.querySelector(`[name="${k}"]`);if(el)el.value=v;};const base=file.name.replace(/\.[^.]+$/,'');const name=form.querySelector('[name="name"]');if(name&&!name.value.trim())name.value=base;const content=form.querySelector('[name="content"]');if(content)content.value=text||`该文件已提取 ${images.length} 张图片预览。`;set('file_name',file.name);set('file_type',file.type||(file.name.split('.').pop()||''));set('file_size',String(file.size));set('file_images',JSON.stringify(images));if(status)status.textContent=`已读取：${file.name} · ${text.length.toLocaleString()} 字 · ${images.length} 张图片，保存后同步到云端。`;showToast(`已读取正文和 ${images.length} 张图片，请检查后保存 ✓`);}
   catch(e){if(status)status.textContent=`读取失败：${e.message}`;showToast(`读取失败：${e.message}`);}finally{box?.classList.remove('busy');}
 }
 function openAssetUpload(){go('assets');setTimeout(()=>{const form=document.getElementById('form-assets');if(form&&!form.classList.contains('open'))toggleForm('assets');setTimeout(()=>document.getElementById('asset-file-input')?.click(),50);},50);}
+function assetImages(rec){try{const a=Array.isArray(rec?.file_images)?rec.file_images:JSON.parse(rec?.file_images||'[]');return a.filter(x=>typeof x==='string'&&x.startsWith('data:image/')).slice(0,8);}catch(e){return [];}}
+function assetGalleryHTML(rec){const imgs=assetImages(rec);return imgs.length?`<div class="asset-gallery">${imgs.map((src,i)=>`<img src="${src}" alt="${rec.name||'案例'}图片 ${i+1}" onclick="event.stopPropagation();window.open(this.src,'_blank')">`).join('')}</div>`:'';}
 
 function projectMatchPanelHTML() {
   return `<div class="project-match" id="project-match-panel">
@@ -2331,6 +2338,7 @@ function renderAssetLib(kw, typeF, statusF) {
         ${r.type?`<span class="db-prop ${typeColors[r.type]||'dp-default'}" style="flex-shrink:0">${r.type}</span>`:''}
       </div>
       ${r.source_proj?`<div style="font-size:11px;color:#9ca3af;margin-bottom:4px">来源：${r.source_proj}</div>`:''}
+      ${assetImages(r)[0]?`<img class="asset-thumb" src="${assetImages(r)[0]}" alt="${r.name||'案例'}预览">`:''}
       <div class="ilib-summary">${r.content||'暂无内容'}</div>
       <div class="ilib-foot">
         <span>${r.status?`<span class="db-prop dp-${r.status==='已发布'||r.status==='已优化'?'green':'amber'}">${r.status}</span>`:''}</span>
@@ -2379,6 +2387,7 @@ function renderAssetWin() {
       </div>
       <div class="istar-title">${r.name||'—'}</div>
       ${r.source_proj?`<div style="font-size:11px;color:#6b7280;margin-bottom:6px">来源项目：${r.source_proj}</div>`:''}
+      ${assetImages(r)[0]?`<img class="asset-thumb" src="${assetImages(r)[0]}" alt="${r.name||'案例'}预览">`:''}
       ${r.content?`<div class="istar-section"><div class="istar-sec-label">内容摘要</div><div class="istar-text">${r.content}</div></div>`:''}
       ${r.use_for?`<div class="istar-section"><div class="istar-sec-label">可用于</div><div class="istar-text istar-take">${r.use_for}</div></div>`:''}
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">
@@ -2459,7 +2468,7 @@ function showRecordDetail(modKey, id) {
   const title = rec[mod.titleField] || rec.title || rec.name || '详情';
   document.getElementById('rec-det-heading').textContent = `${mod.icon||''} ${title}`;
   const standard = fields
-    .filter(f=>rec[f.k])
+    .filter(f=>f.t!=='hidden'&&rec[f.k])
     .map(f=>`
       <div style="margin-bottom:10px">
         <div style="font-size:10px;font-weight:700;color:#9ca3af;letter-spacing:.06em;margin-bottom:3px">${f.l.toUpperCase()}</div>
@@ -2475,7 +2484,8 @@ function showRecordDetail(modKey, id) {
   </div>` : '';
   const canEdit=modKey==='projects'&&(!rec._shared||rec._invite_role==='editor');
   const collaborate=modKey==='projects'?`<div style="margin-top:14px;display:flex;gap:8px;justify-content:flex-end">${canEdit?`<span class="btn" onclick="editProjectBasics(${rec._id})">编辑项目</span>`:''}${rec._cloud_id&&!rec._shared?`<span class="btn" onclick="openProjectInvite('${rec._cloud_id}','${String(title).replace(/'/g,"\\'")}')">＋ 邀请协作</span>`:''}</div>${rec._shared?`<div class="pm-empty" style="margin-top:8px">这是协作项目，你的权限：${rec._invite_role==='editor'?'可编辑':'仅查看'}。</div>`:''}`:'';
-  document.getElementById('rec-det-body').innerHTML = standard + linked + collaborate;
+  const fileBlock=modKey==='assets'&&(rec.file_name||assetImages(rec).length)?`<div class="linked-case-block"><div style="font-size:11px;font-weight:700;color:#555b7a">📎 来源文件${rec.file_name?` · ${rec.file_name}`:''}</div>${assetGalleryHTML(rec)}</div>`:'';
+  document.getElementById('rec-det-body').innerHTML = standard + fileBlock + linked + collaborate;
   document.getElementById('rec-detail-modal').style.display = 'flex';
 }
 
