@@ -435,6 +435,8 @@ textarea.fta{resize:vertical;min-height:62px}
   <div class="nav" onclick="go('finance')"><span class="nav-ic">¥</span>财务生活</div>
   <div class="nav" onclick="go('ledger')"><span class="nav-ic">🐱</span>记账本</div>
   <div class="nav" onclick="go('body')"><span class="nav-ic">♡</span>身体精力</div>
+  <div class="nav-sec">系统设置</div>
+  <div class="nav" onclick="insOpenApiMo()"><span class="nav-ic">⚙</span>AI 模型设置</div>
   <div class="sb-foot">
     想法先进池 · 先完成再完美<br>
     每天留下一个可见成果<br>
@@ -476,8 +478,8 @@ textarea.fta{resize:vertical;min-height:62px}
     获取方式：登录 <a href="https://console.volcengine.com/ark" target="_blank" style="color:#5b5cf6">火山方舟控制台</a> → 左侧「API Key管理」→ 创建 API Key 复制即可。</p>
     <input class="api-key-inp" id="api-key-inp" type="password" placeholder="请粘贴 API Key（格式：xxxxx）">
     <div style="margin-bottom:.75rem">
-      <label style="font-size:12px;color:#6b7280;display:block;margin-bottom:4px">模型（默认 doubao-pro-32k-241215，也可填接入点 ID）</label>
-      <input class="api-key-inp" id="doubao-model-inp" type="text" placeholder="doubao-pro-32k-241215" style="margin-bottom:0">
+      <label style="font-size:12px;color:#6b7280;display:block;margin-bottom:4px">模型推理接入点 ID</label>
+      <input class="api-key-inp" id="doubao-model-inp" type="text" placeholder="例如：ep-20260627001043-8jvcz" style="margin-bottom:0">
     </div>
     <div style="display:flex;gap:.5rem;justify-content:flex-end">
       <span class="btn" onclick="insCloseApiMo()">取消</span>
@@ -1069,7 +1071,7 @@ function saveProfile() {
 const S = {
   get(k){return localGet('sys_'+k,[])},
   set(k,v){const before=new Map(S.get(k).map(r=>[String(r._id),JSON.stringify(stripCloudFields(r))]));localSet('sys_'+k,v);scheduleModule(k,v.filter(r=>!before.has(String(r._id))||before.get(String(r._id))!==JSON.stringify(stripCloudFields(r))))},
-  add(k,r){ const d=S.get(k); d.unshift({_id:Date.now(),...r,_createdAt:new Date().toISOString()}); S.set(k,d); },
+  add(k,r){const d=S.get(k);if(!r._id)r._id=Date.now();if(!r._createdAt)r._createdAt=new Date().toISOString();d.unshift({...r});S.set(k,d);return r;},
   del(k,id){const old=S.get(k).find(r=>r._id===id);S.set(k,S.get(k).filter(r=>r._id!==id));deleteCloudRecord(old)},
 };
 
@@ -1187,13 +1189,14 @@ function projectUploadHTML(){
   </div>`;
 }
 
-function projectDiagnosisEntryHTML(){return `<div class="diag-entry"><div class="diag-entry-head"><div class="diag-entry-icon">⌁</div><div class="diag-entry-main"><div class="diag-entry-title">YGM 项目经营诊断</div><div class="diag-entry-desc">资料读取后，由 V2.2 规则引擎识别经营模型、校验证据口径，并生成因果链、优先问题与第一动作。</div></div><span class="btn" onclick="previewFormDiagnosis()">查看诊断页</span></div><div class="diag-steps"><div class="diag-step" id="diag-form-step-source"><b>1</b>材料读取</div><div class="diag-step" id="diag-form-step-analyze"><b>2</b>经营诊断</div><div class="diag-step"><b>3</b>证据链</div><div class="diag-step"><b>4</b>优先动作</div></div></div>`;}
+function projectDiagnosisEntryHTML(){return `<div class="diag-entry"><div class="diag-entry-head"><div class="diag-entry-icon">⌁</div><div class="diag-entry-main"><div class="diag-entry-title">YGM 项目经营诊断</div><div class="diag-entry-desc">资料读取后，由 V2.2 规则引擎识别经营模型、校验证据口径，并生成因果链、优先问题与第一动作。</div></div><span class="btn" onclick="insOpenApiMo()">模型设置</span><span class="btn pri" onclick="saveProjectAndDiagnose()">保存并开始诊断</span></div><div class="diag-steps"><div class="diag-step" id="diag-form-step-source"><b>1</b>材料读取</div><div class="diag-step" id="diag-form-step-analyze"><b>2</b>经营诊断</div><div class="diag-step"><b>3</b>证据链</div><div class="diag-step"><b>4</b>优先动作</div></div></div>`;}
 
 function diagnosisShell(fileName='',text='',imageCount=0){return {version:1,status:text?'material_ready':'waiting_material',source:{file_name:fileName,char_count:text.length,image_count:imageCount,read_at:new Date().toISOString()},facts:[],data_points:[],phenomena:[],hypotheses:[],judgments:[],causal_chain:[],goal_validation:'',root_causes:[],priority_problem:'',first_action:'',validation_metrics:[],missing_evidence:[],case_links:[]};}
 function initProjectDiagnosis(fileName,text,images){const form=document.getElementById('form-projects');if(!form)return;const shell=diagnosisShell(fileName,text,(images||[]).length),json=form.querySelector('[name="diagnosis_json"]'),status=form.querySelector('[name="diagnosis_status"]');if(json)json.value=JSON.stringify(shell);if(status)status.value='材料已读取，等待诊断';renderDiagnosisFormState(shell);}
 function parseDiagnosis(raw,fallback={}){try{return typeof raw==='string'?{...fallback,...JSON.parse(raw||'{}')}:{...fallback,...(raw||{})};}catch(e){return fallback;}}
 function renderDiagnosisFormState(diag){const source=document.getElementById('diag-form-step-source'),analyze=document.getElementById('diag-form-step-analyze');if(source)source.className='diag-step '+(diag?.status&&diag.status!=='waiting_material'?'done':'');if(analyze)analyze.className='diag-step '+(diag?.status==='complete'?'done':diag?.status==='material_ready'?'active':'');}
-function previewFormDiagnosis(){const form=document.getElementById('form-projects');if(!form)return;currentDiagnosisProjectId=null;const raw=form.querySelector('[name="diagnosis_json"]')?.value,diag=parseDiagnosis(raw,diagnosisShell(form.querySelector('[name="file_name"]')?.value||'',form.querySelector('[name="file_content"]')?.value||'',assetImages({file_images:form.querySelector('[name="file_images"]')?.value}).length));showProjectDiagnosisReport(form.querySelector('[name="name"]')?.value||'未命名项目',diag);}
+function previewFormDiagnosis(){const form=document.getElementById('form-projects');if(!form)return;currentDiagnosisProjectId=editingRecord?.module==='projects'?editingRecord.id:null;const raw=form.querySelector('[name="diagnosis_json"]')?.value,diag=parseDiagnosis(raw,diagnosisShell(form.querySelector('[name="file_name"]')?.value||'',form.querySelector('[name="file_content"]')?.value||'',assetImages({file_images:form.querySelector('[name="file_images"]')?.value}).length));showProjectDiagnosisReport(form.querySelector('[name="name"]')?.value||'未命名项目',diag);}
+function saveProjectAndDiagnose(){const rec=submitForm('projects');if(!rec)return;setTimeout(()=>openProjectDiagnosis(rec._id),80);}
 
 function loadBrowserScript(src,globalName){
   if(window[globalName])return Promise.resolve(window[globalName]);
@@ -1481,6 +1484,7 @@ function submitForm(modKey, tabName) {
   editingRecord=null;
   renderPage(modKey);
   if(editing)showToast('修改已保存并同步 ✓');else postSaveHook(modKey, r);
+  return r;
 }
 
 // ─── Obsidian 同步 ────────────────────────────────────────────────
@@ -2582,7 +2586,7 @@ function showProjectDiagnosisReport(title,diag){
   document.getElementById('diag-modal-sub').textContent=`${source.file_name?`资料：${source.file_name} · `:''}${Number(source.char_count||0).toLocaleString()} 字 · ${source.image_count||0} 张图片`;
   const chain=Array.isArray(diag.causal_chain)?diag.causal_chain:[],nodes=chain.length?chain.slice(0,5):['事实/数据','中间判断','核心根因','经营目标','第一优先动作'];
   const statusText=complete?'诊断已完成，结果已随项目同步保存。':running?'YGM Agent 正在按 V2.2 规则执行诊断，请稍候…':failed?`上次诊断失败：${diag.error||'请重试'}`:'材料已读取，可以开始经营诊断。',stop=diag.stop_status||{},problemMap=diag.problem_map||{};
-  document.getElementById('project-diagnosis-body').innerHTML=`<div class="diag-status"><span class="diag-status-dot" style="background:${complete?'#10b981':failed?'#ef4444':'#f59e0b'}"></span><div class="diag-status-text">${escapeHTML(statusText)}</div><span class="db-prop ${complete?'dp-green':'dp-amber'}">${complete?'诊断完成':running?'诊断中':failed?'诊断失败':'待诊断'}</span>${currentDiagnosisProjectId?`<button class="btn btn-primary" ${running?'disabled':''} onclick="runProjectDiagnosis(currentDiagnosisProjectId)">${running?'诊断中…':complete?'重新诊断':'开始诊断'}</button>`:''}</div>
+  document.getElementById('project-diagnosis-body').innerHTML=`<div class="diag-status"><span class="diag-status-dot" style="background:${complete?'#10b981':failed?'#ef4444':'#f59e0b'}"></span><div class="diag-status-text">${escapeHTML(statusText)}</div><span class="db-prop ${complete?'dp-green':'dp-amber'}">${complete?'诊断完成':running?'诊断中':failed?'诊断失败':'待诊断'}</span><button class="btn" onclick="insOpenApiMo()">模型设置</button>${currentDiagnosisProjectId?`<button class="btn pri" ${running?'disabled':''} onclick="runProjectDiagnosis(currentDiagnosisProjectId)">${running?'诊断中…':complete?'重新诊断':'开始诊断'}</button>`:''}</div>
   <div class="diag-grid" style="margin-bottom:10px"><div class="diag-card"><div class="diag-card-title">经营模型识别</div><div class="diag-card-content">${diagValueHTML(diag.business_state)}</div></div><div class="diag-card"><div class="diag-card-title">真实经营目标</div><div class="diag-card-content">${diagValueHTML(diag.business_goal)}</div></div></div>
   <div class="diag-card full" style="margin-bottom:10px"><div class="diag-card-title">因果推理证据链</div><div class="diag-chain">${nodes.map((n,i)=>`<div class="diag-chain-node ${i===nodes.length-1?'diag-action':''}">${diagValueHTML(n,'待输出')}</div>`).join('')}</div></div>
   <div class="diag-grid"><div class="diag-card"><div class="diag-card-title">① 经营事实与数据</div><div class="diag-card-content">${diagValueHTML([...(diag.facts||[]),...(diag.data_points||[])])}</div></div><div class="diag-card"><div class="diag-card-title">② 现象、问题与待验证假设</div><div class="diag-card-content">${diagValueHTML([...(diag.phenomena||[]),...(diag.hypotheses||[])])}</div></div><div class="diag-card"><div class="diag-card-title">③ 中间判断</div><div class="diag-card-content">${diagValueHTML(diag.judgments)}</div></div><div class="diag-card"><div class="diag-card-title">④ 经营目标有效性</div><div class="diag-card-content">${diagValueHTML(diag.goal_validation)}</div></div><div class="diag-card"><div class="diag-card-title">⑤ 核心根因</div><div class="diag-card-content">${diagValueHTML(diag.root_causes)}</div></div><div class="diag-card diag-priority"><div class="diag-card-title">⑥ 第一优先问题</div><div class="diag-card-content">${diagValueHTML(diag.priority_problem)}</div></div><div class="diag-card diag-action"><div class="diag-card-title">⑦ 第一优先动作</div><div class="diag-card-content">${diagValueHTML(diag.first_action)}</div></div><div class="diag-card"><div class="diag-card-title">⑧ 验证指标</div><div class="diag-card-content">${diagValueHTML(diag.validation_metrics)}</div></div><div class="diag-card"><div class="diag-card-title">⑨ 缺失证据与待补材料</div><div class="diag-card-content">${diagValueHTML(diag.missing_evidence)}</div></div><div class="diag-card"><div class="diag-card-title">⑩ 可关联案例</div><div class="diag-card-content">${diagValueHTML(diag.case_links)}</div></div><div class="diag-card full"><div class="diag-card-title">问题分级 P0 / P1 / P2</div><div class="diag-card-content"><b>P0：</b>${diagValueHTML(problemMap.P0,'无')}<b>P1：</b>${diagValueHTML(problemMap.P1,'无')}<b>P2：</b>${diagValueHTML(problemMap.P2,'无')}</div></div>${stop.stopped?`<div class="diag-card full" style="border-color:#f59e0b"><div class="diag-card-title">诊断闸门已触发</div><div class="diag-card-content">${diagValueHTML(stop)}</div></div>`:''}<div class="diag-card full"><div class="diag-card-title">本次应用规则</div><div class="diag-card-content">${diagValueHTML(diag.applied_rules)}</div></div></div>`;document.getElementById('project-diagnosis-modal').style.display='flex';
@@ -2749,15 +2753,17 @@ function insCloseApiMo() {
 
 function insSaveApiKey() {
   const key = document.getElementById('api-key-inp').value.trim();
-  if (!key) { alert('请输入 API Key'); return; }
-  if (key.length < 10) { alert('Key 格式不对，请检查是否完整复制'); return; }
-  const model = (document.getElementById('doubao-model-inp')?.value || '').trim() || 'doubao-pro-32k-241215';
-  localSet('sys_doubao_key',key);
+  const savedKey = localGet('sys_doubao_key','');
+  if (!key && !savedKey) { alert('请输入 API Key'); return; }
+  if (key && key.length < 10) { alert('Key 格式不对，请检查是否完整复制'); return; }
+  const model = (document.getElementById('doubao-model-inp')?.value || '').trim();
+  if (!model) { alert('请输入 ep- 开头的模型推理接入点 ID'); return; }
+  localSet('sys_doubao_key',key || savedKey);
   localSet('sys_doubao_model',model);
   insCloseApiMo();
   document.getElementById('api-key-inp').value = '';
   insCheckApiKey();
-  showToast('豆包 API Key 已保存到本机浏览器 ✓ 现在可以分析文章了');
+  showToast('AI 模型配置已保存 ✓ 现在可以运行项目诊断');
 }
 
 // ─── Server酱 推送 ─────────────────────────────────────────────────
