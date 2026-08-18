@@ -2638,8 +2638,39 @@ async function repairDiagnosisResponse(apiKey,model,raw,errorMessage=''){
   const repaired=await requestArkDiagnosis(apiKey,model,[{role:'user',content:repairPrompt}],{temperature:0,jsonMode:true,maxTokens:6500});
   return parseDiagnosisResponse(repaired.answer);
 }
+function diagnosisText(value){
+  if(typeof value==='string')return value.trim();
+  if(Array.isArray(value))return value.map(diagnosisText).filter(Boolean).join('；');
+  if(value&&typeof value==='object')return String(value.text||value.claim||value.conclusion||value.action||value.question||value.item||value.primary||value.true_goal||'').trim();
+  return '';
+}
+function ensureDiagnosisExecutiveSummary(result){
+  result=result&&typeof result==='object'?result:{};
+  const original=result.executive_summary,summary=original&&typeof original==='object'&&!Array.isArray(original)?{...original}:{overall_conclusion:diagnosisText(original)};
+  const facts=[...(Array.isArray(result.facts)?result.facts:[]),...(Array.isArray(result.data_points)?result.data_points:[])].map(diagnosisText).filter(Boolean);
+  const roots=(Array.isArray(result.root_causes)?result.root_causes:[]).map(diagnosisText).filter(Boolean);
+  const missing=(Array.isArray(result.missing_evidence)?result.missing_evidence:[]).map(diagnosisText).filter(Boolean);
+  const state=diagnosisText(result.business_state?.primary)||diagnosisText(result.business_state);
+  const priority=diagnosisText(result.priority_problem)||roots[0]||diagnosisText(result.problem_map?.P0);
+  const goalGap=diagnosisText(result.business_goal?.goal_gap)||diagnosisText(result.goal_validation)||diagnosisText(result.business_goal);
+  const action=diagnosisText(result.first_action)||diagnosisText(result.provisional_action);
+  const stopped=result.status==='needs_evidence'||result.stop_status?.stopped;
+  if(!summary.current_stage)summary.current_stage=state||'已完成材料读取，进入经营问题核验阶段';
+  if(!summary.core_problem)summary.core_problem=priority||'现有材料尚不足以确认唯一核心问题';
+  if(!Array.isArray(summary.key_evidence)||!summary.key_evidence.length)summary.key_evidence=facts.slice(0,3);
+  if(!summary.why_it_matters)summary.why_it_matters=goalGap||'需要确认该问题是否直接影响当前经营目标及核心结果变量';
+  if(!summary.conclusion_boundary)summary.conclusion_boundary=stopped?(result.stop_status?.reason||`仍缺少：${missing.slice(0,2).join('；')||'可改变判断的关键证据'}`):'结论仅适用于本次上传材料覆盖的项目阶段与数据范围';
+  if(!summary.recommended_focus)summary.recommended_focus=stopped?(missing[0]||'先补齐最可能改变判断的关键事实，再确定正式动作'):(action||'围绕第一优先问题设置单一目标、责任人与验证周期');
+  if(!summary.confidence)summary.confidence=stopped?'低':(facts.length>=3?'中':'低');
+  if(!summary.overall_conclusion){
+    summary.overall_conclusion=priority
+      ?`${stopped?'初步判断':'综合判断'}：当前最需要关注的是“${priority}”。${goalGap?`它与经营目标的关系是：${goalGap}。`:''}${stopped?'该结论尚未通过证据闸门，暂不能直接作为正式行动依据。':''}`
+      :'当前资料已经完成读取，但尚未形成能够被事实与数据支持的核心经营结论。';
+  }
+  result.executive_summary=summary;return result;
+}
 function auditDiagnosisResult(result,running,rec,rules){
-  result=result&&typeof result==='object'?result:{};result.source={...(result.source||{}),...(running.source||{})};
+  result=ensureDiagnosisExecutiveSummary(result&&typeof result==='object'?result:{});result.source={...(result.source||{}),...(running.source||{})};
   const facts=Array.isArray(result.facts)?result.facts:[],roots=Array.isArray(result.root_causes)?result.root_causes:[],claims=Array.isArray(result.source_claims)?result.source_claims:[],metrics=Array.isArray(result.validation_metrics)?result.validation_metrics:[];
   const traceableFacts=facts.filter(x=>x&&typeof x==='object'&&String(x.text||'').trim()&&String(x.source||'').trim()&&String(x.source_locator||'').trim());
   const rootSupported=roots.some(x=>x&&typeof x==='object'&&Array.isArray(x.evidence)&&x.evidence.filter(Boolean).length>=2&&String(x.counter_evidence||'').trim());
@@ -2662,7 +2693,7 @@ function auditDiagnosisResult(result,running,rec,rules){
   if(!checks[3].passed)questions.push('请补充核心指标的定义、当前基线、目标值和观察周期。');
   result.quality_gate={status:passed?'passed':'needs_evidence',checks,blocked_outputs:passed?[]:['正式核心根因','正式P0结论','正式第一优先动作']};
   if(passed){result.status='complete';}
-  else{result.status='needs_evidence';result.provisional_action=result.first_action||{};result.first_action={};result.stop_status={stopped:true,reason:`诊断质量闸门未通过：${failed.map(x=>x.name).join('、')}`,minimal_questions:[...new Set(questions)].slice(0,5)};result.executive_summary={...summary,overall_conclusion:'当前材料只能形成初步判断，证据不足以完成正式诊断。',core_problem:summary.core_problem||result.priority_problem||'待补充证据后确认',conclusion_boundary:failed.map(x=>x.reason).join('；'),recommended_focus:'先补齐最可能改变判断的关键证据，再重新诊断。',confidence:'低'};}
+  else{result.status='needs_evidence';result.provisional_action=result.first_action||{};result.first_action={};result.stop_status={stopped:true,reason:`诊断质量闸门未通过：${failed.map(x=>x.name).join('、')}`,minimal_questions:[...new Set(questions)].slice(0,5)};result.executive_summary={...summary,overall_conclusion:`初步判断：${summary.core_problem||result.priority_problem||'当前核心问题仍待确认'}。由于${failed.map(x=>x.name).join('、')}未通过，目前不能把该判断当作正式诊断结论。`,core_problem:summary.core_problem||result.priority_problem||'待补充证据后确认',conclusion_boundary:failed.map(x=>x.reason).join('；'),recommended_focus:questions[0]||summary.recommended_focus||'先补齐最可能改变判断的关键证据，再重新诊断。',confidence:'低'};}
   result.applied_rules=Array.isArray(result.applied_rules)&&result.applied_rules.length?result.applied_rules:rules.map(r=>r.rule_id);if(!result.applied_rules.includes('CORE-018'))result.applied_rules.unshift('CORE-018');return result;
 }
 async function runProjectDiagnosis(id){
@@ -2708,15 +2739,15 @@ function diagValueHTML(value,empty='等待诊断 Agent 输出'){
   if(String(value||'').trim())return escapeHTML(value);
   return `<div class="diag-empty">${empty}</div>`;
 }
-function diagnosisSummaryHTML(summary){summary=summary||{};const rows=[['总体结论',summary.overall_conclusion],['当前阶段',summary.current_stage],['核心问题',summary.core_problem],['关键证据',summary.key_evidence],['经营影响',summary.why_it_matters],['结论边界',summary.conclusion_boundary],['当前应聚焦',summary.recommended_focus],['置信度',summary.confidence]];return rows.filter(([,v])=>Array.isArray(v)?v.length:String(v||'').trim()).map(([k,v])=>`<div style="margin-bottom:8px"><b style="color:#30336b">${k}：</b>${Array.isArray(v)?diagValueHTML(v):escapeHTML(v)}</div>`).join('')||'<div class="diag-empty">等待生成诊断总览</div>';}
+function diagnosisSummaryHTML(summary){summary=summary||{};const conclusion=diagnosisText(summary.overall_conclusion),rows=[['当前阶段',summary.current_stage],['核心问题',summary.core_problem],['关键证据',summary.key_evidence],['经营影响',summary.why_it_matters],['结论边界',summary.conclusion_boundary],['当前应聚焦',summary.recommended_focus],['置信度',summary.confidence]];return `${conclusion?`<div style="padding:12px 14px;margin-bottom:12px;border-radius:8px;background:#fff;border-left:4px solid #5b5cf6;font-size:13px;line-height:1.8;color:#25284b"><b>综合结论：</b>${escapeHTML(conclusion)}</div>`:''}${rows.filter(([,v])=>Array.isArray(v)?v.length:String(v||'').trim()).map(([k,v])=>`<div style="margin-bottom:8px"><b style="color:#30336b">${k}：</b>${Array.isArray(v)?diagValueHTML(v):escapeHTML(v)}</div>`).join('')}`||'<div class="diag-empty">等待生成综合诊断总结</div>';}
 function diagnosisQualityHTML(gate){const checks=Array.isArray(gate?.checks)?gate.checks:[];if(!checks.length)return '<div class="diag-empty">等待质量检查</div>';return checks.map(x=>`<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:7px"><span style="color:${x.passed?'#059669':'#e05a6a'}">${x.passed?'✓':'✕'}</span><div><b>${escapeHTML(x.name)}</b><div style="font-size:10.5px;color:#8a8fac;margin-top:2px">${escapeHTML(x.reason||'')}</div></div></div>`).join('');}
 function showProjectDiagnosisReport(title,diag){
-  diag=parseDiagnosis(diag,diagnosisShell());const complete=diag.status==='complete',running=diag.status==='running',failed=diag.status==='failed',needsEvidence=diag.status==='needs_evidence',source=diag.source||{};document.getElementById('diag-modal-title').textContent=`${title} · YGM 项目诊断`;
+  diag=ensureDiagnosisExecutiveSummary(parseDiagnosis(diag,diagnosisShell()));const complete=diag.status==='complete',running=diag.status==='running',failed=diag.status==='failed',needsEvidence=diag.status==='needs_evidence',source=diag.source||{};document.getElementById('diag-modal-title').textContent=`${title} · YGM 项目诊断`;
   document.getElementById('diag-modal-sub').textContent=`${source.file_count||source.file_name?`${source.file_count||1} 份资料 · `:''}${Number(source.char_count||0).toLocaleString()} 字 · ${source.image_count||0} 张图片`;
   const chain=Array.isArray(diag.causal_chain)?diag.causal_chain:[],nodes=chain.length?chain.slice(0,5):['事实/数据','中间判断','核心根因','经营目标','第一优先动作'];
   const statusText=complete?'诊断质量闸门已通过，结果已随项目同步保存。':needsEvidence?'已形成初步判断，但证据不足，暂不能作为正式诊断。':running?'YGM Agent 正在按 V2.3 规则执行诊断，请稍候…':failed?`上次诊断失败：${diag.error||'请重试'}`:'材料已读取，可以开始经营诊断。',stop=diag.stop_status||{},problemMap=diag.problem_map||{},needsApi=/no_api_key|api key|authentication|unauthorized/i.test(String(diag.error||''));
   document.getElementById('project-diagnosis-body').innerHTML=`<div class="diag-status"><span class="diag-status-dot" style="background:${complete?'#10b981':failed?'#ef4444':'#f59e0b'}"></span><div class="diag-status-text">${escapeHTML(statusText)}</div><span class="db-prop ${complete?'dp-green':'dp-amber'}">${complete?'诊断完成':needsEvidence?'需要补证':running?'诊断中':failed?'诊断失败':'待诊断'}</span><button class="btn" onclick="openDiagnosisApiSettings(${needsApi})">${needsApi?'重新填写 API':'模型设置'}</button>${currentDiagnosisProjectId?`<button class="btn pri" ${running?'disabled':''} onclick="runProjectDiagnosis(currentDiagnosisProjectId)">${running?'诊断中…':complete||needsEvidence?'重新诊断':'开始诊断'}</button>`:''}</div>
-  <div class="diag-card full" style="margin-bottom:10px;border:1.5px solid ${complete?'#a7f3d0':'#c7c8f8'};background:${complete?'#f0fdf4':'#fafaff'}"><div class="diag-card-title" style="font-size:13px;color:#30336b">诊断总览</div><div class="diag-card-content">${diagnosisSummaryHTML(diag.executive_summary)}</div></div>
+  <div class="diag-card full" style="margin-bottom:10px;border:1.5px solid ${complete?'#a7f3d0':'#c7c8f8'};background:${complete?'#f0fdf4':'#fafaff'}"><div class="diag-card-title" style="font-size:13px;color:#30336b">综合诊断总结</div><div class="diag-card-content">${diagnosisSummaryHTML(diag.executive_summary)}</div></div>
   <div class="diag-card full" style="margin-bottom:10px"><div class="diag-card-title">诊断质量闸门</div><div class="diag-card-content">${diagnosisQualityHTML(diag.quality_gate)}</div></div>
   <div class="diag-grid" style="margin-bottom:10px"><div class="diag-card"><div class="diag-card-title">经营模型识别</div><div class="diag-card-content">${diagValueHTML(diag.business_state)}</div></div><div class="diag-card"><div class="diag-card-title">真实经营目标</div><div class="diag-card-content">${diagValueHTML(diag.business_goal)}</div></div></div>
   <div class="diag-grid" style="margin-bottom:10px"><div class="diag-card"><div class="diag-card-title">资料原有判断及核验状态</div><div class="diag-card-content">${diagValueHTML(diag.source_claims,'未发现需要隔离的原有判断')}</div></div><div class="diag-card"><div class="diag-card-title">多材料口径冲突</div><div class="diag-card-content">${diagValueHTML(diag.source_conflicts,'未发现材料冲突')}</div></div></div>
