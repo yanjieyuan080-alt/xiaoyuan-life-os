@@ -2579,7 +2579,65 @@ function compactYgmRule(r){const c=r.compiled_rule||{};return {rule_id:r.rule_id
 function diagnosisMaterialText(rec,maxChars=12000){const raw=String(rec.file_content||'');if(raw.length<=maxChars)return raw;const blocks=raw.split(/(?=【资料\s*\d+：)/).filter(x=>x.trim());if(blocks.length<=1)return raw.slice(0,maxChars);const each=Math.max(900,Math.floor(maxChars/blocks.length));return blocks.map(x=>x.slice(0,each)).join('\n\n').slice(0,maxChars);}
 function projectDiagnosisPayload(rec){const fields=['name','priority','status','type','background','problem','goal','biz_value','org_value','growth_value','kpi','key_actions','resources','key_people','blockers','interest_bind','week1','today_step','blocker_now','risk','report','file_name'];const out={};fields.forEach(k=>{if(rec[k])out[k]=rec[k];});out.file_manifest=parseProjectManifest(rec.file_manifest).map(x=>({name:x.name,type:x.type,size:x.size,char_count:x.char_count,image_count:x.image_count}));out.file_content=diagnosisMaterialText(rec);return out;}
 function buildYgmPrompt(rec,rules){const schema={status:'complete|needs_evidence',source:{file_name:'',file_names:[],file_count:0,char_count:0,image_count:0},executive_summary:{overall_conclusion:'',current_stage:'',core_problem:'',key_evidence:[],why_it_matters:'',conclusion_boundary:'',recommended_focus:'',confidence:'高|中|低'},source_claims:[{claim:'',source:'文件名',claim_type:'问题定义|原因判断|结论|建议|目标口径',verification_status:'未验证|有事实支持|被反证',supporting_facts:[]}],source_conflicts:[{topic:'',sources:[],conflict:'',resolution_needed:''}],business_state:{primary:'',secondary:'',basis:[]},business_goal:{true_goal:'',goal_validity:'',goal_gap:''},facts:[{text:'',evidence_level:'A|B|C|D',source:'文件名',source_locator:'页码/表名/段落'}],data_points:[],phenomena:[],hypotheses:[{text:'',validation_needed:''}],judgments:[{text:'',supported_by:[],confidence:''}],causal_chain:[{stage:'事实|判断|根因|目标|动作',text:'',evidence:[]}],goal_validation:'',root_causes:[{text:'',evidence:[],counter_evidence:'',confidence:''}],priority_problem:'',problem_map:{P0:[],P1:[],P2:[]},first_action:{action:'',stage:'',single_purpose:'',target_variable:'',why_first:'',why_not_others:'',owner:'',time_window:''},validation_metrics:[{metric:'',definition:'',baseline:'',target:'',window:''}],missing_evidence:[{item:'',why_it_changes_decision:'',question:''}],stop_status:{stopped:false,reason:'',minimal_questions:[]},quality_gate:{status:'passed|needs_evidence',checks:[{name:'',passed:false,reason:''}],blocked_outputs:[]},case_links:[],applied_rules:[]};return `${YGM_AGENT_CONTRACT}\n\n【本次召回规则】\n${JSON.stringify(rules.map(compactYgmRule))}\n\n【项目资料】\n${JSON.stringify(projectDiagnosisPayload(rec))}\n\n【材料身份提醒】\n项目字段中的background、problem、goal、key_actions、report以及文件正文里的问题定义、原因、结论和建议均可能来自原项目方或自动填充，只能作为SOURCE_CLAIM等待核验。必须从各文件中的数据、记录、访谈原话、明确行为与可计算结果重新建立事实链；每条事实标注来源文件。\n\n【完成闸门】\n只有同时满足以下条件才允许status=complete：至少2条可追溯事实；核心根因至少由2条事实或2个独立中间判断支持；材料中的既有判断已进入source_claims并完成核验；至少1个验证指标具备口径、基线、目标和周期；已检查反证。任一条件不满足，必须status=needs_evidence、stop_status.stopped=true，first_action保持空对象，只输出最小补证问题。\n\n【输出JSON合同】\n${JSON.stringify(schema)}\n\n规则：先用executive_summary给出可独立阅读的诊断总览；applied_rules必须包含CORE-018并填写实际使用的其他Rule ID；不得为了填满字段而编造结论。`;}
-function parseDiagnosisResponse(raw){let s=String(raw||'').trim().replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'');const a=s.indexOf('{'),b=s.lastIndexOf('}');if(a<0||b<=a)throw new Error('诊断接口没有返回结构化结果');return JSON.parse(s.slice(a,b+1));}
+function diagnosisJsonCandidate(raw){
+  let s=String(raw||'').trim().replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'');
+  const a=s.indexOf('{'),b=s.lastIndexOf('}');
+  if(a<0||b<=a)throw new Error('诊断接口没有返回结构化结果');
+  return s.slice(a,b+1);
+}
+function sanitizeDiagnosisJson(raw){
+  let s=diagnosisJsonCandidate(raw).replace(/^\uFEFF/,'').replace(/[\u00A0\u2007\u202F]/g,' ');
+  s=s.replace(/,\s*([}\]])/g,'$1');
+  let out='',inString=false,escaped=false;
+  for(let i=0;i<s.length;i++){
+    const ch=s[i];
+    if(inString){
+      if(escaped){out+=ch;escaped=false;continue;}
+      if(ch==='\\'){out+=ch;escaped=true;continue;}
+      if(ch==='"'){inString=false;out+=ch;continue;}
+      if(ch==='\n'){out+='\\n';continue;}
+      if(ch==='\r'){out+='\\r';continue;}
+      if(ch==='\t'){out+='\\t';continue;}
+      if(ch.charCodeAt(0)<32){out+=' ';continue;}
+      out+=ch;
+    }else{
+      if(ch==='"')inString=true;
+      out+=ch;
+    }
+  }
+  return out;
+}
+function parseDiagnosisResponse(raw){
+  const candidate=diagnosisJsonCandidate(raw);
+  try{return JSON.parse(candidate);}catch(firstError){
+    try{return JSON.parse(sanitizeDiagnosisJson(candidate));}catch(secondError){
+      const err=new Error(`模型返回的诊断格式不完整：${secondError.message}`);
+      err.code='invalid_diagnosis_json';err.rawResponse=String(raw||'');err.parseError=secondError;throw err;
+    }
+  }
+}
+async function requestArkDiagnosis(apiKey,model,messages,options={}){
+  const body={model,messages,temperature:options.temperature??0.1,max_tokens:options.maxTokens||6500};
+  if(options.jsonMode!==false)body.response_format={type:'json_object'};
+  let res=await fetch(ARK_CHAT_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${apiKey}`},body:JSON.stringify(body),signal:AbortSignal.timeout(180000)}),data=await res.json().catch(()=>({}));
+  const errorMessage=String(data.error?.message||data.error||data.message||'');
+  if(!res.ok&&options.jsonMode!==false&&/response_format|json_object|unsupported|unknown parameter/i.test(errorMessage)){
+    delete body.response_format;
+    res=await fetch(ARK_CHAT_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${apiKey}`},body:JSON.stringify(body),signal:AbortSignal.timeout(180000)});data=await res.json().catch(()=>({}));
+  }
+  if(!res.ok)throw new Error(data.error?.message||data.error||data.message||`诊断请求失败（${res.status}）`);
+  const answer=data.choices?.[0]?.message?.content,finishReason=data.choices?.[0]?.finish_reason;
+  if(!answer)throw new Error('模型未返回诊断内容');
+  if(finishReason==='length'){
+    const err=new Error('诊断内容超出模型单次输出上限，系统将自动压缩重试');err.code='diagnosis_truncated';err.rawResponse=answer;throw err;
+  }
+  return {answer,data};
+}
+async function repairDiagnosisResponse(apiKey,model,raw,errorMessage=''){
+  const repairPrompt=`你是 JSON 语法修复器。下面内容是餐饮项目诊断 Agent 已生成但无法解析的 JSON。只修复缺失逗号、括号、引号转义、尾随逗号或截断字段等语法问题；不得改变已有判断，不得新增事实。只返回一个可被 JSON.parse 直接解析的 JSON 对象，不要 Markdown。\n\n解析错误：${errorMessage}\n\n待修复内容：\n${String(raw||'').slice(0,26000)}`;
+  const repaired=await requestArkDiagnosis(apiKey,model,[{role:'user',content:repairPrompt}],{temperature:0,jsonMode:true,maxTokens:6500});
+  return parseDiagnosisResponse(repaired.answer);
+}
 function auditDiagnosisResult(result,running,rec,rules){
   result=result&&typeof result==='object'?result:{};result.source={...(result.source||{}),...(running.source||{})};
   const facts=Array.isArray(result.facts)?result.facts:[],roots=Array.isArray(result.root_causes)?result.root_causes:[],claims=Array.isArray(result.source_claims)?result.source_claims:[],metrics=Array.isArray(result.validation_metrics)?result.validation_metrics:[];
@@ -2610,8 +2668,35 @@ function auditDiagnosisResult(result,running,rec,rules){
 async function runProjectDiagnosis(id){
   currentDiagnosisProjectId=id;
   const recs=S.get('projects'),idx=recs.findIndex(r=>String(r._id)===String(id));if(idx<0)return;const rec=recs[idx],apiKey=localGet('sys_doubao_key',''),model=localGet('sys_doubao_model','doubao-pro-32k-241215');if(!apiKey){insOpenApiMo();showToast('请先配置诊断模型 API Key');return;}if(!rec.file_content&&!rec.background){showToast('请先上传项目资料或填写项目背景');return;}
-  try{rec.diagnosis_status='诊断中';const running=parseDiagnosis(rec.diagnosis_json,diagnosisShell(rec.file_name||'',rec.file_content||'',assetImages(rec).length));running.status='running';rec.diagnosis_json=JSON.stringify(running);recs[idx]=rec;S.set('projects',recs);showProjectDiagnosisReport(rec.name||'未命名项目',running);const registry=await loadYgmRules(),rules=selectYgmRules(registry,JSON.stringify(projectDiagnosisPayload(rec))),prompt=buildYgmPrompt(rec,rules),res=await fetch(ARK_CHAT_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${apiKey}`},body:JSON.stringify({model,messages:[{role:'user',content:prompt}],temperature:0.1,max_tokens:5500}),signal:AbortSignal.timeout(180000)}),data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.error?.message||data.error||data.message||`诊断请求失败（${res.status}）`);const answer=data.choices?.[0]?.message?.content;if(!answer)throw new Error('模型未返回诊断内容');const result=auditDiagnosisResult(parseDiagnosisResponse(answer),running,rec,rules);rec.diagnosis_status=result.status==='complete'?'诊断完成':'待补充证据';rec.diagnosis_json=JSON.stringify(result);recs[idx]=rec;S.set('projects',recs);showProjectDiagnosisReport(rec.name||'未命名项目',result);showToast(result.status==='complete'?'YGM 项目诊断已完成并同步 ✓':'已生成初步判断，请按最小问题补充证据');}
-  catch(e){console.error(e);rec.diagnosis_status='诊断失败';const failed=parseDiagnosis(rec.diagnosis_json,diagnosisShell());failed.status='failed';failed.error=e.message;rec.diagnosis_json=JSON.stringify(failed);recs[idx]=rec;S.set('projects',recs);showProjectDiagnosisReport(rec.name||'未命名项目',failed);showToast(`诊断失败：${e.message}`);if(/no_api_key|api key|authentication|unauthorized/i.test(String(e.message||'')))setTimeout(()=>openDiagnosisApiSettings(true),120);}
+  try{
+    rec.diagnosis_status='诊断中';
+    const running=parseDiagnosis(rec.diagnosis_json,diagnosisShell(rec.file_name||'',rec.file_content||'',assetImages(rec).length));running.status='running';
+    rec.diagnosis_json=JSON.stringify(running);recs[idx]=rec;S.set('projects',recs);showProjectDiagnosisReport(rec.name||'未命名项目',running);
+    const registry=await loadYgmRules(),rules=selectYgmRules(registry,JSON.stringify(projectDiagnosisPayload(rec))),prompt=buildYgmPrompt(rec,rules);
+    let response;
+    try{response=await requestArkDiagnosis(apiKey,model,[{role:'user',content:prompt}],{jsonMode:true,maxTokens:6500});}
+    catch(requestError){
+      if(requestError.code!=='diagnosis_truncated')throw requestError;
+      const compactPrompt=`${prompt}\n\n【输出长度控制】上一次输出被截断。本次必须保留全部顶层字段，但每个数组最多输出5项、每项不超过120字；证据只保留能改变结论的内容，确保JSON完整闭合。`;
+      response=await requestArkDiagnosis(apiKey,model,[{role:'user',content:compactPrompt}],{jsonMode:true,maxTokens:6500});
+    }
+    let parsed,recoveredJson=false;
+    try{parsed=parseDiagnosisResponse(response.answer);}
+    catch(parseError){
+      if(parseError.code!=='invalid_diagnosis_json')throw parseError;
+      showToast('诊断内容已返回，正在自动修复格式…');
+      parsed=await repairDiagnosisResponse(apiKey,model,parseError.rawResponse,parseError.parseError?.message||parseError.message);
+      recoveredJson=true;
+    }
+    const result=auditDiagnosisResult(parsed,running,rec,rules);
+    result.response_meta={model,usage:response.data?.usage||{},recovered_json:recoveredJson,completed_at:new Date().toISOString()};
+    rec.diagnosis_status=result.status==='complete'?'诊断完成':'待补充证据';rec.diagnosis_json=JSON.stringify(result);recs[idx]=rec;S.set('projects',recs);showProjectDiagnosisReport(rec.name||'未命名项目',result);showToast(result.status==='complete'?'YGM 项目诊断已完成并同步 ✓':'已生成初步判断，请按最小问题补充证据');
+  }
+  catch(e){
+    console.error(e);rec.diagnosis_status='诊断失败';const failed=parseDiagnosis(rec.diagnosis_json,diagnosisShell());failed.status='failed';failed.error=e.message;failed.error_code=e.code||'';
+    if(e.rawResponse)failed.raw_response_preview=String(e.rawResponse).slice(0,1200);
+    rec.diagnosis_json=JSON.stringify(failed);recs[idx]=rec;S.set('projects',recs);showProjectDiagnosisReport(rec.name||'未命名项目',failed);showToast(`诊断失败：${e.message}`);if(/no_api_key|api key|authentication|unauthorized/i.test(String(e.message||'')))setTimeout(()=>openDiagnosisApiSettings(true),120);
+  }
 }
 
 function openDiagnosisApiSettings(resetKey=false){if(resetKey)localStorage.removeItem(storageKey('sys_doubao_key'));insOpenApiMo();const keyInp=document.getElementById('api-key-inp');if(keyInp&&!localGet('sys_doubao_key','')){keyInp.value='';keyInp.placeholder='请重新粘贴完整 API Key';}}
