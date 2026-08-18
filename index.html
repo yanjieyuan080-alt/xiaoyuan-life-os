@@ -1149,7 +1149,7 @@ function projectUploadHTML(){
     <input id="project-file-input" type="file" hidden accept=".pdf,.docx,.pptx,.xlsx,.xls,.txt,.md,.csv,.json,.html,.htm" onchange="readProjectFile(this.files[0])">
     <div class="asset-upload-ic">⇧</div><div class="asset-upload-main"><div class="asset-upload-title">上传项目资料，自动读取背景信息</div>
     <div class="asset-upload-tip">支持 PDF、Word（DOCX）、PPTX、Excel 等，最大 20MB。正文会参与场景理解和案例匹配，图片会随项目保存。</div>
-    <div class="asset-upload-status" id="project-upload-status">上传后请确认“项目背景”和“要解决的问题”，再选择关联案例。</div></div><span class="asset-upload-btn">选择文件</span>
+    <div class="asset-upload-status" id="project-upload-status">上传后将自动拆解并填充项目字段，再生成案例推荐。</div></div><span class="asset-upload-btn">选择文件</span>
   </div>`;
 }
 
@@ -1178,10 +1178,33 @@ async function readAssetFile(file){
   try{const result=await extractAssetFile(file),text=result.text||'',images=result.images||[];if(!text&&!images.length)throw new Error('没有读取到可用文字或图片');const set=(k,v)=>{const el=form.querySelector(`[name="${k}"]`);if(el)el.value=v;};const base=file.name.replace(/\.[^.]+$/,'');const name=form.querySelector('[name="name"]');if(name&&!name.value.trim())name.value=base;const content=form.querySelector('[name="content"]');if(content)content.value=text||`该文件已提取 ${images.length} 张图片预览。`;set('file_name',file.name);set('file_type',file.type||(file.name.split('.').pop()||''));set('file_size',String(file.size));set('file_images',JSON.stringify(images));if(status)status.textContent=`已读取：${file.name} · ${text.length.toLocaleString()} 字 · ${images.length} 张图片，保存后同步到云端。`;showToast(`已读取正文和 ${images.length} 张图片，请检查后保存 ✓`);}
   catch(e){if(status)status.textContent=`读取失败：${e.message}`;showToast(`读取失败：${e.message}`);}finally{box?.classList.remove('busy');}
 }
+function projectSection(text,labels,max=1400){
+  const lines=String(text||'').split(/\n+/).map(x=>x.trim()).filter(Boolean),heading=/^(项目背景|背景|项目概况|现状|核心问题|问题|痛点|挑战|目标|项目目标|目的|核心指标|指标|kpi|关键动作|行动计划|执行方案|策略|解决方案|关键资源|资源支持|关键影响人|相关角色|参与人|负责人|潜在阻力|阻力|难点|风险|利益绑定|激励机制|第一周动作|首周计划|下一步|今天第一步|汇报口径|核心结论)[：:\s]*$/i;
+  for(let i=0;i<lines.length;i++){const raw=lines[i],norm=raw.replace(/^[一二三四五六七八九十\d]+[、.．)）\s]+/,'').trim(),hit=labels.some(l=>norm.toLowerCase()===l.toLowerCase()||norm.toLowerCase().startsWith(l.toLowerCase()+'：')||norm.toLowerCase().startsWith(l.toLowerCase()+':'));if(!hit)continue;const inline=norm.replace(/^[^：:]{1,12}[：:]/,'').trim(),out=inline?[inline]:[];for(let j=i+1;j<lines.length&&out.join('\n').length<max;j++){const next=lines[j].replace(/^[一二三四五六七八九十\d]+[、.．)）\s]+/,'').trim();if(heading.test(next))break;out.push(lines[j]);}if(out.length)return out.join('\n').slice(0,max);}
+  return '';
+}
+function projectSentences(text,words,maxItems=5){return String(text||'').split(/[。！？!?\n]+/).map(x=>x.trim()).filter(x=>x.length>=6&&words.some(w=>x.toLowerCase().includes(w))).slice(0,maxItems).join('\n');}
+function autoFillProjectFields(text,fileBase,overwrite=false){
+  const form=document.getElementById('form-projects');if(!form)return [];const filled=[],put=(k,v)=>{const el=form.querySelector(`[name="${k}"]`);v=String(v||'').trim();if(el&&(overwrite||!el.value.trim())&&v){el.value=v;filled.push(MOD.projects.fields.find(f=>f.k===k)?.l||k);}};
+  const clean=cleanExtractedText(text),firstLine=clean.split('\n').map(x=>x.trim()).find(x=>x.length>=2&&x.length<=60&&!/^【第\s*\d+\s*页】$/.test(x));put('name',fileBase||firstLine);put('status','规划中');
+  put('background',projectSection(clean,['项目背景','背景','项目概况','现状'],2200)||clean.slice(0,1800));
+  put('problem',projectSection(clean,['核心问题','问题','痛点','挑战'],1400)||projectSentences(clean,['问题','痛点','不足','缺少','缺乏','无法','不能','卡点','冲突','断层','困难','挑战'],6));
+  put('goal',projectSection(clean,['项目目标','目标','目的'],700)||projectSentences(clean,['目标','提升至','达到','实现'],3));
+  put('kpi',projectSection(clean,['核心指标','指标','kpi'],700)||projectSentences(clean,['gmv','营业额','转化率','复购率','订单占比','增长率','人数','指标'],4));
+  put('key_actions',projectSection(clean,['关键动作','行动计划','执行方案','策略','解决方案'],1800)||projectSentences(clean,['动作','执行','推进','建立','搭建','开展','上线','培训','触达'],7));
+  put('resources',projectSection(clean,['关键资源','资源支持'],700)||projectSentences(clean,['需要支持','资源','预算','物料','系统支持'],3));
+  put('key_people',projectSection(clean,['关键影响人','相关角色','参与人','负责人'],700)||projectSentences(clean,['总部','加盟商','店长','店员','负责人','老板','甲方','督导'],4));
+  put('blockers',projectSection(clean,['潜在阻力','阻力','难点'],700)||projectSentences(clean,['阻力','难点','对冲','抵触','不愿意','推不动'],4));
+  put('risk',projectSection(clean,['风险'],700)||projectSentences(clean,['风险','可能导致','存在隐患'],3));
+  put('interest_bind',projectSection(clean,['利益绑定','激励机制'],700)||projectSentences(clean,['利益','激励','奖励','考核'],4));
+  put('week1',projectSection(clean,['第一周动作','首周计划'],1000));put('today_step',projectSection(clean,['下一步','今天第一步'],400));put('report',projectSection(clean,['汇报口径','核心结论'],1000));
+  const lower=clean.toLowerCase();if(!form.querySelector('[name="type"]').value){const type=/健康|减脂|饮食|运动|睡眠/.test(lower)?'健康':/财务|预算|收入|支出|记账/.test(lower)?'财务':/内容|文章|选题|账号运营|ip/.test(lower)?'内容':/管理|培训|带人|团队/.test(lower)?'能力':'职业';put('type',type);}return filled;
+}
+function refillProjectFromFile(){const form=document.getElementById('form-projects'),text=form?.querySelector('[name="file_content"]')?.value||'',name=form?.querySelector('[name="file_name"]')?.value?.replace(/\.[^.]+$/,'')||'';if(!text){showToast('请先上传项目文件');return;}if(!confirm('重新自动填充会覆盖当前表单中已填写的对应字段，是否继续？'))return;const filled=autoFillProjectFields(text,name,true);refreshProjectMatches(true);showToast(`已重新填充 ${filled.length} 个字段`);}
 async function readProjectFile(file){
   if(!file)return;if(file.size>20*1024*1024){showToast('文件不能超过 20MB');return;}
   const form=document.getElementById('form-projects'),box=document.getElementById('project-upload-box'),status=document.getElementById('project-upload-status');if(!form)return;box?.classList.add('busy');if(status)status.textContent=`正在读取「${file.name}」…`;
-  try{const result=await extractAssetFile(file),text=result.text||'',images=result.images||[];if(!text&&!images.length)throw new Error('没有读取到可用文字或图片');const set=(k,v)=>{const el=form.querySelector(`[name="${k}"]`);if(el)el.value=v;},base=file.name.replace(/\.[^.]+$/,'');const name=form.querySelector('[name="name"]'),background=form.querySelector('[name="background"]');if(name&&!name.value.trim())name.value=base;if(background&&!background.value.trim()&&text)background.value=text.slice(0,6000);set('file_name',file.name);set('file_type',file.type||(file.name.split('.').pop()||''));set('file_size',String(file.size));set('file_content',text);set('file_images',JSON.stringify(images));if(status)status.textContent=`已读取：${file.name} · ${text.length.toLocaleString()} 字 · ${images.length} 张图片。请补充或确认要解决的问题。`;refreshProjectMatches();showToast('项目资料已读取，请确认问题后保存 ✓');}
+  try{const result=await extractAssetFile(file),text=result.text||'',images=result.images||[];if(!text&&!images.length)throw new Error('没有读取到可用文字或图片');const set=(k,v)=>{const el=form.querySelector(`[name="${k}"]`);if(el)el.value=v;},base=file.name.replace(/\.[^.]+$/,'');set('file_name',file.name);set('file_type',file.type||(file.name.split('.').pop()||''));set('file_size',String(file.size));set('file_content',text);set('file_images',JSON.stringify(images));const filled=autoFillProjectFields(text,base);if(status)status.innerHTML=`已读取：${file.name} · ${text.length.toLocaleString()} 字 · ${images.length} 张图片 · 已填充 ${filled.length} 个字段。<span class="pm-refresh" style="margin-left:6px" onclick="event.stopPropagation();refillProjectFromFile()">重新自动填充</span>`;refreshProjectMatches();showToast(`项目资料已读取并自动填充 ${filled.length} 个字段 ✓`);}
   catch(e){if(status)status.textContent=`读取失败：${e.message}`;showToast(`读取失败：${e.message}`);}finally{box?.classList.remove('busy');}
 }
 function openAssetUpload(){go('assets');setTimeout(()=>{const form=document.getElementById('form-assets');if(form&&!form.classList.contains('open'))toggleForm('assets');setTimeout(()=>document.getElementById('asset-file-input')?.click(),50);},50);}
