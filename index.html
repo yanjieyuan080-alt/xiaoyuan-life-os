@@ -131,6 +131,7 @@ textarea.fta{resize:vertical;min-height:62px}
 .pm-empty{font-size:11px;color:#9ca3af;background:#fff;border:1px dashed #dfe1eb;border-radius:7px;padding:10px;text-align:center}
 .pm-status{font-size:10px;color:#8a8fac;white-space:nowrap}.pm-refresh{cursor:pointer;color:#5b5cf6}
 .linked-case-block{margin-top:14px;border-top:1px solid #ececf5;padding-top:12px}.linked-case{background:#f7f7ff;border:1px solid #e4e4fb;border-radius:7px;padding:8px 10px;margin-top:7px}
+.asset-upload{grid-column:span 2;background:#f8f9ff;border:1.5px dashed #bfc1f7;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .15s}.asset-upload:hover{background:#f0f0ff;border-color:#7779ee}.asset-upload.busy{opacity:.7;pointer-events:none}.asset-upload-ic{width:38px;height:38px;border-radius:9px;background:#e7e7ff;color:#5b5cf6;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}.asset-upload-main{flex:1;min-width:0}.asset-upload-title{font-size:12.5px;font-weight:700;color:#34375c}.asset-upload-tip{font-size:10.5px;color:#8d92aa;line-height:1.55;margin-top:2px}.asset-upload-status{font-size:11px;color:#5b5cf6;margin-top:5px;word-break:break-all}.asset-upload-btn{font-size:11px;color:#fff;background:#5b5cf6;border-radius:6px;padding:5px 10px;white-space:nowrap}
 
 /* 重点洞察 */
 .istar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
@@ -724,6 +725,9 @@ const MOD = {
       {k:'resume',l:'可写进简历',t:'sel',opts:['是','否','待评估']},
       {k:'article',l:'可变成文章',t:'sel',opts:['是','否','待评估']},
       {k:'method',l:'可变成方法论',t:'sel',opts:['是','否','待评估']},
+      {k:'file_name',l:'来源文件',t:'hidden'},
+      {k:'file_type',l:'文件类型',t:'hidden'},
+      {k:'file_size',l:'文件大小',t:'hidden'},
     ],
     listFields:['type','source_proj','use_for','status','portfolio'],
     colorMap:{status:{'草稿':'amber','可用':'green','已优化':'blue','已发布':'green'},portfolio:{是:'green',否:'',待评估:'amber'}}
@@ -1104,7 +1108,7 @@ function fieldActionBtn(modKey, fieldKey) {
 
 // ─── Generic Form ─────────────────────────────────────────────────
 function formHTML(modKey, fields) {
-  return `<div class="fgrid">${fields.map(f=>`
+  return `<div class="fgrid">${modKey==='assets'?assetUploadHTML():''}${fields.map(f=>f.t==='hidden'?`<input type="hidden" name="${f.k}">`:`
     <div class="fg ${f.cls||''}">
       <label class="fl">${f.l}${f.req?'<span style="color:#e05a6a;margin-left:2px">*</span>':''}
         ${fieldActionBtn(modKey, f.k)}
@@ -1123,6 +1127,39 @@ function formHTML(modKey, fields) {
     <span class="btn" onclick="toggleForm('${modKey}')">取消</span>
   </div>`;
 }
+
+function assetUploadHTML(){
+  return `<div class="asset-upload" id="asset-upload-box" onclick="document.getElementById('asset-file-input').click()">
+    <input id="asset-file-input" type="file" hidden accept=".pdf,.docx,.xlsx,.xls,.txt,.md,.csv,.json,.html,.htm" onchange="readAssetFile(this.files[0])">
+    <div class="asset-upload-ic">⇧</div><div class="asset-upload-main"><div class="asset-upload-title">上传文件，自动生成案例内容</div>
+    <div class="asset-upload-tip">支持 PDF、Word（DOCX）、Excel、TXT、Markdown、CSV、JSON、HTML，最大 10MB。解析出的正文会保存到云端并参与项目匹配。</div>
+    <div class="asset-upload-status" id="asset-upload-status">选择文件后，系统会自动填写资产名称和内容摘要。</div></div><span class="asset-upload-btn">选择文件</span>
+  </div>`;
+}
+
+function loadBrowserScript(src,globalName){
+  if(window[globalName])return Promise.resolve(window[globalName]);
+  return new Promise((resolve,reject)=>{const old=document.querySelector(`script[data-lib="${globalName}"]`);if(old){old.addEventListener('load',()=>resolve(window[globalName]),{once:true});old.addEventListener('error',reject,{once:true});return;}const s=document.createElement('script');s.src=src;s.dataset.lib=globalName;s.onload=()=>resolve(window[globalName]);s.onerror=()=>reject(new Error('解析组件加载失败'));document.head.appendChild(s);});
+}
+function cleanExtractedText(text){return String(text||'').replace(/\u0000/g,'').replace(/[ \t]+\n/g,'\n').replace(/\n{4,}/g,'\n\n\n').trim();}
+async function extractAssetFile(file){
+  const ext=(file.name.split('.').pop()||'').toLowerCase();
+  if(['txt','md','csv'].includes(ext))return cleanExtractedText(await file.text());
+  if(ext==='json'){const raw=await file.text();try{return JSON.stringify(JSON.parse(raw),null,2);}catch(e){return cleanExtractedText(raw);}}
+  if(['html','htm'].includes(ext)){const doc=new DOMParser().parseFromString(await file.text(),'text/html');doc.querySelectorAll('script,style,noscript').forEach(x=>x.remove());return cleanExtractedText(doc.body?.innerText||'');}
+  if(ext==='docx'){const mammoth=await loadBrowserScript('https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js','mammoth');const out=await mammoth.extractRawText({arrayBuffer:await file.arrayBuffer()});return cleanExtractedText(out.value);}
+  if(['xlsx','xls'].includes(ext)){const XLSX=await loadBrowserScript('https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js','XLSX');const wb=XLSX.read(await file.arrayBuffer(),{type:'array'});return cleanExtractedText(wb.SheetNames.map(n=>`【${n}】\n${XLSX.utils.sheet_to_csv(wb.Sheets[n])}`).join('\n\n'));}
+  if(ext==='pdf'){const pdfjsLib=await loadBrowserScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js','pdfjsLib');pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';const pdf=await pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise;const pages=[];for(let i=1;i<=pdf.numPages;i++){const page=await pdf.getPage(i),tc=await page.getTextContent();pages.push(`【第 ${i} 页】\n`+tc.items.map(x=>x.str).join(' '));}return cleanExtractedText(pages.join('\n\n'));}
+  throw new Error('暂不支持这种文件格式');
+}
+async function readAssetFile(file){
+  if(!file)return;if(file.size>10*1024*1024){showToast('文件不能超过 10MB');return;}
+  const form=document.getElementById('form-assets'),box=document.getElementById('asset-upload-box'),status=document.getElementById('asset-upload-status');if(!form)return;
+  box?.classList.add('busy');if(status)status.textContent=`正在读取「${file.name}」…`;
+  try{const text=await extractAssetFile(file);if(!text)throw new Error('没有读取到可用文字，请确认文件不是扫描图片');const set=(k,v)=>{const el=form.querySelector(`[name="${k}"]`);if(el)el.value=v;};const base=file.name.replace(/\.[^.]+$/,'');const name=form.querySelector('[name="name"]');if(name&&!name.value.trim())name.value=base;const content=form.querySelector('[name="content"]');if(content)content.value=text;set('file_name',file.name);set('file_type',file.type||(file.name.split('.').pop()||''));set('file_size',String(file.size));if(status)status.textContent=`已读取：${file.name} · ${text.length.toLocaleString()} 字，保存案例后会同步到云端。`;showToast('文件内容已读取，请检查后保存 ✓');}
+  catch(e){if(status)status.textContent=`读取失败：${e.message}`;showToast(`读取失败：${e.message}`);}finally{box?.classList.remove('busy');}
+}
+function openAssetUpload(){go('assets');setTimeout(()=>{const form=document.getElementById('form-assets');if(form&&!form.classList.contains('open'))toggleForm('assets');setTimeout(()=>document.getElementById('asset-file-input')?.click(),50);},50);}
 
 function projectMatchPanelHTML() {
   return `<div class="project-match" id="project-match-panel">
@@ -2304,6 +2341,7 @@ function renderAssetLib(kw, typeF, statusF) {
 
   document.getElementById('assetlib').innerHTML = `
     <div class="ph"><h1><span>◉</span>资产库</h1><div class="remind">快速检索你积累的所有职业资产</div></div>
+    <div class="toolbar"><span class="btn pri" onclick="openAssetUpload()">⇧ 上传文件生成案例</span><span style="font-size:11px;color:#9ca3af">上传后自动读取正文，保存后参与项目智能匹配</span></div>
     <div class="ilib-filters">
       <input class="sinput" id="alib-kw" placeholder="🔍 搜索关键词..." value="${kw||''}"
         oninput="renderAssetLib(this.value,document.getElementById('alib-type').value,document.getElementById('alib-status').value)"
