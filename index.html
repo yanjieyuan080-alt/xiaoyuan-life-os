@@ -116,6 +116,22 @@ textarea.fta{resize:vertical;min-height:62px}
 .sug-section-label{font-size:11px;font-weight:700;color:#6b7280;letter-spacing:.06em;padding:6px 2px 4px;border-bottom:1px solid #f3f4f6;margin-bottom:4px;margin-top:8px}
 .sug-section-label:first-child{margin-top:0}
 
+/* 项目案例智能匹配 */
+.project-match{grid-column:span 2;background:#fafaff;border:1px solid #dedffd;border-radius:10px;padding:14px;margin-top:4px}
+.pm-head{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}.pm-head-main{flex:1}
+.pm-title{font-size:13px;font-weight:700;color:#30336b}.pm-desc{font-size:11px;color:#8a8fac;margin-top:3px;line-height:1.6}
+.pm-scene{background:#fff;border:1px solid #ececf8;border-radius:8px;padding:9px 10px;margin-bottom:10px}
+.pm-scene-title{font-size:10px;font-weight:700;color:#9ca3af;margin-bottom:5px;letter-spacing:.06em}
+.pm-tags{display:flex;gap:5px;flex-wrap:wrap}.pm-tag{font-size:10px;color:#5b5cf6;background:#efefff;border-radius:20px;padding:2px 7px}
+.pm-group{margin-top:10px}.pm-group-title{font-size:11px;font-weight:700;color:#555b7a;margin-bottom:6px;display:flex;justify-content:space-between}
+.pm-list{display:flex;flex-direction:column;gap:7px}.pm-card{display:grid;grid-template-columns:20px 1fr;gap:8px;background:#fff;border:1px solid #e7e8f2;border-radius:8px;padding:9px 10px}
+.pm-card:has(input:checked){border-color:#8b8cf8;background:#f7f7ff}.pm-check{margin-top:2px;accent-color:#5b5cf6}
+.pm-card-title{font-size:12.5px;font-weight:700;color:#25284b;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.pm-score{font-size:9px;color:#059669;background:#ecfdf5;border-radius:20px;padding:1px 6px}.pm-reason,.pm-learn{font-size:11px;line-height:1.6;margin-top:4px}.pm-reason{color:#6b7280}.pm-learn{color:#4f52a0;background:#f5f5ff;border-radius:5px;padding:5px 7px}
+.pm-empty{font-size:11px;color:#9ca3af;background:#fff;border:1px dashed #dfe1eb;border-radius:7px;padding:10px;text-align:center}
+.pm-status{font-size:10px;color:#8a8fac;white-space:nowrap}.pm-refresh{cursor:pointer;color:#5b5cf6}
+.linked-case-block{margin-top:14px;border-top:1px solid #ececf5;padding-top:12px}.linked-case{background:#f7f7ff;border:1px solid #e4e4fb;border-radius:7px;padding:8px 10px;margin-top:7px}
+
 /* 重点洞察 */
 .istar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
 .istar-card{background:#fffbeb;border:1.5px solid #fde68a;border-radius:12px;padding:16px 18px;cursor:pointer;transition:box-shadow .15s,border-color .15s}
@@ -359,26 +375,33 @@ textarea.fta{resize:vertical;min-height:62px}
 /* 跨页面联动按钮 */
 .field-action{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#5b5cf6;background:#f0f0ff;border:1px solid #d4d4ff;border-radius:5px;padding:2px 8px;cursor:pointer;margin-bottom:4px;transition:all .12s}
 .field-action:hover{background:#e8e8ff;color:#4040cc}
-/* 访问密码锁屏 */
+/* 多用户登录 */
 .lock-screen{position:fixed;inset:0;background:#1e2040;display:flex;align-items:center;justify-content:center;z-index:9999}
-.lock-box{background:#fff;border-radius:16px;padding:2rem 2.25rem;width:320px;max-width:88vw;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.lock-box{background:#fff;border-radius:16px;padding:2rem 2.25rem;width:360px;max-width:90vw;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.35)}
 .lock-box h2{font-size:16px;color:#1e2040;margin-bottom:.25rem}
 .lock-box p{font-size:12px;color:#9ca3af;margin-bottom:1.25rem}
-.lock-inp{width:100%;padding:10px 12px;font-size:14px;border:1.5px solid #e2e4ef;border-radius:8px;text-align:center;letter-spacing:2px;margin-bottom:.75rem;font-family:inherit;box-sizing:border-box}
+.lock-inp{width:100%;padding:10px 12px;font-size:14px;border:1.5px solid #e2e4ef;border-radius:8px;text-align:left;letter-spacing:0;margin-bottom:.65rem;font-family:inherit;box-sizing:border-box}
 .lock-inp:focus{outline:none;border-color:#5b5cf6}
 .lock-err{font-size:11px;color:#e05a6a;min-height:16px;margin-bottom:.5rem}
+.auth-tabs{display:grid;grid-template-columns:1fr 1fr;background:#f3f4fb;border-radius:8px;padding:3px;margin-bottom:14px}.auth-tab{font-size:12px;color:#8a8fac;padding:7px;cursor:pointer;border-radius:6px}.auth-tab.on{background:#fff;color:#5b5cf6;font-weight:700;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.auth-note{font-size:10.5px;color:#9ca3af;line-height:1.6;margin-top:10px}.auth-user{font-size:10px;color:#7c82a0;word-break:break-all}.auth-logout{cursor:pointer;color:#e05a6a;margin-left:4px}
+.invite-row{display:grid;grid-template-columns:1fr 110px;gap:8px;margin-bottom:8px}.invite-list{margin-top:12px;display:flex;flex-direction:column;gap:6px}.invite-item{display:flex;align-items:center;gap:8px;background:#f8f9fc;border:1px solid #e8eaf0;border-radius:7px;padding:7px 9px;font-size:11px}.invite-item span:first-child{flex:1}
 </style>
 </head>
 <body>
 
-<!-- 访问密码锁屏 -->
+<!-- 账号登录 -->
 <div class="lock-screen" id="lock-screen">
   <div class="lock-box">
-    <h2>🔒 <span id="lock-title">人生经营系统</span></h2>
-    <p>请输入访问密码</p>
-    <input type="password" class="lock-inp" id="lock-inp" placeholder="密码" autocomplete="off">
+    <h2>◈ <span id="lock-title">人生经营系统</span></h2>
+    <p>每个人都有独立空间，也可以被邀请协作项目</p>
+    <div class="auth-tabs"><div class="auth-tab on" id="auth-tab-login" onclick="switchAuthMode('login')">登录</div><div class="auth-tab" id="auth-tab-signup" onclick="switchAuthMode('signup')">注册</div></div>
+    <input type="text" class="lock-inp" id="auth-name" placeholder="昵称（注册时填写）" style="display:none" autocomplete="name">
+    <input type="email" class="lock-inp" id="auth-email" placeholder="邮箱" autocomplete="email">
+    <input type="password" class="lock-inp" id="auth-password" placeholder="密码（至少 8 位）" autocomplete="current-password">
     <div class="lock-err" id="lock-err"></div>
-    <span class="btn pri" style="width:100%;justify-content:center;box-sizing:border-box" onclick="checkLockPassword()">进入</span>
+    <span class="btn pri" id="auth-submit" style="width:100%;justify-content:center;box-sizing:border-box" onclick="submitAuth()">登录</span>
+    <div class="auth-note" id="auth-note">登录后会自动读取你的个人项目、案例和记录。</div>
   </div>
 </div>
 
@@ -412,7 +435,9 @@ textarea.fta{resize:vertical;min-height:62px}
   <div class="sb-foot">
     想法先进池 · 先完成再完美<br>
     每天留下一个可见成果<br>
-    系统服务我，不是我伺候系统
+    系统服务我，不是我伺候系统<br>
+    <span id="cloud-sync-status" style="color:#9ca3af">☁ 云端未连接</span>
+    <div class="auth-user" id="auth-user-line"></div>
   </div>
 </nav>
 
@@ -455,6 +480,17 @@ textarea.fta{resize:vertical;min-height:62px}
       <span class="btn" onclick="insCloseApiMo()">取消</span>
       <span class="btn pri" onclick="insSaveApiKey()">保存并启用</span>
     </div>
+  </div>
+</div>
+
+<!-- 项目协作邀请 -->
+<div class="api-mo" id="project-invite-modal" style="display:none;align-items:flex-start;padding-top:70px">
+  <div class="api-mo-box" style="max-width:520px;width:95%">
+    <h3 id="invite-heading">邀请协作项目</h3>
+    <p style="font-size:12px;color:#6b7280;line-height:1.7;margin:7px 0 14px">对方使用受邀邮箱注册或登录后，就会看到这个项目。编辑者可以修改项目，查看者只能查看。</p>
+    <div class="invite-row"><input class="ins-input" id="invite-email" type="email" placeholder="协作者邮箱"><select class="ins-sel" id="invite-role"><option value="editor">可编辑</option><option value="viewer">仅查看</option></select></div>
+    <div class="lock-err" id="invite-error"></div><div class="invite-list" id="invite-list"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px"><span class="btn" onclick="document.getElementById('project-invite-modal').style.display='none'">关闭</span><span class="btn pri" onclick="sendProjectInvite()">发送邀请</span></div>
   </div>
 </div>
 
@@ -876,27 +912,57 @@ const MOD = {
   },
 };
 
-// ─── 访问密码保护（仅挡普通访客，不是真正的安全机制）──────────────
-const LOCK_HASH = 'a72e397e625fb71287990881c34b608971d8e2ab0c3359aba5e25a64983bcf73';
-async function sha256Hex(str) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+// ─── 多用户账号与云端数据 ────────────────────────────────────────
+const CLOUD={url:'https://wozwkpwrvuorfnasfvkx.supabase.co',key:'sb_publishable_JoztpuQppRmXrFTnRmntrw_HNVzPn8I'};
+const AUTH={mode:'login',session:null,user:null,workspaceId:null,applying:false,timers:{},inviteProjectId:null};
+function switchAuthMode(mode){
+  AUTH.mode=mode;
+  document.getElementById('auth-tab-login').classList.toggle('on',mode==='login');document.getElementById('auth-tab-signup').classList.toggle('on',mode==='signup');
+  document.getElementById('auth-name').style.display=mode==='signup'?'block':'none';document.getElementById('auth-password').autocomplete=mode==='signup'?'new-password':'current-password';
+  document.getElementById('auth-submit').textContent=mode==='signup'?'创建账号':'登录';document.getElementById('auth-note').textContent=mode==='signup'?'注册后请到邮箱完成验证，再回来登录。':'登录后会自动读取你的个人项目、案例和记录。';document.getElementById('lock-err').textContent='';
 }
-async function checkLockPassword() {
-  const inp = document.getElementById('lock-inp');
-  const err = document.getElementById('lock-err');
-  const hash = await sha256Hex(inp.value);
-  if (hash === LOCK_HASH) {
-    localStorage.setItem('sys_unlocked', '1');
-    document.getElementById('lock-screen')?.remove();
-    renderHome();
-  } else {
-    err.textContent = '密码不对，再试试';
-    inp.value = '';
-    inp.focus();
-  }
+function authHeaders(token=AUTH.session?.access_token){return {'Content-Type':'application/json','apikey':CLOUD.key,...(token?{'Authorization':`Bearer ${token}`}:{})};}
+async function authRequest(path,body){const res=await fetch(`${CLOUD.url}/auth/v1/${path}`,{method:'POST',headers:authHeaders(null),body:JSON.stringify(body)});const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.msg||data.message||data.error_description||'账号操作失败');return data;}
+async function dataRequest(path,{method='GET',body,prefer}={}){const res=await fetch(`${CLOUD.url}/rest/v1/${path}`,{method,headers:{...authHeaders(),...(prefer?{'Prefer':prefer}:{})},...(body!==undefined?{body:JSON.stringify(body)}:{})});if(res.status===204)return null;const data=await res.json().catch(()=>null);if(!res.ok)throw new Error(data?.message||data?.hint||`云端请求失败（${res.status}）`);return data;}
+function humanAuthError(msg){const s=String(msg||'');if(/invalid login credentials/i.test(s))return '邮箱或密码不正确';if(/email not confirmed/i.test(s))return '请先到邮箱完成验证';if(/already registered|already exists/i.test(s))return '这个邮箱已经注册，请直接登录';if(/rate limit/i.test(s))return '操作太频繁，请稍后再试';return s;}
+async function submitAuth(){
+  const email=document.getElementById('auth-email').value.trim().toLowerCase(),password=document.getElementById('auth-password').value,name=document.getElementById('auth-name').value.trim(),err=document.getElementById('lock-err'),btn=document.getElementById('auth-submit');err.style.color='#e05a6a';err.textContent='';
+  if(!email||!email.includes('@'))return err.textContent='请输入有效邮箱';if(password.length<8)return err.textContent='密码至少需要 8 位';if(AUTH.mode==='signup'&&!name)return err.textContent='请填写昵称';btn.textContent='请稍候…';
+  try{if(AUTH.mode==='signup'){const data=await authRequest('signup',{email,password,data:{display_name:name},email_redirect_to:location.origin+location.pathname});if(!data.access_token){switchAuthMode('login');err.style.color='#059669';err.textContent='注册成功，请查收验证邮件；验证后回到这里登录。';return;}await acceptSession(data);}else await acceptSession(await authRequest('token?grant_type=password',{email,password}));}catch(e){err.textContent=humanAuthError(e.message);}finally{btn.textContent=AUTH.mode==='signup'?'创建账号':'登录';}
 }
-document.getElementById('lock-inp')?.addEventListener('keydown', e => { if (e.key === 'Enter') checkLockPassword(); });
+document.getElementById('auth-password')?.addEventListener('keydown',e=>{if(e.key==='Enter')submitAuth();});
+function saveSession(s){AUTH.session=s;AUTH.user=s.user;localStorage.setItem('life_os_auth_session',JSON.stringify(s));}
+async function acceptSession(s){if(!s?.access_token)throw new Error('没有取得登录凭证');saveSession(s);await bootAccount();}
+async function refreshSession(){if(!AUTH.session?.refresh_token)return false;try{saveSession(await authRequest('token?grant_type=refresh_token',{refresh_token:AUTH.session.refresh_token}));return true;}catch(e){return false;}}
+async function logout(){try{await fetch(`${CLOUD.url}/auth/v1/logout`,{method:'POST',headers:authHeaders()});}catch(e){}localStorage.removeItem('life_os_auth_session');AUTH.session=null;AUTH.user=null;AUTH.workspaceId=null;location.reload();}
+function storageKey(raw){return AUTH.user?`lifeos_${AUTH.user.id}_${raw}`:raw;}function localGet(raw,fallback=null){try{const v=localStorage.getItem(storageKey(raw));return v===null?fallback:JSON.parse(v);}catch(e){return fallback;}}function localSet(raw,value){localStorage.setItem(storageKey(raw),JSON.stringify(value));}
+function stripCloudFields(rec){const out={};Object.entries(rec||{}).forEach(([k,v])=>{if(!k.startsWith('_cloud')&&!['_workspace_id','_shared','_invite_role'].includes(k))out[k]=v;});return out;}
+function cloudStatus(text,color='#9ca3af'){const el=document.getElementById('cloud-sync-status');if(el){el.textContent=text;el.style.color=color;}}
+async function ensureAccountRows(){
+  await dataRequest('life_os_profiles?on_conflict=id',{method:'POST',prefer:'resolution=merge-duplicates,return=minimal',body:{id:AUTH.user.id,display_name:AUTH.user.user_metadata?.display_name||AUTH.user.email.split('@')[0]}});
+  let rows=await dataRequest(`life_os_workspaces?owner_id=eq.${AUTH.user.id}&kind=eq.personal&select=id&limit=1`);
+  if(!rows.length){rows=await dataRequest('life_os_workspaces',{method:'POST',prefer:'return=representation',body:{owner_id:AUTH.user.id,name:'个人空间',kind:'personal'}});await dataRequest('life_os_workspace_members',{method:'POST',prefer:'return=minimal',body:{workspace_id:rows[0].id,user_id:AUTH.user.id,role:'owner'}});}AUTH.workspaceId=rows[0].id;
+}
+async function loadCloudRecords(){
+  const [rows,invites]=await Promise.all([dataRequest('life_os_records?select=id,workspace_id,module,record_key,data,created_by,updated_at&order=updated_at.desc'),dataRequest('life_os_project_invitations?select=project_id,role')]),grouped={},inviteRoles=Object.fromEntries(invites.map(i=>[i.project_id,i.role]));
+  rows.forEach(row=>{const rec={...row.data,_cloud_id:row.id,_workspace_id:row.workspace_id,_shared:row.workspace_id!==AUTH.workspaceId,_invite_role:inviteRoles[row.id]||null};(grouped[row.module]||(grouped[row.module]=[])).push(rec);});AUTH.applying=true;
+  try{Object.keys(MOD).forEach(k=>localSet('sys_'+k,grouped[k]||[]));localSet('sys_todos',grouped.__todos?.[0]?.value||[]);localSet('sys_ledger',grouped.__ledger?.[0]?.value||{records:[]});localSet('sysdb_insights',grouped.__insights?.[0]?.value||[]);if(grouped.__profile?.[0]?.value)localSet('sys_profile',grouped.__profile[0].value);}finally{AUTH.applying=false;}
+}
+function legacyValue(raw,fallback){try{const v=localStorage.getItem(raw);return v===null?fallback:JSON.parse(v);}catch(e){return fallback;}}
+async function claimLegacyDataOnce(){
+  if(localStorage.getItem('life_os_legacy_claimed_by'))return;let found=false;
+  for(const k of Object.keys(MOD)){const old=legacyValue('sys_'+k,[]);if(old.length){found=true;const merged=[...old,...S.get(k)].filter((r,i,a)=>a.findIndex(x=>String(x._id)===String(r._id))===i);S.set(k,merged);}}
+  const todos=legacyValue('sys_todos',[]);if(todos.length){found=true;TODO.save(todos);}const ledger=legacyValue('sys_ledger',{records:[]});if(ledger.records?.length){found=true;LDG.save(ledger);}const insights=legacyValue('sysdb_insights',[]);if(insights.length){found=true;localSet('sysdb_insights',insights);scheduleSingleton('__insights',insights);}const profile=legacyValue('sys_profile',null);if(profile){found=true;localSet('sys_profile',profile);scheduleSingleton('__profile',profile);}
+  localStorage.setItem('life_os_legacy_claimed_by',AUTH.user.id);if(found)showToast('已把本机原有资料迁入你的个人账号 ✓');
+}
+async function bootAccount(){cloudStatus('☁ 正在读取个人空间…','#d97706');await ensureAccountRows();await loadCloudRecords();await claimLegacyDataOnce();document.getElementById('lock-screen').style.display='none';const line=document.getElementById('auth-user-line');if(line)line.innerHTML=`${AUTH.user.email} · <span class="auth-logout" onclick="logout()">退出</span>`;cloudStatus('☁ 已同步','#059669');renderProfile();renderHome();}
+async function saveRecord(module,rec){
+  if(!AUTH.user||AUTH.applying)return;try{cloudStatus('☁ 正在同步…','#d97706');if(rec._cloud_id)await dataRequest(`life_os_records?id=eq.${rec._cloud_id}`,{method:'PATCH',prefer:'return=minimal',body:{data:stripCloudFields(rec),updated_at:new Date().toISOString()}});else{const rows=await dataRequest('life_os_records',{method:'POST',prefer:'return=representation',body:{workspace_id:AUTH.workspaceId,module,record_key:String(rec._id),data:stripCloudFields(rec),created_by:AUTH.user.id}});if(rows?.[0]){rec._cloud_id=rows[0].id;rec._workspace_id=rows[0].workspace_id;rec._shared=false;const current=S.get(module),idx=current.findIndex(x=>String(x._id)===String(rec._id));if(idx>=0){current[idx]={...current[idx],_cloud_id:rec._cloud_id,_workspace_id:rec._workspace_id,_shared:false};AUTH.applying=true;localSet('sys_'+module,current);AUTH.applying=false;}}}cloudStatus('☁ 已同步','#059669');}catch(e){console.error(e);cloudStatus('☁ 同步失败，稍后重试','#e05a6a');}
+}
+function scheduleModule(module,recs){if(!AUTH.user||AUTH.applying)return;clearTimeout(AUTH.timers[module]);AUTH.timers[module]=setTimeout(()=>Promise.all(recs.map(r=>saveRecord(module,r))),500);}
+async function deleteCloudRecord(rec){if(rec?._cloud_id)try{await dataRequest(`life_os_records?id=eq.${rec._cloud_id}`,{method:'DELETE',prefer:'return=minimal'});}catch(e){showToast(rec._shared?'协作项目不能由你删除':'云端删除失败');}}
+async function saveSingleton(module,value){const rows=await dataRequest(`life_os_records?workspace_id=eq.${AUTH.workspaceId}&module=eq.${module}&record_key=eq.main&select=id&limit=1`);if(rows.length)await dataRequest(`life_os_records?id=eq.${rows[0].id}`,{method:'PATCH',body:{data:{value},updated_at:new Date().toISOString()},prefer:'return=minimal'});else await dataRequest('life_os_records',{method:'POST',body:{workspace_id:AUTH.workspaceId,module,record_key:'main',data:{value},created_by:AUTH.user.id},prefer:'return=minimal'});}
+function scheduleSingleton(module,value){if(!AUTH.user||AUTH.applying)return;clearTimeout(AUTH.timers[module]);AUTH.timers[module]=setTimeout(()=>saveSingleton(module,value).catch(e=>{console.error(e);cloudStatus('☁ 同步失败','#e05a6a');}),600);}
 
 // ─── 行业洞察 AI 分析 / 抓取 · 后端 Worker 地址 ────────────────────
 const XY_WORKER_BASE = 'https://xiaoyuan-analyze.yanjieyuan080.workers.dev';
@@ -905,18 +971,18 @@ const ANALYZE_WORKER_URL = XY_WORKER_BASE + '/analyze';
 // ─── 系统信息（名称/主线/年度目标，可编辑）───────────────────────
 const PROFILE_DEFAULTS = {
   name: '人生经营系统',
-  subtitle: '餐饮 · 运营 · 私域 · 成长',
-  mainline: '餐饮 / 用户运营 / 私域 / 会员体系 / 加盟协同',
-  keyword: '沉淀',
+  subtitle: '项目 · 成长 · 复盘 · 沉淀',
+  mainline: '填写你的长期发展主线',
+  keyword: '成长',
   goals: [
-    '找到能让我从执行者升级到项目型/增长型人才的工作',
-    '搭建个人作品集，沉淀5个可展示案例',
-    '稳定输出行业内容，完成3篇高质量文章',
+    '明确今年最重要的发展目标',
+    '推进一个能产生真实结果的项目',
+    '持续沉淀可复用的案例与方法',
   ],
 };
 function getProfile() {
   try {
-    const saved = JSON.parse(localStorage.getItem('sys_profile') || 'null');
+    const saved = localGet('sys_profile',null);
     if (!saved) return {...PROFILE_DEFAULTS};
     return {...PROFILE_DEFAULTS, ...saved, goals: (saved.goals && saved.goals.length) ? saved.goals : PROFILE_DEFAULTS.goals};
   } catch(e) { return {...PROFILE_DEFAULTS}; }
@@ -946,7 +1012,8 @@ function saveProfile() {
   const mainline = document.getElementById('profile-mainline-inp').value.trim() || PROFILE_DEFAULTS.mainline;
   const keyword = document.getElementById('profile-keyword-inp').value.trim() || PROFILE_DEFAULTS.keyword;
   const goals = document.getElementById('profile-goals-inp').value.split('\n').map(s=>s.trim()).filter(Boolean);
-  localStorage.setItem('sys_profile', JSON.stringify({name, subtitle, mainline, keyword, goals: goals.length ? goals : PROFILE_DEFAULTS.goals}));
+  const profile={name, subtitle, mainline, keyword, goals: goals.length ? goals : PROFILE_DEFAULTS.goals};
+  localSet('sys_profile',profile);scheduleSingleton('__profile',profile);
   document.getElementById('profile-modal').style.display = 'none';
   renderProfile();
   if (currentPage === 'home') renderHome();
@@ -955,10 +1022,10 @@ function saveProfile() {
 
 // ─── Storage ──────────────────────────────────────────────────────
 const S = {
-  get(k){ try{return JSON.parse(localStorage.getItem('sys_'+k)||'[]')}catch(e){return []} },
-  set(k,v){ localStorage.setItem('sys_'+k, JSON.stringify(v)) },
+  get(k){return localGet('sys_'+k,[])},
+  set(k,v){const before=new Map(S.get(k).map(r=>[String(r._id),JSON.stringify(stripCloudFields(r))]));localSet('sys_'+k,v);scheduleModule(k,v.filter(r=>!before.has(String(r._id))||before.get(String(r._id))!==JSON.stringify(stripCloudFields(r))))},
   add(k,r){ const d=S.get(k); d.unshift({_id:Date.now(),...r,_createdAt:new Date().toISOString()}); S.set(k,d); },
-  del(k,id){ S.set(k, S.get(k).filter(r=>r._id!==id)); },
+  del(k,id){const old=S.get(k).find(r=>r._id===id);S.set(k,S.get(k).filter(r=>r._id!==id));deleteCloudRecord(old)},
 };
 
 // ─── Navigation ──────────────────────────────────────────────────
@@ -1049,11 +1116,138 @@ function formHTML(modKey, fields) {
         : `<div class="voice-wrap"><input class="fi has-voice" type="text" name="${f.k}" id="vta-${f.k}"><span class="voice-btn" id="vbtn-${f.k}" onclick="voiceToggle('${f.k}')" title="语音输入">🎤</span><span class="voice-tip">点击语音输入</span></div>`
       }
     </div>`).join('')}
+    ${modKey==='projects' ? projectMatchPanelHTML() : ''}
   </div>
   <div class="factions">
     <span class="btn pri" onclick="submitForm('${modKey}')">保存记录</span>
     <span class="btn" onclick="toggleForm('${modKey}')">取消</span>
   </div>`;
+}
+
+function projectMatchPanelHTML() {
+  return `<div class="project-match" id="project-match-panel">
+    <div class="pm-head">
+      <div class="pm-head-main"><div class="pm-title">🔗 相关案例智能匹配</div><div class="pm-desc">填写“项目背景”和“要解决的问题”后，系统会理解项目场景，并分别匹配你的案例与成功案例。勾选后会和项目一起保存。</div></div>
+      <span class="pm-status pm-refresh" onclick="refreshProjectMatches(true)">重新匹配</span>
+    </div>
+    <div id="project-match-body" class="pm-empty">至少填写项目背景和要解决的问题，系统才会开始匹配。</div>
+  </div>`;
+}
+
+const PROJECT_SCENES = [
+  {name:'餐饮品牌', words:['餐饮','茶饮','奶茶','果茶','火锅','海鲜','门店','品牌']},
+  {name:'连锁/加盟', words:['连锁','加盟','加盟商','总部','督导','大区']},
+  {name:'私域经营', words:['私域','企微','企业微信','社群','朋友圈']},
+  {name:'会员体系', words:['会员','会员体系','储值','积分','权益','用户资产']},
+  {name:'拉新获客', words:['拉新','获客','新增用户','加企微','进群','裂变']},
+  {name:'复购留存', words:['复购','留存','召回','沉睡','生命周期','消费频次','ltv']},
+  {name:'小程序', words:['小程序','点单','pos','渠道','堂食']},
+  {name:'新店增长', words:['新店','开业','冷启动','首月','开店']},
+  {name:'门店执行', words:['门店执行','店员','店长','收银','话术','培训','执行不稳定','落地']},
+  {name:'组织协同', words:['组织','协同','利益','考核','指标对冲','推动','认知差异','利益绑定']},
+  {name:'数据增长', words:['数据','gmv','营业额','订单','转化率','复购率','会员订单占比']},
+  {name:'品牌诊断', words:['诊断','根因','经营问题','优先级','解决路径']},
+  {name:'内容/IP', words:['内容','文章','ip','选题','发布']},
+  {name:'团队管理', words:['管理','带人','实习生','任务分配','冲突']}
+];
+
+let projectMatchTimer = null;
+let currentProjectMatches = [];
+
+function projectFormData() {
+  const el = document.getElementById('form-projects');
+  if (!el) return {};
+  const data = {};
+  MOD.projects.fields.forEach(f=>{ const i=el.querySelector(`[name="${f.k}"]`); data[f.k]=i?.value?.trim()||''; });
+  return data;
+}
+
+function sceneText(data) {
+  return ['name','type','background','problem','goal','biz_value','org_value','kpi','key_actions','resources','key_people','blockers','interest_bind']
+    .map(k=>data[k]).filter(Boolean).join(' ').toLowerCase();
+}
+
+function detectProjectScenes(text) {
+  return PROJECT_SCENES.filter(s=>s.words.some(w=>text.includes(w.toLowerCase()))).map(s=>s.name);
+}
+
+function usefulTerms(text) {
+  const stop = new Set(['项目','问题','需要','目前','通过','进行','实现','提升','相关','当前','一个','以及','没有','形成','验证','路径','效果']);
+  const latin = text.toLowerCase().match(/[a-z0-9]{2,}/g)||[];
+  const known = PROJECT_SCENES.flatMap(s=>s.words).filter(w=>text.toLowerCase().includes(w.toLowerCase()));
+  const chunks = text.split(/[\s，,。；;、：:（）()\/\-]+/).map(x=>x.trim().toLowerCase()).filter(x=>x.length>=2&&x.length<=12&&!stop.has(x));
+  return [...new Set([...known,...latin,...chunks])];
+}
+
+function isSuccessCase(item) {
+  return ['已发布','已优化'].includes(item.status) || item.portfolio==='是' || item.resume==='是';
+}
+
+function caseMatchResult(item, projectText, projectScenes, kind) {
+  const hay = [item.name,item.type,item.source_proj,item.source_event,item.content,item.use_for,item.next_opt].filter(Boolean).join(' ').toLowerCase();
+  const caseScenes = detectProjectScenes(hay);
+  const sharedScenes = projectScenes.filter(s=>caseScenes.includes(s));
+  const terms = usefulTerms(projectText).filter(t=>hay.includes(t)).slice(0,6);
+  let score = sharedScenes.length*12 + terms.length*4;
+  if (item.type==='项目案例') score += 5;
+  if (kind==='success') score += 4;
+  if (!score) return null;
+  const reasonParts=[];
+  if (sharedScenes.length) reasonParts.push(`同属${sharedScenes.slice(0,4).join('、')}场景`);
+  if (terms.length) reasonParts.push(`共同涉及“${terms.slice(0,4).join('、')}”`);
+  const focus = sharedScenes.includes('门店执行') ? '门店动作、培训传导和执行检查方式'
+    : sharedScenes.includes('组织协同') ? '角色利益、协同机制和项目推动路径'
+    : sharedScenes.includes('复购留存') ? '用户分层、复购抓手和验证指标'
+    : sharedScenes.includes('拉新获客') ? '拉新入口、利益点和转化链路'
+    : sharedScenes.includes('会员体系') ? '会员权益、用户资产沉淀和经营指标'
+    : sharedScenes.includes('数据增长') ? '指标设计、数据口径和结果验证方式'
+    : '问题拆解、执行步骤和复盘结论';
+  const evidence = (item.content||item.next_opt||item.use_for||'').replace(/\s+/g,' ').trim();
+  const learning = `重点参考该案例的${focus}${evidence?`；案例中可直接回看：${evidence.slice(0,72)}${evidence.length>72?'…':''}`:''}`;
+  return {id:item._id,kind,name:item.name||'未命名案例',score,reason:reasonParts.join('；'),learning,status:item.status||'',type:item.type||''};
+}
+
+function buildProjectMatches(data) {
+  const text=sceneText(data); const scenes=detectProjectScenes(text); const assets=S.get('assets');
+  const success=[]; const mine=[];
+  assets.forEach(item=>{
+    const kind=isSuccessCase(item)?'success':'mine';
+    const result=caseMatchResult(item,text,scenes,kind);
+    if (result) (kind==='success'?success:mine).push(result);
+  });
+  const sort=a=>a.sort((x,y)=>y.score-x.score).slice(0,5);
+  return {scenes,success:sort(success),mine:sort(mine)};
+}
+
+function matchCardHTML(m) {
+  const checked=currentProjectMatches.some(x=>String(x.id)===String(m.id));
+  const payload=encodeURIComponent(JSON.stringify(m));
+  return `<label class="pm-card"><input class="pm-check" type="checkbox" data-case="${payload}" ${checked?'checked':''} onchange="captureProjectMatchSelection()"><div>
+    <div class="pm-card-title">${m.name}<span class="pm-score">相关度 ${Math.min(99,m.score)}%</span>${m.type?`<span class="db-prop dp-blue">${m.type}</span>`:''}</div>
+    <div class="pm-reason"><b>为什么相关：</b>${m.reason}</div>
+    <div class="pm-learn"><b>可借鉴：</b>${m.learning}</div>
+  </div></label>`;
+}
+
+function matchGroupHTML(title,items,empty) {
+  return `<div class="pm-group"><div class="pm-group-title"><span>${title}</span><span>${items.length} 条</span></div>${items.length?`<div class="pm-list">${items.map(matchCardHTML).join('')}</div>`:`<div class="pm-empty">${empty}</div>`}</div>`;
+}
+
+function refreshProjectMatches(force=false) {
+  const body=document.getElementById('project-match-body'); if(!body)return;
+  const data=projectFormData();
+  if(!data.background||!data.problem){ body.className='pm-empty'; body.innerHTML='至少填写项目背景和要解决的问题，系统才会开始匹配。'; return; }
+  const result=buildProjectMatches(data);
+  body.className='';
+  const sceneHTML=result.scenes.length?result.scenes.map(s=>`<span class="pm-tag">${s}</span>`).join(''):'<span style="font-size:11px;color:#9ca3af">暂未识别出明确业务场景，请补充品牌类型、用户阶段、门店问题或经营目标。</span>';
+  body.innerHTML=`<div class="pm-scene"><div class="pm-scene-title">系统理解的项目场景</div><div class="pm-tags">${sceneHTML}</div></div>`+
+    matchGroupHTML('🏆 成功案例',result.success,'没有找到达到成功案例标准的相关内容。')+
+    matchGroupHTML('◈ 我的案例',result.mine,'没有找到相关的个人案例，请继续补充案例库或完善项目描述。');
+  if(force) showToast(`已重新匹配：${result.success.length} 条成功案例，${result.mine.length} 条我的案例`);
+}
+
+function captureProjectMatchSelection() {
+  currentProjectMatches=[...document.querySelectorAll('#project-match-body input[data-case]:checked')].map(i=>JSON.parse(decodeURIComponent(i.dataset.case)));
 }
 
 function epSelect(el, key) {
@@ -1067,7 +1261,10 @@ function toggleForm(modKey, tabName) {
   if (!el) return;
   const wasOpen = el.classList.contains('open');
   el.classList.toggle('open');
-  if (!wasOpen) formAutoFill(modKey, tabName, el);
+  if (!wasOpen) {
+    if (modKey==='projects') currentProjectMatches=[];
+    formAutoFill(modKey, tabName, el);
+  }
 }
 
 function formAutoFill(modKey, tabName, el) {
@@ -1109,6 +1306,16 @@ function formAutoFill(modKey, tabName, el) {
       if (top1 && !top1.value) top1.value = yRec.tomorrow;
     }
   }
+
+  if (modKey === 'projects') {
+    const watch=['name','type','background','problem','goal','biz_value','org_value','kpi','key_actions','resources','key_people','blockers','interest_bind'];
+    watch.forEach(k=>{
+      const inp=el.querySelector(`[name="${k}"]`); if(!inp)return;
+      inp.addEventListener('input',()=>{ clearTimeout(projectMatchTimer); projectMatchTimer=setTimeout(()=>refreshProjectMatches(),450); });
+      inp.addEventListener('change',()=>{ clearTimeout(projectMatchTimer); projectMatchTimer=setTimeout(()=>refreshProjectMatches(),150); });
+    });
+    refreshProjectMatches();
+  }
 }
 
 function submitForm(modKey, tabName) {
@@ -1125,12 +1332,18 @@ function submitForm(modKey, tabName) {
   });
   if (tabName) r._tab = tabName;
   if (req.length) { alert('请填写：' + req.join('、')); return; }
+  if (modKey==='projects') {
+    captureProjectMatchSelection();
+    r.related_cases=currentProjectMatches;
+    r.scene_tags=detectProjectScenes(sceneText(r));
+  }
   S.add(modKey, r);
   el.classList.remove('open');
   el.querySelectorAll('input,select,textarea').forEach(i=>i.value='');
   // reset emoji pickers
   el.querySelectorAll('.ep-item').forEach(i=>i.classList.remove('on'));
   el.querySelectorAll('.emoji-picker input[type=hidden]').forEach(i=>i.value='');
+  if (modKey==='projects') currentProjectMatches=[];
   renderPage(modKey);
   postSaveHook(modKey, r);
 }
@@ -1150,7 +1363,8 @@ function toObsidianMd(modKey, r) {
 
   if (modKey === 'projects') {
     const path = `03-项目/${date}-${safeName}.md`;
-    const content = `---\ntags: [project]\ncreated: ${date}\nstatus: ${r.status||''}\npriority: ${r.priority||''}\n---\n\n# ${r.name||''}\n\n## 目标\n${r.goal||''}\n\n## 今日第一步\n${r.today_step||''}\n\n## 当前推进\n${r.scope||''}\n\n## 最终资产\n${r.final_asset||''}\n`;
+    const related=(r.related_cases||[]).map(c=>`### ${c.kind==='success'?'成功案例':'我的案例'} · ${c.name}\n- 相关原因：${c.reason}\n- 可借鉴：${c.learning}`).join('\n\n');
+    const content = `---\ntags: [project]\ncreated: ${date}\nstatus: ${r.status||''}\npriority: ${r.priority||''}\n---\n\n# ${r.name||''}\n\n## 项目背景\n${r.background||''}\n\n## 要解决的问题\n${r.problem||''}\n\n## 目标\n${r.goal||''}\n\n## 今天第一步\n${r.today_step||''}\n\n## 关联案例\n${related||'暂未关联'}\n\n## 最终资产\n${r.final_asset||''}\n`;
     return {path, content};
   }
   if (modKey === 'assets') {
@@ -1173,21 +1387,7 @@ function postSaveHook(modKey, r) {
     if (ob) obsidianWrite(ob.path, ob.content);
   }
 
-  // 项目池 → 新增时自动检索相关洞察、资产库、想法池
-  if (modKey==='projects') {
-    const keywords = [r.name, r.goal, r.scope, r.category]
-      .filter(Boolean).join(' ').toLowerCase().split(/[\s，,、]+/).filter(k=>k.length>1);
-    const match = (fields) => (item) => {
-      const hay = fields.map(f=>item[f]).filter(Boolean).join(' ').toLowerCase();
-      return keywords.some(k=>hay.includes(k));
-    };
-    const ins    = S.get('insights').filter(match(['title','tags','summary','key_points','my_take']));
-    const assets = S.get('assets').filter(match(['name','type','content','use_for','source_proj']));
-    const ideas  = S.get('ideas').filter(match(['title','content','type','next','future_asset']));
-    if (ins.length || assets.length || ideas.length) {
-      showProjectSuggestion(r.name, ins, assets, ideas);
-    }
-  }
+  // 项目案例已在填写过程中完成匹配与选择，并随项目记录持久化。
   // 项目池 → 状态"已完成/已复盘" 提示存入资产库
   if (modKey==='projects' && ['已完成','已复盘','已沉淀'].includes(r.status) && r.final_asset) {
     if (confirm(`项目「${r.name}」已完成，要把最终资产存入资产库吗？`)) {
@@ -1242,9 +1442,9 @@ function recordRow(modKey, rec, colFields) {
   }).join('');
   return `<tr>
     <td><div class="db-title-cell">
-      <span class="db-title-text" title="${title}">${title}</span>
+      <span class="db-title-text" title="${title}" ${modKey==='projects'?`style="cursor:pointer;color:#5b5cf6" onclick="showRecordDetail('projects',${rec._id})"`:''}>${title}${modKey==='projects'&&rec._shared?' <span class="db-prop dp-purple">协作</span>':''}</span>
       <span class="db-actions">
-        <span class="btn danger" style="padding:2px 8px;font-size:11px" onclick="delRecord('${modKey}',${rec._id})">删除</span>
+        ${rec._shared?'':`<span class="btn danger" style="padding:2px 8px;font-size:11px" onclick="delRecord('${modKey}',${rec._id})">删除</span>`}
       </span>
     </div></td>
     ${cells}
@@ -1586,7 +1786,7 @@ async function qqmPlayIdx(idx) {
     audio.src = url;
     audio.play();
     // save for restore
-    localStorage.setItem('sys_qqm_meta', JSON.stringify({id:s.id, name:s.name, artist:s.artist, cover:s.cover}));
+    localSet('sys_qqm_meta',{id:s.id, name:s.name, artist:s.artist, cover:s.cover});
   } catch(e) {
     resEl && (resEl.innerHTML = `<div class="qqm-empty">加载失败：${e.message}</div>`);
   }
@@ -1617,7 +1817,7 @@ function qqmSeek(e) {
 }
 
 function qqmInit() {
-  const meta = JSON.parse(localStorage.getItem('sys_qqm_meta') || 'null');
+  const meta = localGet('sys_qqm_meta',null);
   if (meta) {
     const inp = document.getElementById('qqm-inp');
     if (inp) inp.placeholder = `上次播放：${meta.name} — ${meta.artist||''}`;
@@ -1815,7 +2015,7 @@ function insSave() {
 function insCheckApiKey() {
   const banner = document.getElementById('ins-api-banner');
   const btn = document.getElementById('ins-analyze-btn');
-  const hasKey = !!localStorage.getItem('sys_doubao_key');
+  const hasKey = !!localGet('sys_doubao_key','');
   if (hasKey) {
     if (banner) banner.style.display = 'none';
     if (btn) btn.style.display = 'inline-block';
@@ -1854,8 +2054,8 @@ async function insAnalyze() {
   if (!text || text.length < 50) {
     alert('请先抓取文章内容或粘贴原文'); return;
   }
-  const apiKey = localStorage.getItem('sys_doubao_key') || '';
-  const model = localStorage.getItem('sys_doubao_model') || 'doubao-pro-32k-241215';
+  const apiKey = localGet('sys_doubao_key','');
+  const model = localGet('sys_doubao_model','doubao-pro-32k-241215');
   if (!apiKey) {
     insOpenApiMo();
     return;
@@ -2020,7 +2220,7 @@ function insDetailSave() {
     apply_to:   document.getElementById('ins-det-apply').value.trim(),
     starred:    document.getElementById('ins-det-starred').checked,
   });
-  localStorage.setItem('sysdb_insights', JSON.stringify(all));
+  S.set('insights',all);
   insCloseDetail();
   if (document.getElementById('insights').classList.contains('active')) renderInsights();
   if (document.getElementById('inslib').classList.contains('active')) renderInsightLib();
@@ -2220,15 +2420,43 @@ function showRecordDetail(modKey, id) {
   const fields = mod.fields || [];
   const title = rec[mod.titleField] || rec.title || rec.name || '详情';
   document.getElementById('rec-det-heading').textContent = `${mod.icon||''} ${title}`;
-  document.getElementById('rec-det-body').innerHTML = fields
+  const standard = fields
     .filter(f=>rec[f.k])
     .map(f=>`
       <div style="margin-bottom:10px">
         <div style="font-size:10px;font-weight:700;color:#9ca3af;letter-spacing:.06em;margin-bottom:3px">${f.l.toUpperCase()}</div>
         <div style="font-size:13px;color:#1e2040;line-height:1.7;white-space:pre-wrap;background:#f8f9ff;border-radius:6px;padding:7px 10px">${rec[f.k]}</div>
       </div>`).join('');
+  const linked = modKey==='projects' ? `<div class="linked-case-block">
+    <div style="font-size:11px;font-weight:700;color:#555b7a">🔗 已关联案例（${(rec.related_cases||[]).length}）</div>
+    ${(rec.related_cases||[]).length ? rec.related_cases.map(c=>`<div class="linked-case">
+      <div style="font-size:12.5px;font-weight:700;color:#25284b">${c.kind==='success'?'🏆 成功案例':'◈ 我的案例'} · ${c.name}</div>
+      <div style="font-size:11px;color:#6b7280;line-height:1.6;margin-top:4px"><b>相关原因：</b>${c.reason}</div>
+      <div style="font-size:11px;color:#4f52a0;line-height:1.6;margin-top:3px"><b>可借鉴：</b>${c.learning}</div>
+    </div>`).join('') : '<div class="pm-empty" style="margin-top:7px">这个项目还没有关联案例。</div>'}
+  </div>` : '';
+  const canEdit=modKey==='projects'&&(!rec._shared||rec._invite_role==='editor');
+  const collaborate=modKey==='projects'?`<div style="margin-top:14px;display:flex;gap:8px;justify-content:flex-end">${canEdit?`<span class="btn" onclick="editProjectBasics(${rec._id})">编辑项目</span>`:''}${rec._cloud_id&&!rec._shared?`<span class="btn" onclick="openProjectInvite('${rec._cloud_id}','${String(title).replace(/'/g,"\\'")}')">＋ 邀请协作</span>`:''}</div>${rec._shared?`<div class="pm-empty" style="margin-top:8px">这是协作项目，你的权限：${rec._invite_role==='editor'?'可编辑':'仅查看'}。</div>`:''}`:'';
+  document.getElementById('rec-det-body').innerHTML = standard + linked + collaborate;
   document.getElementById('rec-detail-modal').style.display = 'flex';
 }
+
+function editProjectBasics(id){
+  const all=S.get('projects'),idx=all.findIndex(r=>r._id===id);if(idx<0)return;const rec=all[idx];
+  const background=prompt('项目背景',rec.background||'');if(background===null)return;const problem=prompt('要解决的问题',rec.problem||'');if(problem===null)return;const status=prompt('项目状态（想法中 / 规划中 / 推进中 / 卡住了 / 已完成 / 已复盘 / 已沉淀）',rec.status||'规划中');if(status===null)return;
+  rec.background=background.trim();rec.problem=problem.trim();rec.status=status.trim()||rec.status;all[idx]=rec;S.set('projects',all);document.getElementById('rec-detail-modal').style.display='none';renderPage('projects');showToast('项目已更新并同步 ✓');
+}
+
+async function openProjectInvite(projectId,title){AUTH.inviteProjectId=projectId;document.getElementById('invite-heading').textContent=`邀请协作「${title}」`;document.getElementById('invite-email').value='';document.getElementById('invite-error').textContent='';document.getElementById('project-invite-modal').style.display='flex';await loadProjectInvites();}
+async function loadProjectInvites(){
+  const box=document.getElementById('invite-list');box.innerHTML='<div class="pm-empty">正在读取邀请…</div>';
+  try{const rows=await dataRequest(`life_os_project_invitations?project_id=eq.${AUTH.inviteProjectId}&select=id,invited_email,role,created_at&order=created_at.desc`);box.innerHTML=rows.length?rows.map(x=>`<div class="invite-item"><span>${x.invited_email}</span><b>${x.role==='editor'?'可编辑':'仅查看'}</b><span class="auth-logout" onclick="removeProjectInvite('${x.id}')">移除</span></div>`).join(''):'<div class="pm-empty">还没有邀请协作者。</div>';}catch(e){box.innerHTML='<div class="pm-empty">邀请列表读取失败</div>';}
+}
+async function sendProjectInvite(){
+  const email=document.getElementById('invite-email').value.trim().toLowerCase(),role=document.getElementById('invite-role').value,err=document.getElementById('invite-error');err.textContent='';if(!email||!email.includes('@'))return err.textContent='请输入有效邮箱';if(email===AUTH.user.email.toLowerCase())return err.textContent='不需要邀请自己';
+  try{await dataRequest('life_os_project_invitations',{method:'POST',prefer:'return=minimal',body:{project_id:AUTH.inviteProjectId,invited_email:email,role,invited_by:AUTH.user.id}});document.getElementById('invite-email').value='';showToast('协作邀请已创建 ✓');await loadProjectInvites();}catch(e){err.textContent=/duplicate/i.test(e.message)?'这个邮箱已经受邀':e.message;}
+}
+async function removeProjectInvite(id){try{await dataRequest(`life_os_project_invitations?id=eq.${id}`,{method:'DELETE',prefer:'return=minimal'});await loadProjectInvites();}catch(e){showToast('移除失败');}}
 
 function showProjectSuggestion(projName, insights, assets, ideas) {
   const typeColors = {'行业趋势':'dp-blue','数据报告':'dp-purple','竞品分析':'dp-amber','用户研究':'dp-green','政策解读':'dp-accent','方法论':'dp-blue','案例分析':'dp-green','其他':'dp-default'};
@@ -2285,7 +2513,7 @@ function insToggleStar(id) {
   const idx = all.findIndex(r=>r._id===id);
   if (idx===-1) return;
   all[idx].starred = !all[idx].starred;
-  localStorage.setItem('sysdb_insights', JSON.stringify(all));
+  S.set('insights',all);
   const active = document.querySelector('.page.active');
   if (active && active.id==='inslib') renderInsightLib(
     document.getElementById('ilib-kw')?.value,
@@ -2327,8 +2555,8 @@ function renderInsightStar() {
 
 function insOpenApiMo() {
   document.getElementById('api-key-modal').style.display = 'flex';
-  const savedKey = localStorage.getItem('sys_doubao_key') || '';
-  const savedModel = localStorage.getItem('sys_doubao_model') || '';
+  const savedKey = localGet('sys_doubao_key','');
+  const savedModel = localGet('sys_doubao_model','');
   if (savedKey) {
     document.getElementById('api-key-inp').placeholder = savedKey.slice(0,12) + '... (已配置，输入新 Key 以更换)';
   }
@@ -2345,8 +2573,8 @@ function insSaveApiKey() {
   if (!key) { alert('请输入 API Key'); return; }
   if (key.length < 10) { alert('Key 格式不对，请检查是否完整复制'); return; }
   const model = (document.getElementById('doubao-model-inp')?.value || '').trim() || 'doubao-pro-32k-241215';
-  localStorage.setItem('sys_doubao_key', key);
-  localStorage.setItem('sys_doubao_model', model);
+  localSet('sys_doubao_key',key);
+  localSet('sys_doubao_model',model);
   insCloseApiMo();
   document.getElementById('api-key-inp').value = '';
   insCheckApiKey();
@@ -2422,8 +2650,8 @@ async function todoNotifyWeChat() {
 
 // ─── 任务待办 ──────────────────────────────────────────────────────
 const TODO = {
-  get: () => JSON.parse(localStorage.getItem('sys_todos')||'[]'),
-  save: (d) => localStorage.setItem('sys_todos', JSON.stringify(d)),
+  get: () => localGet('sys_todos',[]),
+  save: (d) => {localSet('sys_todos',d);scheduleSingleton('__todos',d)},
   add: (t) => { const d=TODO.get(); t.id='todo_'+Date.now(); t.createdAt=new Date().toISOString(); d.unshift(t); TODO.save(d); },
   toggle: (id) => { const d=TODO.get(); const t=d.find(x=>x.id===id); if(t) t.done=!t.done; TODO.save(d); },
   del: (id) => { TODO.save(TODO.get().filter(x=>x.id!==id)); },
@@ -2871,8 +3099,8 @@ const LEDGER_CATS = {
 };
 
 const LDG = {
-  get: () => JSON.parse(localStorage.getItem('sys_ledger')||'{"records":[]}'),
-  save: (d) => localStorage.setItem('sys_ledger', JSON.stringify(d)),
+  get: () => localGet('sys_ledger',{records:[]}),
+  save: (d) => {localSet('sys_ledger',d);scheduleSingleton('__ledger',d)},
   add: (rec) => { const d=LDG.get(); rec.id='ldg_'+Date.now(); rec.createdAt=new Date().toISOString(); d.records.unshift(rec); LDG.save(d); },
   del: (id) => { const d=LDG.get(); d.records=d.records.filter(r=>r.id!==id); LDG.save(d); },
 };
@@ -3276,13 +3504,14 @@ function pomoSwitch() {
 }
 
 // ─── Init ─────────────────────────────────────────────────────────
-renderProfile();
-if (localStorage.getItem('sys_unlocked') === '1') {
-  document.getElementById('lock-screen')?.remove();
-  renderHome();
-} else {
-  document.getElementById('lock-inp')?.focus();
+async function initApp(){
+  const hash=new URLSearchParams(location.hash.replace(/^#/,''));
+  if(hash.get('access_token')){const payload=JSON.parse(atob(hash.get('access_token').split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));const session={access_token:hash.get('access_token'),refresh_token:hash.get('refresh_token'),expires_in:Number(hash.get('expires_in')||3600),token_type:'bearer',user:{id:payload.sub,email:payload.email,user_metadata:payload.user_metadata||{}}};history.replaceState(null,'',location.pathname+location.search);await acceptSession(session);return;}
+  const saved=localStorage.getItem('life_os_auth_session');
+  if(saved){try{AUTH.session=JSON.parse(saved);AUTH.user=AUTH.session.user;if(await refreshSession())await bootAccount();else localStorage.removeItem('life_os_auth_session');}catch(e){console.error(e);localStorage.removeItem('life_os_auth_session');}}
+  renderProfile();document.getElementById('auth-email')?.focus();
 }
+initApp();
 </script>
 </body>
 </html>
