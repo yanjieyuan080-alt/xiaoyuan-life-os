@@ -457,6 +457,7 @@ body > .main{min-width:0;width:100%}
 }
 @media (prefers-reduced-motion:reduce){body > .sb{transition:none}}
 
+.qqm-official-link{flex-shrink:0;font-size:10px;padding:5px 8px;text-decoration:none}@media(max-width:767px){.qqm-item{flex-wrap:wrap}.qqm-info{flex-basis:calc(100% - 65px)}.qqm-official-link{margin-left:46px;min-height:36px}}
 </style>
 </head>
 <body>
@@ -1932,7 +1933,7 @@ function renderHome() {
         <input class="qqm-inp" id="qqm-inp" placeholder="搜索歌曲、歌手、专辑…" onkeydown="if(event.key==='Enter')qqmSearch()">
         <span class="btn" onclick="qqmSearch()" style="flex-shrink:0;background:#e05a6a;color:#fff;border-color:#e05a6a">搜索</span>
       </div>
-      <div id="qqm-results"></div>
+      <div style="font-size:11px;color:#9ca3af;line-height:1.6;margin:8px 0">支持搜索与可用曲目播放；受限歌曲可在网易云打开。</div><div id="qqm-results"></div>
       <div id="qqm-player" class="qqm-player">
         <img id="qqm-pl-cover" class="qqm-pl-cover" src="" alt="">
         <div class="qqm-pl-info">
@@ -1951,7 +1952,7 @@ function renderHome() {
           <div class="qqm-pl-time" id="qqm-time">0:00 / 0:00</div>
         </div>
       </div>
-      <audio id="qqm-audio" onended="qqmNext()" ontimeupdate="qqmTick()" onplay="qqmOnPlay()" onpause="qqmOnPause()"></audio>
+      <audio id="qqm-audio" onerror="showToast('音频暂时无法播放，可点击「网易云打开」')" onended="qqmNext()" ontimeupdate="qqmTick()" onplay="qqmOnPlay()" onpause="qqmOnPause()"></audio>
     </div>
     <div class="sec-title">番茄钟</div>
     <div class="pomodoro" id="pomo-widget">
@@ -1990,90 +1991,110 @@ function _qqmFmt(s) {
   return Math.floor(s/60) + ':' + String(Math.floor(s%60)).padStart(2,'0');
 }
 
+
+const MUSIC_API = CLOUD.url + '/functions/v1/life-os-music';
+let _qqmSearchVersion = 0, _qqmPlayVersion = 0;
+async function musicRequest(path, retry=true) {
+  if (!AUTH.session?.access_token) throw new Error('请先登录后使用音乐');
+  const res = await fetch(MUSIC_API + path, {headers:authHeaders(),signal:AbortSignal.timeout(20000)});
+  if (res.status===401 && retry && await refreshSession()) return musicRequest(path,false);
+  const data = await res.json().catch(()=>null);
+  if (!res.ok) throw new Error(data?.message || '音乐服务暂不可用（'+res.status+'）');
+  if (!data || (data.code!==undefined && Number(data.code)!==200)) throw new Error('音乐接口返回异常，请稍后重试');
+  return data;
+}
+function musicErrorMessage(error) {
+  if (error?.name==='TimeoutError'||error?.name==='AbortError') return '音乐服务响应超时，请稍后重试';
+  if (/failed to fetch|network/i.test(String(error?.message))) return '暂时无法连接音乐服务，请检查网络后重试';
+  return error?.message || '音乐服务暂不可用，请稍后重试';
+}
+
+
 async function qqmSearch() {
   const q = (document.getElementById('qqm-inp')?.value || '').trim();
   if (!q) return;
   const resEl = document.getElementById('qqm-results');
-  resEl.innerHTML = `<div class="qqm-empty">搜索中…</div>`;
+  if (!resEl) return;
+  const version=++_qqmSearchVersion;
+  resEl.innerHTML='<div class="qqm-empty" role="status">搜索中…</div>';
+  _qqmList=[];_qqmIdx=-1;
   try {
-    const res = await fetch(`https://broad-rain-0c22.yanjieyuan080.workers.dev/search?keywords=${encodeURIComponent(q)}&limit=20`);
-    const data = await res.json();
-    const songs = data?.result?.songs || [];
-    if (!songs.length) { resEl.innerHTML = `<div class="qqm-empty">未找到"${q}"相关歌曲</div>`; return; }
-
-    // fetch covers via song/detail (batch)
-    const ids = songs.map(s=>s.id).join(',');
-    const det = await fetch(`https://broad-rain-0c22.yanjieyuan080.workers.dev/song/detail?ids=${ids}`).then(r=>r.json()).catch(()=>({songs:[]}));
-    const coverMap = {};
-    (det.songs||[]).forEach(s => { coverMap[s.id] = s.al?.picUrl || ''; });
-
-    _qqmList = songs.map(s => ({
-      id: s.id,
-      name: s.name,
-      artist: (s.artists||[]).map(a=>a.name).join(' / '),
-      album: s.album?.name || '',
-      cover: coverMap[s.id] || '',
-      fee: s.fee || 0,
+    const data = await musicRequest('/search?keywords='+encodeURIComponent(q)+'&limit=20');
+    if (version!==_qqmSearchVersion || !resEl.isConnected) return;
+    if (!data.result || typeof data.result!=='object') throw new Error('音乐搜索返回异常，请稍后重试');
+    const songs = data.result.songs || [];
+    if (!Array.isArray(songs)) throw new Error('音乐搜索返回异常，请稍后重试');
+    if (!songs.length) { resEl.innerHTML='<div class="qqm-empty">未找到“'+escapeHTML(q)+'”相关歌曲，可加上歌手名再试</div>'; return; }
+    const ids=songs.map(s=>s.id).join(',');
+    const det=await musicRequest('/song/detail?ids='+encodeURIComponent(ids)).catch(()=>({songs:[]}));
+    if (version!==_qqmSearchVersion || !resEl.isConnected) return;
+    const coverMap={};
+    (det.songs||[]).forEach(s=>{coverMap[s.id]=s.al?.picUrl||s.album?.picUrl||'';});
+    _qqmList=songs.filter(s=>/^\d{1,15}$/.test(String(s.id))).map(s=>({
+      id:s.id,name:s.name||'未命名歌曲',
+      artist:(s.artists||s.ar||[]).map(a=>a.name).join(' / '),
+      album:s.album?.name||s.al?.name||'',cover:coverMap[s.id]||s.album?.picUrl||s.al?.picUrl||'',fee:s.fee||0
     }));
-
-    resEl.innerHTML = _qqmList.map((s,i) => `
+    resEl.innerHTML=_qqmList.map((s,i)=>`
       <div class="qqm-item" id="qqm-item-${s.id}" onclick="qqmPlayIdx(${i})">
-        <img class="qqm-cover" src="${s.cover}?param=68y68" onerror="this.style.background='#f0f2f7'" alt="">
-        <div class="qqm-info">
-          <div class="qqm-sname">${s.name}</div>
-          <div class="qqm-singer">${s.artist}${s.album?' · '+s.album:''}</div>
-        </div>
+        <img class="qqm-cover" src="${escapeHTML(s.cover? s.cover.replace(/^http:/,'https:')+'?param=68y68':'')}" onerror="this.style.background='#f0f2f7'" alt="">
+        <div class="qqm-info"><div class="qqm-sname">${escapeHTML(s.name)}</div><div class="qqm-singer">${escapeHTML(s.artist)}${s.album?' · '+escapeHTML(s.album):''}</div></div>
         ${s.fee===1?'<span class="qqm-vip">VIP</span>':''}
+        <a class="btn qqm-official-link" href="https://music.163.com/#/song?id=${s.id}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">网易云打开</a>
       </div>`).join('');
   } catch(e) {
-    resEl.innerHTML = `<div class="qqm-empty">搜索失败：${e.message}</div>`;
+    if (version===_qqmSearchVersion && resEl.isConnected) resEl.innerHTML='<div class="qqm-empty" role="alert">'+escapeHTML(musicErrorMessage(e))+'</div>';
   }
 }
+
 
 async function qqmPlayIdx(idx) {
-  if (idx < 0 || idx >= _qqmList.length) return;
-  _qqmIdx = idx;
-  const s = _qqmList[idx];
-
-  // highlight row
-  document.querySelectorAll('.qqm-item').forEach(el => el.classList.remove('playing'));
-  const row = document.getElementById('qqm-item-' + s.id);
-  if (row) { row.classList.add('playing'); row.scrollIntoView({block:'nearest'}); }
-
-  // update player bar
-  const player = document.getElementById('qqm-player');
-  document.getElementById('qqm-pl-cover').src = s.cover ? s.cover+'?param=88y88' : '';
-  document.getElementById('qqm-pl-name').textContent = s.name;
-  document.getElementById('qqm-pl-artist').textContent = s.artist;
-  if (player) player.classList.add('on');
-
-  // get play URL
+  if (idx<0 || idx>=_qqmList.length) return;
+  const version=++_qqmPlayVersion, s=_qqmList[idx], audio=document.getElementById('qqm-audio');
+  if (!audio) return;
+  _qqmIdx=idx;audio.pause();audio.removeAttribute('src');audio.load();
+  document.querySelectorAll('.qqm-item').forEach(el=>el.classList.remove('playing'));
+  const row=document.getElementById('qqm-item-'+s.id);
+  if(row){row.classList.add('playing');row.scrollIntoView({block:'nearest'});}
+  document.getElementById('qqm-player')?.classList.add('on');
+  document.getElementById('qqm-pl-cover').src=s.cover?s.cover.replace(/^http:/,'https:')+'?param=88y88':'';
+  document.getElementById('qqm-pl-name').textContent=s.name;
+  document.getElementById('qqm-pl-artist').textContent=s.artist;
+  document.getElementById('qqm-bar').style.width='0%';
+  document.getElementById('qqm-time').textContent='正在加载…';
   try {
-    const urlRes = await fetch(`https://broad-rain-0c22.yanjieyuan080.workers.dev/song/url?id=${s.id}`);
-    const urlData = await urlRes.json();
-    const url = urlData?.data?.[0]?.url;
-    if (!url) {
-      alert(`「${s.name}」暂无版权或需要登录会员，已自动跳到下一首`);
-      qqmNext(); return;
+    const data=await musicRequest('/song/url?id='+s.id);
+    if(version!==_qqmPlayVersion||!audio.isConnected)return;
+    const url=data.data?.[0]?.url;
+    if(!url){
+      document.getElementById('qqm-time').textContent='请在网易云播放';
+      showToast('这首歌没有可用播放地址，可点击「网易云打开」');
+      return;
     }
-    const audio = document.getElementById('qqm-audio');
-    audio.src = url;
-    audio.play();
-    // save for restore
-    localSet('sys_qqm_meta',{id:s.id, name:s.name, artist:s.artist, cover:s.cover});
-  } catch(e) {
-    resEl && (resEl.innerHTML = `<div class="qqm-empty">加载失败：${e.message}</div>`);
+    const parsed=new URL(url);
+    if(!['https:','http:'].includes(parsed.protocol))throw new Error('播放地址无效');
+    parsed.protocol='https:';
+    audio.src=parsed.href;
+    await audio.play();
+    localSet('sys_qqm_meta',{id:s.id,name:s.name,artist:s.artist,cover:s.cover});
+  }catch(e){
+    if(version!==_qqmPlayVersion||!audio.isConnected)return;
+    document.getElementById('qqm-time').textContent='播放失败';
+    const message=e?.name==='NotAllowedError'?'浏览器未允许自动播放，请点击播放按钮':musicErrorMessage(e);
+    showToast(message);
   }
 }
-
-function qqmToggle() {
-  const a = document.getElementById('qqm-audio');
-  a.paused ? a.play() : a.pause();
+async function qqmToggle() {
+  const a=document.getElementById('qqm-audio');
+  if(!a)return;
+  if(!a.getAttribute('src')){if(_qqmIdx>=0)await qqmPlayIdx(_qqmIdx);else showToast('请先搜索并选择歌曲');return;}
+  try{if(a.paused)await a.play();else a.pause();}catch(e){showToast('浏览器暂时无法播放，可点击「网易云打开」');}
 }
+
 function qqmOnPlay()  { document.getElementById('qqm-playbtn').textContent = '⏸'; }
 function qqmOnPause() { document.getElementById('qqm-playbtn').textContent = '▶'; }
 function qqmPrev() { if (_qqmIdx > 0) qqmPlayIdx(_qqmIdx - 1); }
-function qqmNext() { if (_qqmIdx < _qqmList.length - 1) qqmPlayIdx(_qqmIdx + 1); }
+function qqmNext() { if (_qqmIdx >= 0 && _qqmIdx < _qqmList.length - 1) qqmPlayIdx(_qqmIdx + 1); }
 
 function qqmTick() {
   const a = document.getElementById('qqm-audio');
